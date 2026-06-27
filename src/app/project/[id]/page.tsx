@@ -296,14 +296,12 @@ export default function ProjectPage() {
             )}
 
             {activeTab === "procurement" && (
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 fade-up">
-                <div className="lg:col-span-2">
-                  <BOMPanel
-                    bom={project.bom}
-                    error={retrying.bom ? "Retrying…" : errors.bom}
-                    onRetry={errors.bom ? () => handleRetry("bom", "bom") : undefined}
-                  />
-                </div>
+              <div className="w-full fade-up">
+                <BOMPanel
+                  bom={project.bom}
+                  error={retrying.bom ? "Retrying…" : errors.bom}
+                  onRetry={errors.bom ? () => handleRetry("bom", "bom") : undefined}
+                />
               </div>
             )}
 
