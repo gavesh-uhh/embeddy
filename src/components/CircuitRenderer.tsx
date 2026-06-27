@@ -474,7 +474,24 @@ export default function CircuitRenderer({ schematic, error, onRetry }: Props) {
 
   const handleExport = () => {
     if (!stageRef.current) return;
-    const dataURL = stageRef.current.toDataURL({ pixelRatio: 2 });
+    const stage = stageRef.current;
+    const oldScale = stage.scale();
+    const oldPos = stage.position();
+    stage.scale({ x: 1, y: 1 });
+    stage.position({ x: 0, y: 0 });
+    const layer = stage.getLayers()[0];
+    if (!layer) return;
+    const clientRect = layer.getClientRect();
+    const padding = 30;
+    const dataURL = stage.toDataURL({
+      x: clientRect.x - padding,
+      y: clientRect.y - padding,
+      width: clientRect.width + padding * 2,
+      height: clientRect.height + padding * 2,
+      pixelRatio: 2
+    });
+    stage.scale(oldScale);
+    stage.position(oldPos);
     const a = document.createElement("a");
     a.href = dataURL;
     a.download = "circuit-schematic.png";
