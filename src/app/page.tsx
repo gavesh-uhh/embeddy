@@ -5,6 +5,28 @@ import { useRouter } from "next/navigation";
 import { parseFile } from "@/lib/parsePDF";
 import { saveProject } from "@/lib/projectStore";
 import { ProjectData, BoardType } from "@/lib/types";
+import {
+  Cpu,
+  Zap,
+  GitBranch,
+  ShieldAlert,
+  Wrench,
+  Code2,
+  Bot,
+  PinIcon,
+  ShoppingCart,
+  ArrowRight,
+  Upload,
+  FileText,
+  X,
+  Loader2,
+  Plus,
+  ArrowLeft,
+  Sparkles,
+  BookOpen,
+  HelpCircle,
+  CheckCircle2,
+} from "lucide-react";
 
 const BOARDS: BoardType[] = [
   "Arduino Uno",
@@ -15,9 +37,38 @@ const BOARDS: BoardType[] = [
   "STM32F4",
 ];
 
+const FEATURES = [
+  { icon: Zap,          label: "Circuit Schematic",  desc: "Interactive canvas" },
+  { icon: PinIcon,      label: "Pin Diagram",         desc: "Signal-typed wiring" },
+  { icon: Zap,          label: "Power Budget",        desc: "Current draw analysis" },
+  { icon: ShoppingCart, label: "BOM + Sourcing",      desc: "Estimated LKR costs" },
+  { icon: ShieldAlert,  label: "Safety Analysis",     desc: "Voltage conflict flags" },
+  { icon: Wrench,       label: "Compatibility",       desc: "Board + component check" },
+  { icon: Code2,        label: "Code Skeleton",       desc: "Compilable starter code" },
+  { icon: Bot,          label: "9 AI Agents",         desc: "Running in parallel" },
+];
+
+const EXAMPLES = [
+  {
+    title: "IoT Weather Monitor",
+    board: "ESP32" as BoardType,
+    description: "An ESP32-based weather station. Reads temperature and humidity from a DHT22 sensor, displays the data on an I2C OLED (SSD1306) screen, and transmits measurements over Wi-Fi.",
+  },
+  {
+    title: "Automatic Plant Watering",
+    board: "Arduino Uno" as BoardType,
+    description: "Arduino Uno system with a capacitive soil moisture sensor, a 5V relay driving a mini submersible water pump, and indicator LEDs showing status (soil wet/dry).",
+  },
+  {
+    title: "4-Axis Robotic Arm Control",
+    board: "STM32F4" as BoardType,
+    description: "STM32F4 based 4-axis robotic arm controller. Uses four servo motors controlled via PWM, reading positions from dual analog joystick inputs and using UART for debugging.",
+  },
+];
+
 export default function Home() {
   const router = useRouter();
-  const [showModal, setShowModal] = useState(false);
+  const [showForm, setShowForm] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [files, setFiles] = useState<File[]>([]);
@@ -42,36 +93,33 @@ export default function Home() {
     setFiles(dropped);
   };
 
+  const loadExample = (ex: typeof EXAMPLES[0]) => {
+    setForm({
+      title: ex.title,
+      board: ex.board,
+      description: ex.description,
+    });
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.title.trim() || !form.description.trim()) {
       setError("Title and description are required.");
       return;
     }
-
     setLoading(true);
     setError(null);
-
     try {
-      // Parse uploaded files client-side
       const fileContents = await Promise.all(files.map(parseFile));
-
       const res = await fetch("/api/project/create", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          title: form.title,
-          board: form.board,
-          description: form.description,
-          fileContents,
-        }),
+        body: JSON.stringify({ title: form.title, board: form.board, description: form.description, fileContents }),
       });
-
       if (!res.ok) {
         const err = await res.json();
         throw new Error(err.error || "Failed to create project");
       }
-
       const project: ProjectData = await res.json();
       saveProject(project);
       router.push(`/project/${project.id}`);
@@ -81,269 +129,412 @@ export default function Home() {
     }
   };
 
+  if (showForm) {
+    return (
+      <div className="h-screen flex flex-col overflow-hidden" style={{ background: "var(--bg)" }}>
+        <nav
+          className="flex-shrink-0 flex items-center justify-between px-8 py-3.5 border-b"
+          style={{ borderColor: "var(--border)", background: "var(--surface)" }}
+        >
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => { if (!loading) setShowForm(false); }}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all"
+              style={{ border: "1px solid var(--border)", color: "var(--text-muted)" }}
+              onMouseEnter={e => {
+                e.currentTarget.style.color = "var(--text-primary)";
+                e.currentTarget.style.borderColor = "var(--border-bright)";
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.color = "var(--text-muted)";
+                e.currentTarget.style.borderColor = "var(--border)";
+              }}
+              disabled={loading}
+            >
+              <ArrowLeft size={13} />
+              Back
+            </button>
+            <span style={{ color: "var(--border)" }}>|</span>
+            <div className="flex items-center gap-2">
+              <Cpu size={14} style={{ color: "var(--accent)" }} />
+              <span className="font-bold text-sm tracking-tight" style={{ color: "var(--text-primary)" }}>
+                New Design Pipeline
+              </span>
+            </div>
+          </div>
+          <span className="text-xs px-2.5 py-0.5 rounded font-bold tracking-wider" style={{ background: "#00ff6610", color: "var(--accent)", border: "1px solid #00ff6620" }}>
+            AI DESIGN ENGINE ACTIVE
+          </span>
+        </nav>
+
+        <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 min-h-0 overflow-hidden">
+          <div className="lg:col-span-7 p-8 lg:p-12 overflow-y-auto h-full flex flex-col justify-center" style={{ borderRight: "1px solid var(--border)" }}>
+            <div className="max-w-xl mx-auto w-full space-y-5">
+              <div>
+                <h1 className="text-2xl font-bold mb-1" style={{ color: "var(--text-primary)", fontFamily: "Outfit, sans-serif" }}>
+                  Create New Project
+                </h1>
+                <p className="text-xs" style={{ color: "var(--text-muted)" }}>
+                  Provide hardware details below to start the multi-agent design generation.
+                </p>
+              </div>
+
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div>
+                  <label className="panel-header block mb-1.5">Project Title</label>
+                  <input
+                    id="project-title-input"
+                    type="text"
+                    value={form.title}
+                    onChange={(e) => setForm({ ...form, title: e.target.value })}
+                    placeholder="e.g. Temperature Monitor with OLED"
+                    disabled={loading}
+                    className="w-full px-4 py-2.5 rounded-lg text-sm outline-none transition-all"
+                    style={{ background: "var(--surface-raised)", border: "1px solid var(--border-bright)", color: "var(--text-primary)", fontFamily: "Outfit, sans-serif" }}
+                    onFocus={e => (e.currentTarget.style.borderColor = "#00ff6650")}
+                    onBlur={e => (e.currentTarget.style.borderColor = "var(--border-bright)")}
+                  />
+                </div>
+
+                <div>
+                  <label className="panel-header block mb-1.5">Target Board</label>
+                  <div className="grid grid-cols-3 gap-2">
+                    {BOARDS.map((b) => (
+                      <button
+                        key={b}
+                        type="button"
+                        id={`board-btn-${b.replace(/\s+/g, "-").toLowerCase()}`}
+                        onClick={() => setForm({ ...form, board: b })}
+                        disabled={loading}
+                        className="flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-lg text-xs font-medium transition-all"
+                        style={{
+                          border: `1px solid ${form.board === b ? "#00ff6650" : "var(--border-bright)"}`,
+                          background: form.board === b ? "#00ff6612" : "var(--surface-raised)",
+                          color: form.board === b ? "var(--accent)" : "var(--text-muted)",
+                          boxShadow: form.board === b ? "0 0 12px rgba(0,255,102,0.1)" : "none",
+                        }}
+                      >
+                        <Cpu size={11} strokeWidth={2} />
+                        {b}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <label className="panel-header block mb-1.5">Project Description</label>
+                  <textarea
+                    id="project-description-input"
+                    value={form.description}
+                    onChange={(e) => setForm({ ...form, description: e.target.value })}
+                    placeholder="Describe your embedded system project — components, sensors, displays, motors, connectivity needs, etc."
+                    disabled={loading}
+                    rows={4}
+                    className="w-full px-4 py-2.5 rounded-lg text-sm outline-none resize-none transition-all"
+                    style={{ background: "var(--surface-raised)", border: "1px solid var(--border-bright)", color: "var(--text-primary)", fontFamily: "Outfit, sans-serif" }}
+                    onFocus={e => (e.currentTarget.style.borderColor = "#00ff6650")}
+                    onBlur={e => (e.currentTarget.style.borderColor = "var(--border-bright)")}
+                  />
+                </div>
+
+                <div>
+                  <label className="panel-header block mb-1.5">Supporting Documents (optional, max 2)</label>
+                  <div
+                    className="relative rounded-lg border-2 border-dashed p-4 text-center cursor-pointer transition-all"
+                    style={{ borderColor: "var(--border-bright)", background: "var(--surface-raised)" }}
+                    onDrop={handleDrop}
+                    onDragOver={(e) => e.preventDefault()}
+                    onClick={() => !loading && fileInputRef.current?.click()}
+                    onMouseEnter={e => (e.currentTarget.style.borderColor = "#00ff6640")}
+                    onMouseLeave={e => (e.currentTarget.style.borderColor = "var(--border-bright)")}
+                  >
+                    <input ref={fileInputRef} type="file" id="file-upload-input" accept=".pdf,.txt" multiple className="hidden" onChange={handleFileChange} disabled={loading} />
+                    {files.length > 0 ? (
+                      <div className="space-y-1">
+                        {files.map((f, i) => (
+                          <div key={i} className="text-xs flex items-center justify-center gap-2" style={{ color: "var(--accent)" }}>
+                            <FileText size={12} /> {f.name}
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="flex flex-col items-center gap-1.5">
+                        <Upload size={16} style={{ color: "var(--text-muted)" }} />
+                        <span className="text-xs font-medium" style={{ color: "var(--text-primary)" }}>Upload component data sheets</span>
+                        <span className="text-[10px]" style={{ color: "var(--text-muted)" }}>Supports PDF or TXT up to 2MB</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {error && (
+                  <div className="rounded-lg p-3 text-xs flex items-center gap-2"
+                    style={{ background: "var(--accent-red-glow)", color: "var(--accent-red)", border: "1px solid #ff3b3b30" }}>
+                    <ShieldAlert size={13} /> {error}
+                  </div>
+                )}
+
+                <button
+                  type="submit"
+                  id="create-project-submit-btn"
+                  disabled={loading}
+                  className="w-full py-3 rounded-lg font-bold text-sm flex items-center justify-center gap-2 transition-all"
+                  style={{
+                    background: loading ? "var(--surface-raised)" : "var(--accent)",
+                    color: loading ? "var(--text-muted)" : "#000",
+                    cursor: loading ? "not-allowed" : "pointer",
+                    boxShadow: loading ? "none" : "0 0 24px var(--accent-glow-strong)",
+                  }}
+                >
+                  {loading ? (
+                    <><Loader2 size={15} className="animate-spin" /> Running AI Pipeline (30-60s)…</>
+                  ) : (
+                    <>Generate Project Infrastructure <ArrowRight size={15} strokeWidth={2.5} /></>
+                  )}
+                </button>
+              </form>
+            </div>
+          </div>
+
+          <div className="lg:col-span-5 p-8 lg:p-12 overflow-y-auto h-full flex flex-col justify-start space-y-6" style={{ background: "var(--surface)" }}>
+            <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                <BookOpen size={16} style={{ color: "var(--accent)" }} />
+                <h3 className="font-bold text-xs tracking-wide uppercase" style={{ color: "var(--text-primary)", fontFamily: "Outfit, sans-serif" }}>
+                  Prompting Guide
+                </h3>
+              </div>
+              <div className="rounded-xl border p-4 space-y-3.5" style={{ borderColor: "var(--border)", background: "#050505" }}>
+                <div className="flex gap-3">
+                  <span className="text-xs px-2 py-0.5 rounded h-fit font-bold" style={{ background: "#00ff6615", color: "var(--accent)", border: "1px solid #00ff6625" }}>1</span>
+                  <div>
+                    <h4 className="text-xs font-semibold mb-0.5" style={{ color: "var(--text-primary)" }}>State components clearly</h4>
+                    <p className="text-[11px] leading-relaxed" style={{ color: "var(--text-muted)" }}>Include parts like "SSD1306 OLED screen" or "DHT11 sensor" so AI knows exactly what to route.</p>
+                  </div>
+                </div>
+                <div className="flex gap-3">
+                  <span className="text-xs px-2 py-0.5 rounded h-fit font-bold" style={{ background: "#00ff6615", color: "var(--accent)", border: "1px solid #00ff6625" }}>2</span>
+                  <div>
+                    <h4 className="text-xs font-semibold mb-0.5" style={{ color: "var(--text-primary)" }}>Define logic thresholds</h4>
+                    <p className="text-[11px] leading-relaxed" style={{ color: "var(--text-muted)" }}>Operational guidelines: e.g. "when moisture drops below 30%, trigger relay."</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                <Sparkles size={16} style={{ color: "var(--accent)" }} />
+                <h3 className="font-bold text-xs tracking-wide uppercase" style={{ color: "var(--text-primary)", fontFamily: "Outfit, sans-serif" }}>
+                  Interactive Examples
+                </h3>
+              </div>
+              <div className="space-y-3">
+                {EXAMPLES.map((ex, i) => (
+                  <button
+                    key={i}
+                    onClick={() => loadExample(ex)}
+                    className="w-full p-3.5 rounded-xl border text-left transition-all hover:border-[#00ff6640] hover:bg-[#00ff6604]"
+                    style={{ borderColor: "var(--border)", background: "#050505" }}
+                  >
+                    <div className="flex items-center justify-between mb-1.5">
+                      <span className="text-xs font-bold" style={{ color: "var(--text-primary)" }}>{ex.title}</span>
+                      <span className="text-[10px] px-1.5 py-0.5 font-mono rounded" style={{ background: "var(--surface-raised)", color: "var(--text-muted)", border: "1px solid var(--border)" }}>{ex.board}</span>
+                    </div>
+                    <p className="text-xs leading-normal line-clamp-2" style={{ color: "var(--text-muted)" }}>
+                      {ex.description}
+                    </p>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="space-y-3.5 p-4 rounded-xl border text-xs" style={{ borderColor: "var(--border)", background: "rgba(0,0,0,0.2)" }}>
+              <div className="flex items-center gap-1.5">
+                <HelpCircle size={13} style={{ color: "var(--text-muted)" }} />
+                <span className="font-semibold" style={{ color: "var(--text-primary)" }}>Which microcontroller?</span>
+              </div>
+              <p style={{ color: "var(--text-muted)", lineHeight: "1.5" }}>
+                Choose **ESP32** for Wi-Fi/BT IoT. Choose **Arduino Uno** for standard 5V logic shields and basics. Choose **STM32** for advanced, high-performance industrial controller tasks.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen flex flex-col" style={{ background: "var(--bg)" }}>
-      {/* Header */}
-      <header
-        className="border-b px-6 py-4 flex items-center justify-between"
+      <nav
+        className="flex-shrink-0 flex items-center justify-between px-8 py-3 border-b"
         style={{ borderColor: "var(--border)", background: "var(--surface)" }}
       >
-        <div className="flex items-center gap-3">
-          <div
-            className="w-7 h-7 rounded flex items-center justify-center text-sm font-bold"
-            style={{ background: "var(--accent-orange)", color: "white" }}
-          >
-            E
+        <div className="flex items-center gap-2.5">
+          <div className="w-6 h-6 rounded flex items-center justify-center" style={{ background: "var(--accent)", color: "#000" }}>
+            <Cpu size={13} strokeWidth={2.5} />
           </div>
-          <span className="font-semibold text-base" style={{ color: "var(--text-primary)" }}>
+          <span className="font-bold text-sm tracking-tight" style={{ fontFamily: "Outfit, sans-serif", color: "var(--text-primary)" }}>
             Embeddy
           </span>
-          <span
-            className="px-1.5 py-0.5 rounded text-xs"
-            style={{ background: "var(--surface-raised)", color: "var(--text-muted)", border: "1px solid var(--border)" }}
-          >
-            Beta
+          <span className="text-xs px-1.5 py-0.5 rounded font-bold" style={{ background: "#00ff6610", color: "var(--accent)", border: "1px solid #00ff6620", letterSpacing: "0.08em" }}>
+            BETA
           </span>
         </div>
         <button
           id="new-project-header-btn"
-          onClick={() => setShowModal(true)}
-          className="px-4 py-2 rounded text-sm font-medium transition-colors"
-          style={{ background: "var(--accent-orange)", color: "white" }}
+          onClick={() => setShowForm(true)}
+          className="btn-accent flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-bold"
+          style={{ color: "#000" }}
         >
-          + New Project
+          <Plus size={12} strokeWidth={3} />
+          New Project
         </button>
-      </header>
+      </nav>
 
-      {/* Hero */}
-      <main className="flex-1 flex flex-col items-center justify-center px-6 py-20 text-center">
-        <div className="max-w-2xl">
-          {/* Badge */}
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full mb-8 text-xs"
-            style={{ background: "#f9731615", color: "var(--accent-orange)", border: "1px solid #f9731630" }}>
-            <span className="w-1.5 h-1.5 rounded-full" style={{ background: "var(--accent-orange)" }} />
-            AI-Powered · Multi-Agent Pipeline · Real-Time Analysis
+      <main className="flex-1 grid grid-cols-1 lg:grid-cols-2 min-h-0">
+        <div className="flex flex-col justify-center px-10 lg:px-16 py-14 fade-up">
+          <div
+            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium mb-6 self-start"
+            style={{ background: "var(--accent-glow)", color: "var(--accent)", border: "1px solid #00ff6625" }}
+          >
+            <span className="w-1.5 h-1.5 rounded-full" style={{ background: "var(--accent)" }} />
+            AI · Multi-Agent · Real-Time
           </div>
 
           <h1
-            className="font-bold mb-4"
-            style={{ fontSize: "clamp(2rem, 5vw, 3.5rem)", color: "var(--text-primary)", lineHeight: 1.15, fontFamily: "Outfit, sans-serif" }}
+            className="glitch-text font-bold mb-4"
+            data-text="Embeddy"
+            style={{
+              fontSize: "clamp(3.5rem, 6vw, 6rem)",
+              fontFamily: "Outfit, sans-serif",
+              color: "var(--text-primary)",
+              lineHeight: 0.95,
+              letterSpacing: "-0.03em",
+            }}
           >
-            Design embedded systems
-            <span style={{ color: "var(--accent-orange)" }}> 10× faster</span>
+            Embeddy
           </h1>
 
-          <p className="text-base mb-10 leading-relaxed mx-auto max-w-lg" style={{ color: "var(--text-muted)" }}>
-            Describe your project. Embeddy&apos;s AI agents generate circuit schematics, pin diagrams,
+          <p className="text-lg font-medium mb-3" style={{ color: "var(--accent)", fontFamily: "Outfit, sans-serif" }}>
+            Design embedded systems 10× faster
+          </p>
+
+          <p className="text-sm leading-relaxed mb-8 max-w-md" style={{ color: "var(--text-muted)" }}>
+            Describe your project. 9 AI agents generate circuit schematics, pin diagrams,
             power budgets, BOM, and production-ready code — all in parallel.
           </p>
 
-          <button
-            id="hero-new-project-btn"
-            onClick={() => setShowModal(true)}
-            className="inline-flex items-center gap-2 px-6 py-3 rounded font-semibold text-sm transition-all"
-            style={{
-              background: "var(--accent-orange)",
-              color: "white",
-              boxShadow: "0 0 24px rgba(249,115,22,0.3)",
-            }}
-          >
-            Start a Project
-            <span>→</span>
-          </button>
+          <div className="flex items-center gap-3">
+            <button
+              id="hero-new-project-btn"
+              onClick={() => setShowForm(true)}
+              className="btn-accent flex items-center gap-2 px-6 py-3 rounded-lg font-bold text-sm"
+              style={{ color: "#000" }}
+            >
+              Start a Project
+              <ArrowRight size={15} strokeWidth={2.5} />
+            </button>
+            <a
+              href="#features"
+              className="flex items-center gap-2 px-4 py-3 rounded-lg text-sm font-medium transition-colors"
+              style={{ color: "var(--text-muted)", border: "1px solid var(--border)" }}
+              onMouseEnter={e => {
+                e.currentTarget.style.color = "var(--text-primary)";
+                e.currentTarget.style.borderColor = "var(--border-bright)";
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.color = "var(--text-muted)";
+                e.currentTarget.style.borderColor = "var(--border)";
+              }}
+            >
+              See features
+            </a>
+          </div>
+
+          <div className="flex items-center gap-6 mt-10 pt-8" style={{ borderTop: "1px solid var(--border)" }}>
+            {[
+              { value: "9",    label: "AI Agents" },
+              { value: "~30s", label: "Full analysis" },
+              { value: "6",    label: "Board types" },
+            ].map((s, i) => (
+              <div key={i}>
+                <div className="text-xl font-bold" style={{ color: "var(--accent)", fontFamily: "Outfit, sans-serif" }}>{s.value}</div>
+                <div className="text-xs" style={{ color: "var(--text-muted)" }}>{s.label}</div>
+              </div>
+            ))}
+          </div>
         </div>
 
-        {/* Feature grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-20 max-w-4xl w-full">
-          {[
-            { icon: "⚡", label: "Circuit Schematic", desc: "Interactive Konva canvas with zoom & pan" },
-            { icon: "📌", label: "Pin Diagram", desc: "Signal-typed connections for all components" },
-            { icon: "💡", label: "Power Budget", desc: "Per-component current draw analysis" },
-            { icon: "📦", label: "BOM + Sourcing", desc: "Estimated costs and availability ratings" },
-            { icon: "🔒", label: "Safety Analysis", desc: "Fatal issues and voltage conflict detection" },
-            { icon: "🔧", label: "Compatibility", desc: "Board + component compatibility checks" },
-            { icon: "💻", label: "Code Skeleton", desc: "Syntax-highlighted, compilable starter code" },
-            { icon: "🤖", label: "9 AI Agents", desc: "All running in parallel via Gemini 1.5 Flash" },
-          ].map((f, i) => (
-            <div key={i}
-              className="p-4 rounded border text-left"
-              style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
-              <div className="text-xl mb-2">{f.icon}</div>
-              <div className="text-sm font-medium mb-1" style={{ color: "var(--text-primary)" }}>{f.label}</div>
-              <div className="text-xs" style={{ color: "var(--text-muted)" }}>{f.desc}</div>
+        <div
+          className="hidden lg:flex items-center justify-center p-10 relative overflow-hidden"
+          style={{ borderLeft: "1px solid var(--border)", background: "var(--surface)" }}
+        >
+          <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'radial-gradient(var(--accent) 1px, transparent 0)', backgroundSize: '24px 24px' }} />
+          
+          <div
+            className="w-full max-w-lg rounded-xl overflow-hidden relative group"
+            style={{ 
+              border: "1px solid var(--border-bright)", 
+              boxShadow: "0 0 50px rgba(0,255,102,0.05), inset 0 0 20px rgba(255,255,255,0.02)",
+              background: "#050505"
+            }}
+          >
+            <div
+              className="flex items-center justify-between px-4 py-3"
+              style={{ background: "#0a0a0a", borderBottom: "1px solid var(--border)" }}
+            >
+              <div className="flex gap-1.5">
+                <div className="w-3 h-3 rounded-full" style={{ background: "#333" }} />
+                <div className="w-3 h-3 rounded-full" style={{ background: "#333" }} />
+                <div className="w-3 h-3 rounded-full" style={{ background: "#333" }} />
+              </div>
+              <span className="text-[10px] tracking-widest font-mono uppercase" style={{ color: "var(--text-muted)" }}>
+                Circuit Visualizer
+              </span>
+              <div className="w-12 h-1.5 bg-[#111] rounded-full" />
             </div>
-          ))}
+
+            <div className="relative aspect-[4/3] w-full overflow-hidden bg-black p-4 flex items-center justify-center">
+              <img 
+                src="/circuit_schematic.png" 
+                alt="Circuit Schematic preview" 
+                className="w-full h-full object-cover rounded-lg border"
+                style={{ borderColor: "var(--border)" }}
+              />
+              
+              <div className="absolute inset-0 pointer-events-none bg-gradient-to-b from-transparent via-transparent to-[rgba(0,255,102,0.03)]" />
+            </div>
+          </div>
         </div>
       </main>
 
-      {/* Modal */}
-      {showModal && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4"
-          style={{ background: "rgba(0,0,0,0.7)", backdropFilter: "blur(4px)" }}
-          onClick={(e) => e.target === e.currentTarget && !loading && setShowModal(false)}
-        >
-          <div
-            className="w-full max-w-lg rounded-lg border overflow-hidden"
-            style={{ background: "var(--surface-raised)", borderColor: "var(--border)", boxShadow: "0 24px 64px rgba(0,0,0,0.5)" }}
-          >
-            {/* Modal header */}
-            <div className="px-6 py-4 border-b flex items-center justify-between" style={{ borderColor: "var(--border)" }}>
-              <h2 className="font-semibold text-base" style={{ color: "var(--text-primary)" }}>
-                New Project
-              </h2>
-              {!loading && (
-                <button
-                  onClick={() => setShowModal(false)}
-                  className="w-7 h-7 rounded flex items-center justify-center text-lg transition-colors"
-                  style={{ color: "var(--text-muted)", background: "transparent" }}
-                >
-                  ×
-                </button>
-              )}
+      <div
+        id="features"
+        className="border-t grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8"
+        style={{ borderColor: "var(--border)", background: "var(--surface)" }}
+      >
+        {FEATURES.map((f, i) => {
+          const Icon = f.icon;
+          return (
+            <div
+              key={i}
+              className="flex flex-col items-start gap-2 p-4 border-r card-hover cursor-default"
+              style={{ borderColor: "var(--border)" }}
+            >
+              <div className="w-6 h-6 rounded flex items-center justify-center" style={{ background: "var(--accent-glow)", color: "var(--accent)" }}>
+                <Icon size={12} strokeWidth={2} />
+              </div>
+              <div className="text-xs font-semibold" style={{ color: "var(--text-primary)" }}>{f.label}</div>
+              <div className="text-xs" style={{ color: "var(--text-muted)" }}>{f.desc}</div>
             </div>
+          );
+        })}
+      </div>
 
-            <form onSubmit={handleSubmit} className="p-6 space-y-5">
-              {/* Title */}
-              <div>
-                <label className="panel-header block mb-2">Project Title</label>
-                <input
-                  id="project-title-input"
-                  type="text"
-                  value={form.title}
-                  onChange={(e) => setForm({ ...form, title: e.target.value })}
-                  placeholder="e.g. Temperature Monitor with OLED"
-                  disabled={loading}
-                  className="w-full px-3 py-2.5 rounded text-sm outline-none transition-colors"
-                  style={{
-                    background: "var(--surface)",
-                    border: "1px solid var(--border)",
-                    color: "var(--text-primary)",
-                    fontFamily: "Outfit, sans-serif",
-                  }}
-                />
-              </div>
-
-              {/* Board */}
-              <div>
-                <label className="panel-header block mb-2">Target Board</label>
-                <div className="grid grid-cols-3 gap-2">
-                  {BOARDS.map((b) => (
-                    <button
-                      key={b}
-                      type="button"
-                      id={`board-btn-${b.replace(/\s+/g, "-").toLowerCase()}`}
-                      onClick={() => setForm({ ...form, board: b })}
-                      disabled={loading}
-                      className="px-3 py-2 rounded text-xs font-medium transition-colors text-center"
-                      style={{
-                        border: `1px solid ${form.board === b ? "var(--accent-orange)" : "var(--border)"}`,
-                        background: form.board === b ? "#f9731620" : "var(--surface)",
-                        color: form.board === b ? "var(--accent-orange)" : "var(--text-muted)",
-                      }}
-                    >
-                      {b}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Description */}
-              <div>
-                <label className="panel-header block mb-2">Project Description</label>
-                <textarea
-                  id="project-description-input"
-                  value={form.description}
-                  onChange={(e) => setForm({ ...form, description: e.target.value })}
-                  placeholder="Describe your embedded system project — components, sensors, displays, motors, connectivity needs, etc."
-                  disabled={loading}
-                  rows={4}
-                  className="w-full px-3 py-2.5 rounded text-sm outline-none resize-none transition-colors"
-                  style={{
-                    background: "var(--surface)",
-                    border: "1px solid var(--border)",
-                    color: "var(--text-primary)",
-                    fontFamily: "Outfit, sans-serif",
-                  }}
-                />
-              </div>
-
-              {/* File upload */}
-              <div>
-                <label className="panel-header block mb-2">Supporting Documents (optional, max 2)</label>
-                <div
-                  className="relative rounded border-2 border-dashed p-4 text-center cursor-pointer transition-colors"
-                  style={{ borderColor: "var(--border)", background: "var(--surface)" }}
-                  onDrop={handleDrop}
-                  onDragOver={(e) => e.preventDefault()}
-                  onClick={() => !loading && fileInputRef.current?.click()}
-                >
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    id="file-upload-input"
-                    accept=".pdf,.txt"
-                    multiple
-                    className="hidden"
-                    onChange={handleFileChange}
-                    disabled={loading}
-                  />
-                  {files.length > 0 ? (
-                    <div className="space-y-1">
-                      {files.map((f, i) => (
-                        <div key={i} className="text-xs flex items-center justify-center gap-2" style={{ color: "var(--accent-green)" }}>
-                          <span>📄</span> {f.name}
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="text-xs" style={{ color: "var(--text-muted)" }}>
-                      Drop PDF or TXT files here, or click to browse
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {error && (
-                <div className="rounded p-3 text-sm" style={{ background: "#f8514920", color: "#f85149", border: "1px solid #f8514940" }}>
-                  {error}
-                </div>
-              )}
-
-              {/* Submit */}
-              <button
-                type="submit"
-                id="create-project-submit-btn"
-                disabled={loading}
-                className="w-full py-3 rounded font-semibold text-sm flex items-center justify-center gap-2 transition-all"
-                style={{
-                  background: loading ? "var(--surface-raised)" : "var(--accent-orange)",
-                  color: loading ? "var(--text-muted)" : "white",
-                  cursor: loading ? "not-allowed" : "pointer",
-                }}
-              >
-                {loading ? (
-                  <>
-                    <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
-                    </svg>
-                    Running AI pipeline…
-                  </>
-                ) : (
-                  "Generate Project →"
-                )}
-              </button>
-
-              {loading && (
-                <p className="text-xs text-center" style={{ color: "var(--text-muted)" }}>
-                  9 AI agents are analyzing your project in parallel. This takes 30–60 seconds.
-                </p>
-              )}
-            </form>
-          </div>
-        </div>
-      )}
+      <footer className="py-3 text-center text-xs" style={{ color: "var(--text-dim)", borderTop: "1px solid var(--border)" }}>
+        Powered by Gemini AI · Built for engineers
+      </footer>
     </div>
   );
 }

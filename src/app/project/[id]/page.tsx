@@ -13,8 +13,25 @@ import BOMPanel from "@/components/BOMPanel";
 import CodeSkeletonPanel from "@/components/CodeSkeletonPanel";
 import PinDiagramPanel from "@/components/PinDiagramPanel";
 import CircuitRenderer from "@/components/CircuitRenderer";
+import {
+  Cpu,
+  LayoutDashboard,
+  CircuitBoard,
+  ShoppingCart,
+  Code2,
+  AlertTriangle,
+  ChevronLeft,
+  RotateCcw,
+} from "lucide-react";
 
 type DashboardSection = "overview" | "hardware" | "procurement" | "software";
+
+const NAV_ITEMS: { key: DashboardSection; label: string; icon: React.ElementType }[] = [
+  { key: "overview",     label: "Overview & Health",  icon: LayoutDashboard },
+  { key: "hardware",     label: "Schematic & Wiring", icon: CircuitBoard },
+  { key: "procurement",  label: "Bill of Materials",  icon: ShoppingCart },
+  { key: "software",     label: "Code Skeleton",      icon: Code2 },
+];
 
 export default function ProjectPage() {
   const params = useParams();
@@ -35,9 +52,7 @@ export default function ProjectPage() {
     }
   }, [id]);
 
-  const hasFatal = project?.fatalIssues?.issues?.some(
-    (i) => i.severity === "fatal",
-  );
+  const hasFatal = project?.fatalIssues?.issues?.some((i) => i.severity === "fatal");
 
   const handleRetry = async (agentKey: string, agentName: string) => {
     if (!project) return;
@@ -65,7 +80,6 @@ export default function ProjectPage() {
       const result = await res.json();
 
       const updated: ProjectData = { ...project };
-      // Map agentKey to project field
       const fieldMap: Record<string, keyof ProjectData> = {
         fatalIssues: "fatalIssues",
         compatibility: "compatibility",
@@ -82,12 +96,10 @@ export default function ProjectPage() {
         delete updated.errors[agentKey];
       }
 
-      // Save and update state
       const { saveProject } = await import("@/lib/projectStore");
       saveProject(updated);
       setProject(updated);
     } catch {
-      // Keep existing error
     } finally {
       setRetrying((prev) => ({ ...prev, [agentKey]: false }));
     }
@@ -99,11 +111,13 @@ export default function ProjectPage() {
         className="min-h-screen flex items-center justify-center flex-col gap-4"
         style={{ background: "var(--bg)" }}
       >
-        <div className="text-4xl">🔌</div>
-        <h1
-          className="text-lg font-semibold"
-          style={{ color: "var(--text-primary)" }}
+        <div
+          className="w-12 h-12 rounded-xl flex items-center justify-center"
+          style={{ background: "var(--accent-glow)", border: "1px solid #00ff6625" }}
         >
+          <AlertTriangle size={22} style={{ color: "var(--accent)" }} />
+        </div>
+        <h1 className="text-lg font-semibold" style={{ color: "var(--text-primary)" }}>
           Project not found
         </h1>
         <p className="text-sm" style={{ color: "var(--text-muted)" }}>
@@ -111,9 +125,10 @@ export default function ProjectPage() {
         </p>
         <button
           onClick={() => router.push("/")}
-          className="px-4 py-2 rounded text-sm font-medium"
-          style={{ background: "var(--accent-orange)", color: "white" }}
+          className="btn-accent flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold"
+          style={{ color: "#000" }}
         >
+          <ChevronLeft size={14} />
           Back to Home
         </button>
       </div>
@@ -126,7 +141,8 @@ export default function ProjectPage() {
         className="min-h-screen flex items-center justify-center"
         style={{ background: "var(--bg)" }}
       >
-        <div className="text-sm" style={{ color: "var(--text-muted)" }}>
+        <div className="flex items-center gap-2 text-sm" style={{ color: "var(--text-muted)" }}>
+          <RotateCcw size={14} className="animate-spin" />
           Loading…
         </div>
       </div>
@@ -136,40 +152,30 @@ export default function ProjectPage() {
   const errors = project.errors || {};
 
   return (
-    <div
-      className="flex flex-col h-screen overflow-hidden"
-      style={{ background: "var(--bg)" }}
-    >
-      {/* ── Header ── */}
+    <div className="flex flex-col h-screen overflow-hidden" style={{ background: "var(--bg)" }}>
       <header
-        className="flex-shrink-0 border-b px-6 py-3 flex items-center gap-4"
+        className="flex-shrink-0 border-b px-5 py-3 flex items-center gap-3"
         style={{ background: "var(--surface)", borderColor: "var(--border)" }}
       >
         <button
           onClick={() => router.push("/")}
           className="flex items-center gap-2 text-sm transition-colors"
           style={{ color: "var(--text-muted)" }}
+          onMouseEnter={e => (e.currentTarget.style.color = "var(--accent)")}
+          onMouseLeave={e => (e.currentTarget.style.color = "var(--text-muted)")}
         >
           <div
-            className="w-6 h-6 rounded flex items-center justify-center text-xs font-bold"
-            style={{ background: "var(--accent-orange)", color: "white" }}
+            className="w-6 h-6 rounded flex items-center justify-center"
+            style={{ background: "var(--accent)", color: "#000" }}
           >
-            E
+            <Cpu size={12} strokeWidth={2.5} />
           </div>
-          <span
-            className="font-medium"
-            style={{ color: "var(--text-primary)" }}
-          >
-            Embeddy
-          </span>
+          <span className="font-bold" style={{ color: "var(--text-primary)" }}>Embeddy</span>
         </button>
 
-        <span style={{ color: "var(--border)" }}>/</span>
+        <span style={{ color: "var(--text-dim)" }}>/</span>
 
-        <h1
-          className="font-semibold text-sm"
-          style={{ color: "var(--text-primary)" }}
-        >
+        <h1 className="font-semibold text-sm truncate" style={{ color: "var(--text-primary)", maxWidth: "280px" }}>
           {project.title}
         </h1>
 
@@ -188,10 +194,7 @@ export default function ProjectPage() {
           </span>
         )}
 
-        <span
-          className="ml-auto text-xs"
-          style={{ color: "var(--text-muted)" }}
-        >
+        <span className="ml-auto text-xs" style={{ color: "var(--text-muted)" }}>
           {new Date(project.createdAt).toLocaleDateString("en-US", {
             year: "numeric",
             month: "short",
@@ -200,118 +203,83 @@ export default function ProjectPage() {
         </span>
       </header>
 
-      {/* ── Main layout ── */}
       <div className="flex flex-1 overflow-hidden">
-        {/* ── LEFT SIDEBAR NAVIGATION ── */}
         <aside
-          className="flex-shrink-0 border-r overflow-y-auto p-4 flex flex-col gap-2"
+          className="flex-shrink-0 border-r overflow-y-auto p-3 flex flex-col gap-1"
           style={{
-            width: "240px",
+            width: "220px",
             borderColor: "var(--border)",
             background: "var(--surface)",
           }}
         >
           <div
-            className="text-xs font-semibold mb-2"
-            style={{
-              color: "var(--text-muted)",
-              textTransform: "uppercase",
-              letterSpacing: "0.05em",
-            }}
+            className="panel-header px-3 py-2 mb-1"
           >
             Dashboard
           </div>
 
-          {(["overview", "hardware", "procurement", "software"] as const).map(
-            (section) => (
+          {NAV_ITEMS.map(({ key, label, icon: Icon }) => {
+            const isActive = activeTab === key;
+            return (
               <button
-                key={section}
-                onClick={() => setActiveTab(section as any)} // Overloading activeTab state for now, will rename later if needed
-                className="flex items-center gap-3 px-3 py-2 rounded text-sm font-medium transition-colors w-full text-left"
+                key={key}
+                onClick={() => setActiveTab(key)}
+                className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-medium transition-all w-full text-left"
                 style={{
-                  background:
-                    activeTab === section
-                      ? "var(--surface-raised)"
-                      : "transparent",
-                  color:
-                    activeTab === section
-                      ? "var(--text-primary)"
-                      : "var(--text-muted)",
-                  border:
-                    activeTab === section
-                      ? "1px solid var(--border)"
-                      : "1px solid transparent",
+                  background: isActive ? "#00ff6610" : "transparent",
+                  color: isActive ? "var(--accent)" : "var(--text-muted)",
+                  border: `1px solid ${isActive ? "#00ff6630" : "transparent"}`,
+                }}
+                onMouseEnter={e => {
+                  if (!isActive) e.currentTarget.style.color = "var(--text-primary)";
+                }}
+                onMouseLeave={e => {
+                  if (!isActive) e.currentTarget.style.color = "var(--text-muted)";
                 }}
               >
-                {section === "overview" && "Overview & Health"}
-                {section === "hardware" && "Schematic & Wiring"}
-                {section === "procurement" && "Bill of Materials"}
-                {section === "software" && "Code Skeleton"}
+                <Icon size={14} strokeWidth={isActive ? 2.5 : 1.75} />
+                {label}
               </button>
-            ),
-          )}
+            );
+          })}
         </aside>
 
-        {/* ── MAIN CONTENT ── */}
         <main
-          className="flex-1 overflow-y-auto p-6"
+          className="flex-1 overflow-y-auto p-5"
           style={{ background: "var(--bg)" }}
         >
-          <div className="max-w-6xl mx-auto flex flex-col gap-6">
+          <div className="max-w-6xl mx-auto flex flex-col gap-5">
             {activeTab === "overview" && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 fade-up">
                 <div className="flex flex-col gap-4">
-                  <ProjectOverviewCard
-                    overview={project.overview}
-                    error={errors.overview}
-                  />
+                  <ProjectOverviewCard overview={project.overview} error={errors.overview} />
                   <PowerBudgetPanel
                     powerBudget={project.powerBudget}
-                    error={
-                      retrying.powerBudget ? "Retrying…" : errors.powerBudget
-                    }
-                    onRetry={
-                      errors.powerBudget
-                        ? () => handleRetry("powerBudget", "powerBudget")
-                        : undefined
-                    }
+                    error={retrying.powerBudget ? "Retrying…" : errors.powerBudget}
+                    onRetry={errors.powerBudget ? () => handleRetry("powerBudget", "powerBudget") : undefined}
                   />
                 </div>
                 <div className="flex flex-col gap-4">
                   <FatalIssuesPanel
                     fatalIssues={project.fatalIssues}
-                    error={
-                      retrying.fatalIssues ? "Retrying…" : errors.fatalIssues
-                    }
-                    onRetry={
-                      errors.fatalIssues
-                        ? () => handleRetry("fatalIssues", "fatalIssues")
-                        : undefined
-                    }
+                    error={retrying.fatalIssues ? "Retrying…" : errors.fatalIssues}
+                    onRetry={errors.fatalIssues ? () => handleRetry("fatalIssues", "fatalIssues") : undefined}
                   />
                   <CompatibilityPanel
                     compatibility={project.compatibility}
-                    error={
-                      retrying.compatibility
-                        ? "Retrying…"
-                        : errors.compatibility
-                    }
-                    onRetry={
-                      errors.compatibility
-                        ? () => handleRetry("compatibility", "compatibility")
-                        : undefined
-                    }
+                    error={retrying.compatibility ? "Retrying…" : errors.compatibility}
+                    onRetry={errors.compatibility ? () => handleRetry("compatibility", "compatibility") : undefined}
                   />
                 </div>
               </div>
             )}
 
             {activeTab === "hardware" && (
-              <div className="flex flex-col gap-6">
+              <div className="flex flex-col gap-5 fade-up">
                 <div
                   style={{
                     height: "500px",
-                    borderRadius: "8px",
+                    borderRadius: "10px",
                     overflow: "hidden",
                     border: "1px solid var(--border)",
                     background: "var(--surface)",
@@ -320,49 +288,31 @@ export default function ProjectPage() {
                   <CircuitRenderer
                     schematic={project.schematic}
                     error={retrying.schematic ? "Retrying…" : errors.schematic}
-                    onRetry={
-                      errors.schematic
-                        ? () => handleRetry("schematic", "schematic")
-                        : undefined
-                    }
+                    onRetry={errors.schematic ? () => handleRetry("schematic", "schematic") : undefined}
                   />
                 </div>
-                <PinDiagramPanel
-                  pinDiagram={project.pinDiagram}
-                  error={errors.pinDiagram}
-                />
+                <PinDiagramPanel pinDiagram={project.pinDiagram} error={errors.pinDiagram} />
               </div>
             )}
 
             {activeTab === "procurement" && (
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 fade-up">
                 <div className="lg:col-span-2">
                   <BOMPanel
                     bom={project.bom}
                     error={retrying.bom ? "Retrying…" : errors.bom}
-                    onRetry={
-                      errors.bom ? () => handleRetry("bom", "bom") : undefined
-                    }
+                    onRetry={errors.bom ? () => handleRetry("bom", "bom") : undefined}
                   />
                 </div>
               </div>
             )}
 
             {activeTab === "software" && (
-              <div
-                className="flex flex-col gap-4 h-full"
-                style={{ minHeight: "600px" }}
-              >
+              <div className="flex flex-col gap-4 fade-up" style={{ minHeight: "600px" }}>
                 <CodeSkeletonPanel
                   codeSkeleton={project.codeSkeleton}
-                  error={
-                    retrying.codeSkeleton ? "Retrying…" : errors.codeSkeleton
-                  }
-                  onRetry={
-                    errors.codeSkeleton
-                      ? () => handleRetry("codeSkeleton", "codeSkeleton")
-                      : undefined
-                  }
+                  error={retrying.codeSkeleton ? "Retrying…" : errors.codeSkeleton}
+                  onRetry={errors.codeSkeleton ? () => handleRetry("codeSkeleton", "codeSkeleton") : undefined}
                 />
               </div>
             )}

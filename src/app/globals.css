@@ -5,17 +5,25 @@
 @tailwind utilities;
 
 :root {
-  --bg: #030712;
-  --surface: #0a0f1d;
-  --surface-raised: #121b2e;
-  --border: #1e293b;
-  --text-primary: #f8fafc;
-  --text-muted: #64748b;
-  --accent-blue: #00e5ff;
+  --bg: #000000;
+  --surface: #0a0a0a;
+  --surface-raised: #111111;
+  --surface-hover: #161616;
+  --border: #1a1a1a;
+  --border-bright: #2a2a2a;
+  --text-primary: #f0f0f0;
+  --text-muted: #555555;
+  --text-dim: #333333;
+  --accent: #00ff66;
+  --accent-dim: #00cc52;
+  --accent-glow: rgba(0, 255, 102, 0.15);
+  --accent-glow-strong: rgba(0, 255, 102, 0.3);
   --accent-orange: #00ff66;
   --accent-green: #00ff66;
-  --accent-red: #ef4444;
-  --accent-purple: #a855f7;
+  --accent-red: #ff3b3b;
+  --accent-red-glow: rgba(255, 59, 59, 0.15);
+  --accent-yellow: #f5c518;
+  --accent-blue: #00b4ff;
 }
 
 * {
@@ -35,27 +43,27 @@ html, body {
 
 /* Scrollbars */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--surface);
+  background: var(--bg);
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--border);
+  background: #1e1e1e;
   border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--text-muted);
+  background: #2a2a2a;
 }
 
-/* Panel section headers - VS Code style */
+/* Panel section headers */
 .panel-header {
   font-family: 'Outfit', sans-serif;
   font-weight: 500;
   font-size: 11px;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.1em;
   color: var(--text-muted);
 }
 
@@ -64,12 +72,24 @@ code, pre {
   font-family: 'JetBrains Mono', monospace;
 }
 
-/* Pulsing animation for fatal issues */
-@keyframes pulse-ring {
-  0% { transform: scale(0.8); opacity: 1; }
-  100% { transform: scale(2); opacity: 0; }
+/* Accent glow button */
+.btn-accent {
+  background: var(--accent);
+  color: #000;
+  font-weight: 600;
+  box-shadow: 0 0 20px var(--accent-glow-strong);
+  transition: all 0.2s;
+}
+.btn-accent:hover {
+  box-shadow: 0 0 32px var(--accent-glow-strong), 0 0 8px var(--accent);
+  transform: translateY(-1px);
 }
 
+/* Green glow pulse for fatal indicator */
+@keyframes pulse-ring {
+  0% { transform: scale(0.8); opacity: 1; }
+  100% { transform: scale(2.2); opacity: 0; }
+}
 .pulse-dot::before {
   content: '';
   position: absolute;
@@ -84,7 +104,6 @@ code, pre {
   0% { background-position: -200% 0; }
   100% { background-position: 200% 0; }
 }
-
 .skeleton {
   background: linear-gradient(
     90deg,
@@ -93,39 +112,196 @@ code, pre {
     var(--surface) 75%
   );
   background-size: 200% 100%;
-  animation: shimmer 1.5s infinite;
+  animation: shimmer 1.8s infinite;
   border-radius: 6px;
 }
 
-/* Signal type colors */
-.signal-power { color: #ef4444; }
-.signal-ground { color: #4b5563; }
-.signal-digital { color: #00ff66; }
-.signal-analog { color: #00e5ff; }
-.signal-i2c { color: #00ff66; }
-.signal-spi { color: #00e5ff; }
-.signal-uart { color: #3b82f6; }
+/* Green accent scanline underline animation */
+@keyframes scan {
+  0% { width: 0%; }
+  100% { width: 100%; }
+}
 
-/* Board badges */
+/* Signal type colors — green-forward palette */
+.signal-power   { color: #ff3b3b; }
+.signal-ground  { color: #333333; }
+.signal-digital { color: #00ff66; }
+.signal-analog  { color: #00b4ff; }
+.signal-i2c     { color: #00cc52; }
+.signal-spi     { color: #00b4ff; }
+.signal-uart    { color: #a3e635; }
+
+/* Board badges — black/green theme */
 .badge-arduino {
-  background: #00878a20;
-  color: #00878a;
-  border: 1px solid #00878a40;
+  background: #00ff6615;
+  color: #00ff66;
+  border: 1px solid #00ff6630;
 }
 .badge-esp32 {
-  background: #e7383820;
-  color: #e73838;
-  border: 1px solid #e7383840;
+  background: #00cc5215;
+  color: #00cc52;
+  border: 1px solid #00cc5230;
 }
 .badge-stm32 {
-  background: #0352fc20;
-  color: #4a7fff;
-  border: 1px solid #0352fc40;
+  background: #00b4ff15;
+  color: #00b4ff;
+  border: 1px solid #00b4ff30;
 }
 
-/* Highlight.js theme override */
+/* Highlight.js theme override — pitch black */
 .hljs {
-  background: #0d1117 !important;
-  color: #e6edf3;
+  background: #050505 !important;
+  color: #a3e635;
   padding: 0 !important;
+}
+
+/* Micro hover glow for interactive cards */
+.card-hover {
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.card-hover:hover {
+  border-color: #00ff6640 !important;
+  box-shadow: 0 0 16px rgba(0, 255, 102, 0.06);
+}
+
+/* Green text glow */
+.text-glow {
+  text-shadow: 0 0 12px rgba(0, 255, 102, 0.5);
+}
+
+/* Fade in animation */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.fade-up {
+  animation: fadeUp 0.4s ease forwards;
+}
+
+/* Hero logo animations */
+@keyframes logoPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(0,255,102,0.4), 0 0 20px rgba(0,255,102,0.2); }
+  50%       { box-shadow: 0 0 0 10px rgba(0,255,102,0), 0 0 40px rgba(0,255,102,0.4); }
+}
+@keyframes logoSpin {
+  0%   { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+@keyframes textReveal {
+  0%   { opacity: 0; letter-spacing: 0.5em; filter: blur(6px); }
+  60%  { opacity: 1; filter: blur(0); }
+  100% { opacity: 1; letter-spacing: -0.02em; filter: blur(0); }
+}
+@keyframes subtitleFade {
+  0%   { opacity: 0; transform: translateY(6px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+@keyframes borderRotate {
+  0%   { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+@keyframes iconBounce {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-3px); }
+}
+.hero-icon {
+  animation: logoPulse 2.4s ease-in-out infinite;
+}
+.hero-icon-inner {
+  animation: iconBounce 2.4s ease-in-out infinite;
+}
+.hero-title {
+  animation: textReveal 0.9s cubic-bezier(0.22,1,0.36,1) forwards;
+}
+.hero-subtitle {
+  animation: subtitleFade 0.6s ease forwards;
+  animation-delay: 0.5s;
+  opacity: 0;
+}
+
+/* ── Glitch effect ── */
+@keyframes glitch-1 {
+  0%   { clip: rect(20px, 930px, 56px, 0); }
+  5%   { clip: rect(30px, 930px, 16px, 0); }
+  10%  { clip: rect(81px, 930px, 95px, 0); }
+  15%  { clip: rect(54px, 930px, 26px, 0); }
+  20%  { clip: rect(91px, 930px, 31px, 0); }
+  25%  { clip: rect(88px, 930px, 16px, 0); }
+  30%  { clip: rect(42px, 930px, 11px, 0); }
+  35%  { clip: rect(67px, 930px, 65px, 0); }
+  40%  { clip: rect(32px, 930px, 31px, 0); }
+  45%  { clip: rect(67px, 930px, 78px, 0); }
+  50%  { clip: rect(42px, 930px, 42px, 0); }
+  55%  { clip: rect(72px, 930px, 22px, 0); }
+  60%  { clip: rect(57px, 930px, 32px, 0); }
+  65%  { clip: rect(89px, 930px, 92px, 0); }
+  70%  { clip: rect(30px, 930px, 64px, 0); }
+  75%  { clip: rect(18px, 930px, 75px, 0); }
+  80%  { clip: rect(42px, 930px, 15px, 0); }
+  85%  { clip: rect(97px, 930px, 30px, 0); }
+  90%  { clip: rect(60px, 930px, 33px, 0); }
+  95%  { clip: rect(82px, 930px, 94px, 0); }
+  100% { clip: rect(10px, 930px, 24px, 0); }
+}
+
+@keyframes glitch-2 {
+  0%   { clip: rect(72px, 930px, 25px, 0); }
+  5%   { clip: rect(92px, 930px, 85px, 0); }
+  10%  { clip: rect(38px, 930px, 65px, 0); }
+  15%  { clip: rect(66px, 930px, 84px, 0); }
+  20%  { clip: rect(19px, 930px, 35px, 0); }
+  25%  { clip: rect(11px, 930px, 82px, 0); }
+  30%  { clip: rect(44px, 930px, 81px, 0); }
+  35%  { clip: rect(53px, 930px, 21px, 0); }
+  40%  { clip: rect(31px, 930px, 69px, 0); }
+  45%  { clip: rect(39px, 930px, 17px, 0); }
+  50%  { clip: rect(54px, 930px, 28px, 0); }
+  55%  { clip: rect(95px, 930px, 17px, 0); }
+  60%  { clip: rect(75px, 930px, 65px, 0); }
+  65%  { clip: rect(67px, 930px, 23px, 0); }
+  70%  { clip: rect(58px, 930px, 73px, 0); }
+  75%  { clip: rect(41px, 930px, 95px, 0); }
+  80%  { clip: rect(83px, 930px, 54px, 0); }
+  85%  { clip: rect(30px, 930px, 82px, 0); }
+  90%  { clip: rect(95px, 930px, 21px, 0); }
+  95%  { clip: rect(12px, 930px, 25px, 0); }
+  100% { clip: rect(48px, 930px, 56px, 0); }
+}
+
+.glitch-text {
+  position: relative;
+  display: inline-block;
+}
+
+.glitch-text::before,
+.glitch-text::after {
+  content: attr(data-text);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  font-size: inherit;
+  font-weight: inherit;
+  font-family: inherit;
+  line-height: inherit;
+  letter-spacing: inherit;
+}
+
+/* Green-shifted ghost — runs glitch-1 */
+.glitch-text::before {
+  left: 2px;
+  color: #00ff66;
+  text-shadow: -2px 0 #00ff66;
+  animation: glitch-1 3s infinite linear alternate-reverse;
+  opacity: 0.75;
+}
+
+/* Red-shifted ghost — runs glitch-2 */
+.glitch-text::after {
+  left: -2px;
+  color: #ff3b3b;
+  text-shadow: 2px 0 #ff3b3b;
+  animation: glitch-2 2s infinite linear alternate-reverse;
+  opacity: 0.6;
 }
