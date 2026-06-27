@@ -31,7 +31,6 @@ const COMPONENT_BORDER_COLORS: Record<string, string> = {
   module: "#3b82f6",
 };
 
-// Component dimensions based on pins and pin label lengths to prevent text overlaps
 function getCompDims(type: string, pinCount: number, maxLeftPinLen: number = 0, maxRightPinLen: number = 0) {
   let w = 120;
   if (type === "mcu") w = 180;
@@ -39,11 +38,10 @@ function getCompDims(type: string, pinCount: number, maxLeftPinLen: number = 0, 
   
   const leftLabelW = maxLeftPinLen > 0 ? maxLeftPinLen * 5.8 + 6 : 0;
   const rightLabelW = maxRightPinLen > 0 ? maxRightPinLen * 5.8 + 6 : 0;
-  const neededWidth = leftLabelW + rightLabelW + 20; // 20px spacer in the middle
+  const neededWidth = leftLabelW + rightLabelW + 20;
   
   w = Math.max(w, Math.ceil(neededWidth));
   
-  // Leave 45px at top for header (preventing component name overlap), 20px at bottom for ID label
   const h = Math.max(type === "mcu" ? 140 : 90, pinCount * 25 + 65);
   return { w, h };
 }

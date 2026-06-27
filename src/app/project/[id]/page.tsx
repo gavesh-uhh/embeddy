@@ -277,9 +277,7 @@ export default function ProjectPage() {
 
               return (
                 <div className="flex flex-col gap-5 fade-up">
-                  {/* KPI Stats Grid */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                    {/* Health Card */}
                     <div className="rounded-lg border p-4 flex flex-col justify-between transition-all duration-300 card-hover relative overflow-hidden"
                       style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
                       <div className="absolute top-0 right-0 w-24 h-24 rounded-full filter blur-xl opacity-20 pointer-events-none"
@@ -302,7 +300,6 @@ export default function ProjectPage() {
                       </div>
                     </div>
 
-                    {/* Power Budget Card */}
                     <div className="rounded-lg border p-4 flex flex-col justify-between transition-all duration-300 card-hover relative overflow-hidden"
                       style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
                       <div className="absolute top-0 right-0 w-24 h-24 rounded-full filter blur-xl opacity-20 pointer-events-none"
@@ -332,7 +329,6 @@ export default function ProjectPage() {
                       </div>
                     </div>
 
-                    {/* Cost Card */}
                     <div className="rounded-lg border p-4 flex flex-col justify-between transition-all duration-300 card-hover relative overflow-hidden"
                       style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
                       <div className="absolute top-0 right-0 w-24 h-24 rounded-full filter blur-xl opacity-20 pointer-events-none"
@@ -351,7 +347,6 @@ export default function ProjectPage() {
                       </div>
                     </div>
 
-                    {/* Modules Card */}
                     <div className="rounded-lg border p-4 flex flex-col justify-between transition-all duration-300 card-hover relative overflow-hidden"
                       style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
                       <div className="absolute top-0 right-0 w-24 h-24 rounded-full filter blur-xl opacity-20 pointer-events-none"
@@ -371,7 +366,6 @@ export default function ProjectPage() {
                     </div>
                   </div>
 
-                  {/* Diagnostic Panels Grid */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="flex flex-col gap-4">
                       <ProjectOverviewCard overview={project.overview} error={errors.overview} />
