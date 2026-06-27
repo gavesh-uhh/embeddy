@@ -9,7 +9,6 @@ interface Props {
   onRetry?: () => void;
 }
 
-// Color mapping
 const COMPONENT_COLORS: Record<string, string> = {
   mcu: "#051329",
   sensor: "#051f0f",
@@ -46,7 +45,6 @@ function getCompDims(type: string, pinCount: number, maxLeftPinLen: number = 0, 
   return { w, h };
 }
 
-// Extract pins for layout
 function getComponentPins(comp: SchematicComponent, connections: SchematicConnection[], mcuX: number): { left: string[], right: string[] } {
   const pins = new Set<string>();
   connections.forEach(conn => {
@@ -93,7 +91,6 @@ function getComponentPins(comp: SchematicComponent, connections: SchematicConnec
   return { left, right };
 }
 
-// Get connection point on exact pin coordinates
 function getConnectionPoint(comp: SchematicComponent, pinName: string | undefined, layout: { left: string[], right: string[] }) {
   const maxPins = Math.max(layout.left.length, layout.right.length);
   const maxLeftPinLen = Math.max(0, ...layout.left.map(p => p.length));
@@ -123,7 +120,6 @@ function getConnectionPoint(comp: SchematicComponent, pinName: string | undefine
   return { x: comp.x + dims.w / 2, y: comp.y + dims.h / 2 };
 }
 
-// Auto-layout: prevent overlaps
 function autoLayout(components: SchematicComponent[]): SchematicComponent[] {
   const COLS = 3;
   const COL_WIDTH = 220;
@@ -140,7 +136,6 @@ function autoLayout(components: SchematicComponent[]): SchematicComponent[] {
   });
 }
 
-// Resolve overlapping components
 function resolveOverlaps(
   components: SchematicComponent[],
   compPinMap: Map<string, { left: string[], right: string[] }>
@@ -169,13 +164,10 @@ function resolveOverlaps(
   return result;
 }
 
-// Manhattan routing: L-shaped path between two points
 function manhattanPath(x1: number, y1: number, x2: number, y2: number): number[] {
   const midX = (x1 + x2) / 2;
   return [x1, y1, midX, y1, midX, y2, x2, y2];
 }
-
-
 
 export default function CircuitRenderer({ schematic, error, onRetry }: Props) {
   const canvasRef = useRef<HTMLDivElement>(null);
@@ -198,7 +190,6 @@ export default function CircuitRenderer({ schematic, error, onRetry }: Props) {
     const width = container.clientWidth || 800;
     const height = container.clientHeight || 500;
 
-    // Destroy previous stage
     if (stageRef.current) {
       stageRef.current.destroy();
     }
@@ -206,7 +197,6 @@ export default function CircuitRenderer({ schematic, error, onRetry }: Props) {
     const stage = new K.default.Stage({ container, width, height });
     stageRef.current = stage;
 
-    // Zoom & pan
     let scale = 1;
     stage.on("wheel", (e) => {
       e.evt.preventDefault();
@@ -219,12 +209,10 @@ export default function CircuitRenderer({ schematic, error, onRetry }: Props) {
       stage.position({ x: pointer.x - mousePointTo.x * scale, y: pointer.y - mousePointTo.y * scale });
     });
 
-    // Drag to pan
     stage.draggable(true);
 
     const layer = new K.default.Layer();
 
-    // Prepare component pin maps
     const mcu = schematic.components.find(c => c.type === "mcu");
     const mcuX = mcu ? mcu.x : 200;
     const compPinMap = new Map<string, { left: string[], right: string[] }>();
@@ -235,7 +223,6 @@ export default function CircuitRenderer({ schematic, error, onRetry }: Props) {
     const laidOut = resolveOverlaps(autoLayout(schematic.components), compPinMap);
     const compMap = new Map(laidOut.map((c) => [c.id, c]));
 
-    // Draw connections first (behind components)
     const connectionGroup = new K.default.Group();
 
     schematic.connections.forEach((conn) => {
@@ -263,7 +250,6 @@ export default function CircuitRenderer({ schematic, error, onRetry }: Props) {
       });
       connectionGroup.add(line);
 
-      // Arrow on data lines at endpoint
       if (conn.signalType === "data" || conn.signalType === "analog") {
         const arrowSize = 6;
         const isLeftPin = toLayout.left.includes(conn.toPin || "");
@@ -282,7 +268,6 @@ export default function CircuitRenderer({ schematic, error, onRetry }: Props) {
         connectionGroup.add(arrow);
       }
 
-      // Junction dots
       [fp, tp].forEach((pt) => {
         const dot = new K.default.Circle({
           x: pt.x, y: pt.y, radius: 2.5,
@@ -294,7 +279,6 @@ export default function CircuitRenderer({ schematic, error, onRetry }: Props) {
 
     layer.add(connectionGroup);
 
-    // Draw components
     laidOut.forEach((comp) => {
       const layout = compPinMap.get(comp.id) || { left: [], right: [] };
       const maxPins = Math.max(layout.left.length, layout.right.length);
@@ -311,7 +295,6 @@ export default function CircuitRenderer({ schematic, error, onRetry }: Props) {
         name: comp.id,
       });
 
-      // Main box
       const rect = new K.default.Rect({
         width: dims.w, height: dims.h,
         fill: bg,
@@ -324,7 +307,6 @@ export default function CircuitRenderer({ schematic, error, onRetry }: Props) {
       });
       group.add(rect);
 
-      // Type indicator bar at top
       const typeBar = new K.default.Rect({
         width: dims.w, height: 4,
         fill: border,
@@ -332,7 +314,6 @@ export default function CircuitRenderer({ schematic, error, onRetry }: Props) {
       });
       group.add(typeBar);
 
-      // Component type label
       const typeLabel = new K.default.Text({
         y: 8,
         width: dims.w,
@@ -345,7 +326,6 @@ export default function CircuitRenderer({ schematic, error, onRetry }: Props) {
       });
       group.add(typeLabel);
 
-      // Variant / name
       const nameLabel = new K.default.Text({
         y: 18,
         width: dims.w,
@@ -360,7 +340,6 @@ export default function CircuitRenderer({ schematic, error, onRetry }: Props) {
       });
       group.add(nameLabel);
 
-      // ID label
       const idLabel = new K.default.Text({
         y: dims.h - 16,
         width: dims.w,
@@ -372,18 +351,15 @@ export default function CircuitRenderer({ schematic, error, onRetry }: Props) {
       });
       group.add(idLabel);
 
-      // Draw left pins
       layout.left.forEach((pin, idx) => {
         const y = 45 + idx * 25;
         
-        // Horizontal stub line extending left
         const stub = new K.default.Line({
           points: [-6, y, 0, y],
           stroke: border,
           strokeWidth: 1.5,
         });
 
-        // Pin terminal junction dot
         const dot = new K.default.Circle({
           x: -6,
           y: y,
@@ -393,7 +369,6 @@ export default function CircuitRenderer({ schematic, error, onRetry }: Props) {
 
         const leftLabelW = maxLeftPinLen > 0 ? maxLeftPinLen * 5.8 : 50;
 
-        // Pin label text inside the box (aligned left)
         const pinTxt = new K.default.Text({
           x: 6,
           y: y - 5,
@@ -408,18 +383,15 @@ export default function CircuitRenderer({ schematic, error, onRetry }: Props) {
         group.add(stub, dot, pinTxt);
       });
 
-      // Draw right pins
       layout.right.forEach((pin, idx) => {
         const y = 45 + idx * 25;
         
-        // Horizontal stub line extending right
         const stub = new K.default.Line({
           points: [dims.w, y, dims.w + 6, y],
           stroke: border,
           strokeWidth: 1.5,
         });
 
-        // Pin terminal junction dot
         const dot = new K.default.Circle({
           x: dims.w + 6,
           y: y,
@@ -429,7 +401,6 @@ export default function CircuitRenderer({ schematic, error, onRetry }: Props) {
 
         const rightLabelW = maxRightPinLen > 0 ? maxRightPinLen * 5.8 : 50;
 
-        // Pin label text inside the box (aligned right)
         const pinTxt = new K.default.Text({
           x: dims.w - rightLabelW - 6,
           y: y - 5,
@@ -445,12 +416,10 @@ export default function CircuitRenderer({ schematic, error, onRetry }: Props) {
         group.add(stub, dot, pinTxt);
       });
 
-      // Click to highlight connections
       group.on("click", () => {
         const newSelected = selectedId === comp.id ? null : comp.id;
         setSelectedId(newSelected);
 
-        // Dim/highlight connections
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         connectionGroup.children.forEach((child: any) => {
           const name = child.name();
@@ -464,7 +433,6 @@ export default function CircuitRenderer({ schematic, error, onRetry }: Props) {
           }
         });
 
-        // Highlight selected component
         laidOut.forEach((c) => {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const grp = layer.findOne(`#${c.id}`) as any;
@@ -569,7 +537,6 @@ export default function CircuitRenderer({ schematic, error, onRetry }: Props) {
         </div>
       </div>
 
-      {/* Legend */}
       <div className="px-4 py-2 border-b flex flex-wrap gap-4 flex-shrink-0" style={{ borderColor: "var(--border)", background: "var(--surface-raised)" }}>
         {Object.entries(CONNECTION_COLORS).map(([type, color]) => (
           <div key={type} className="flex items-center gap-1.5 text-xs">
@@ -587,7 +554,6 @@ export default function CircuitRenderer({ schematic, error, onRetry }: Props) {
         </div>
       </div>
 
-      {/* Canvas */}
       <div
         ref={canvasRef}
         className="flex-1"
