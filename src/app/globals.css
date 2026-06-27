@@ -1,27 +1,131 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bg: #030712;
+  --surface: #0a0f1d;
+  --surface-raised: #121b2e;
+  --border: #1e293b;
+  --text-primary: #f8fafc;
+  --text-muted: #64748b;
+  --accent-blue: #00e5ff;
+  --accent-orange: #00ff66;
+  --accent-green: #00ff66;
+  --accent-red: #ef4444;
+  --accent-purple: #a855f7;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  box-sizing: border-box;
 }
 
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+html, body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--bg);
+  color: var(--text-primary);
+  font-family: 'Outfit', sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
 }
 
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
+/* Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--surface);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+
+/* Panel section headers - VS Code style */
+.panel-header {
+  font-family: 'Outfit', sans-serif;
+  font-weight: 500;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+}
+
+/* Code blocks */
+code, pre {
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* Pulsing animation for fatal issues */
+@keyframes pulse-ring {
+  0% { transform: scale(0.8); opacity: 1; }
+  100% { transform: scale(2); opacity: 0; }
+}
+
+.pulse-dot::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: var(--accent-red);
+  animation: pulse-ring 1.5s ease-out infinite;
+}
+
+/* Skeleton shimmer */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--surface) 25%,
+    var(--surface-raised) 50%,
+    var(--surface) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 6px;
+}
+
+/* Signal type colors */
+.signal-power { color: #ef4444; }
+.signal-ground { color: #4b5563; }
+.signal-digital { color: #00ff66; }
+.signal-analog { color: #00e5ff; }
+.signal-i2c { color: #00ff66; }
+.signal-spi { color: #00e5ff; }
+.signal-uart { color: #3b82f6; }
+
+/* Board badges */
+.badge-arduino {
+  background: #00878a20;
+  color: #00878a;
+  border: 1px solid #00878a40;
+}
+.badge-esp32 {
+  background: #e7383820;
+  color: #e73838;
+  border: 1px solid #e7383840;
+}
+.badge-stm32 {
+  background: #0352fc20;
+  color: #4a7fff;
+  border: 1px solid #0352fc40;
+}
+
+/* Highlight.js theme override */
+.hljs {
+  background: #0d1117 !important;
+  color: #e6edf3;
+  padding: 0 !important;
 }

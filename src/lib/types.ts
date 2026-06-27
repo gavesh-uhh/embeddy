@@ -1,0 +1,135 @@
+export type BoardType =
+  | "Arduino Uno"
+  | "Arduino Mega"
+  | "ESP32"
+  | "ESP32-S3"
+  | "STM32F103"
+  | "STM32F4";
+export type SignalType =
+  "power" | "ground" | "digital" | "analog" | "i2c" | "spi" | "uart";
+export type Severity = "fatal" | "warning" | "info";
+export type Availability = "common" | "moderate" | "rare";
+
+export interface ProjectOverview {
+  summary: string;
+  board: BoardType;
+  components: string[];
+  goals: string[];
+  warnings: string[];
+}
+
+export interface Pin {
+  component: string;
+  pin: string;
+  boardPin: string;
+  signalType: SignalType;
+  voltage: string;
+}
+
+export interface PinDiagram {
+  pins: Pin[];
+}
+
+export interface SchematicComponent {
+  id: string;
+  type: string;
+  variant: string;
+  x: number;
+  y: number;
+}
+
+export interface SchematicConnection {
+  from: string;
+  fromPin?: string;
+  to: string;
+  toPin?: string;
+  signalType: "power" | "ground" | "data" | "analog";
+}
+
+export interface CircuitSchematic {
+  components: SchematicComponent[];
+  connections: SchematicConnection[];
+}
+
+export interface FatalIssue {
+  severity: Severity;
+  title: string;
+  description: string;
+  affectedComponents: string[];
+}
+
+export interface FatalIssues {
+  issues: FatalIssue[];
+}
+
+export interface CompatibilityCheck {
+  component: string;
+  issue: string;
+  resolution: string;
+  voltageConflict: boolean;
+}
+
+export interface CompatibilityChecks {
+  checks: CompatibilityCheck[];
+}
+
+export interface PowerComponent {
+  name: string;
+  currentMa: number;
+  voltage: number;
+}
+
+export interface PowerBudget {
+  totalCurrentMa: number;
+  components: PowerComponent[];
+  supplyRecommendation: string;
+  overBudget: boolean;
+}
+
+export interface BOMItem {
+  name: string;
+  quantity: number;
+  description: string;
+  estimatedLKR: number;
+}
+
+export interface BOM {
+  items: BOMItem[];
+  totalEstimatedLKR: number;
+}
+
+export interface CodeSkeleton {
+  language: "C++" | "MicroPython";
+  framework: "Arduino" | "ESP-IDF" | "STM32 HAL";
+  code: string;
+}
+
+export interface ComponentSource {
+  component: string;
+  availability: Availability;
+  notes: string;
+}
+
+export interface ProjectContext {
+  title: string;
+  board: BoardType;
+  description: string;
+  fileContents: string[];
+}
+
+export interface ProjectData {
+  id: string;
+  title: string;
+  board: BoardType;
+  description: string;
+  createdAt: string;
+  overview?: ProjectOverview;
+  pinDiagram?: PinDiagram;
+  schematic?: CircuitSchematic;
+  fatalIssues?: FatalIssues;
+  compatibility?: CompatibilityChecks;
+  powerBudget?: PowerBudget;
+  bom?: BOM;
+  codeSkeleton?: CodeSkeleton;
+  errors?: Record<string, string>;
+}
