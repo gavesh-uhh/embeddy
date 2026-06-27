@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, useCallback } from "react";
-import { CircuitSchematic, SchematicComponent } from "@/lib/types";
+import { CircuitSchematic, SchematicComponent, SchematicConnection } from "@/lib/types";
 
 interface Props {
   schematic?: CircuitSchematic;
@@ -42,7 +42,7 @@ function getCompDims(type: string, pinCount: number) {
 }
 
 // Extract pins for layout
-function getComponentPins(comp: SchematicComponent, connections: any[], mcuX: number): { left: string[], right: string[] } {
+function getComponentPins(comp: SchematicComponent, connections: SchematicConnection[], mcuX: number): { left: string[], right: string[] } {
   const pins = new Set<string>();
   connections.forEach(conn => {
     if (conn.from === comp.id && conn.fromPin) pins.add(conn.fromPin);

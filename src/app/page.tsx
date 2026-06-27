@@ -8,7 +8,6 @@ import { ProjectData, BoardType } from "@/lib/types";
 import {
   Cpu,
   Zap,
-  GitBranch,
   ShieldAlert,
   Wrench,
   Code2,
@@ -18,14 +17,12 @@ import {
   ArrowRight,
   Upload,
   FileText,
-  X,
   Loader2,
   Plus,
   ArrowLeft,
   Sparkles,
   BookOpen,
   HelpCircle,
-  CheckCircle2,
 } from "lucide-react";
 
 const BOARDS: BoardType[] = [
@@ -296,8 +293,8 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="lg:col-span-5 p-8 lg:p-12 overflow-y-auto h-full flex flex-col justify-start space-y-6" style={{ background: "var(--surface)" }}>
-            <div className="space-y-3">
+          <div className="lg:col-span-5 p-8 lg:p-12 h-full flex flex-col justify-start space-y-6 overflow-hidden" style={{ background: "var(--surface)" }}>
+            <div className="space-y-3 flex-shrink-0">
               <div className="flex items-center gap-2">
                 <BookOpen size={16} style={{ color: "var(--accent)" }} />
                 <h3 className="font-bold text-xs tracking-wide uppercase" style={{ color: "var(--text-primary)", fontFamily: "Outfit, sans-serif" }}>
@@ -309,54 +306,56 @@ export default function Home() {
                   <span className="text-xs px-2 py-0.5 rounded h-fit font-bold" style={{ background: "#00ff6615", color: "var(--accent)", border: "1px solid #00ff6625" }}>1</span>
                   <div>
                     <h4 className="text-xs font-semibold mb-0.5" style={{ color: "var(--text-primary)" }}>State components clearly</h4>
-                    <p className="text-[11px] leading-relaxed" style={{ color: "var(--text-muted)" }}>Include parts like "SSD1306 OLED screen" or "DHT11 sensor" so AI knows exactly what to route.</p>
+                    <p className="text-[11px] leading-relaxed" style={{ color: "var(--text-muted)" }}>Include parts like &quot;SSD1306 OLED screen&quot; or &quot;DHT11 sensor&quot; so AI knows exactly what to route.</p>
                   </div>
                 </div>
                 <div className="flex gap-3">
                   <span className="text-xs px-2 py-0.5 rounded h-fit font-bold" style={{ background: "#00ff6615", color: "var(--accent)", border: "1px solid #00ff6625" }}>2</span>
                   <div>
                     <h4 className="text-xs font-semibold mb-0.5" style={{ color: "var(--text-primary)" }}>Define logic thresholds</h4>
-                    <p className="text-[11px] leading-relaxed" style={{ color: "var(--text-muted)" }}>Operational guidelines: e.g. "when moisture drops below 30%, trigger relay."</p>
+                    <p className="text-[11px] leading-relaxed" style={{ color: "var(--text-muted)" }}>Operational guidelines: e.g. &quot;when moisture drops below 30%, trigger relay.&quot;</p>
                   </div>
                 </div>
               </div>
             </div>
 
-            <div className="space-y-3">
-              <div className="flex items-center gap-2">
-                <Sparkles size={16} style={{ color: "var(--accent)" }} />
-                <h3 className="font-bold text-xs tracking-wide uppercase" style={{ color: "var(--text-primary)", fontFamily: "Outfit, sans-serif" }}>
-                  Interactive Examples
-                </h3>
-              </div>
+            <div className="flex-1 overflow-y-auto pr-1 space-y-6">
               <div className="space-y-3">
-                {EXAMPLES.map((ex, i) => (
-                  <button
-                    key={i}
-                    onClick={() => loadExample(ex)}
-                    className="w-full p-3.5 rounded-xl border text-left transition-all hover:border-[#00ff6640] hover:bg-[#00ff6604]"
-                    style={{ borderColor: "var(--border)", background: "#050505" }}
-                  >
-                    <div className="flex items-center justify-between mb-1.5">
-                      <span className="text-xs font-bold" style={{ color: "var(--text-primary)" }}>{ex.title}</span>
-                      <span className="text-[10px] px-1.5 py-0.5 font-mono rounded" style={{ background: "var(--surface-raised)", color: "var(--text-muted)", border: "1px solid var(--border)" }}>{ex.board}</span>
-                    </div>
-                    <p className="text-xs leading-normal line-clamp-2" style={{ color: "var(--text-muted)" }}>
-                      {ex.description}
-                    </p>
-                  </button>
-                ))}
+                <div className="flex items-center gap-2">
+                  <Sparkles size={16} style={{ color: "var(--accent)" }} />
+                  <h3 className="font-bold text-xs tracking-wide uppercase" style={{ color: "var(--text-primary)", fontFamily: "Outfit, sans-serif" }}>
+                    Interactive Examples
+                  </h3>
+                </div>
+                <div className="space-y-3">
+                  {EXAMPLES.map((ex, i) => (
+                    <button
+                      key={i}
+                      onClick={() => loadExample(ex)}
+                      className="w-full p-3.5 rounded-xl border text-left transition-all hover:border-[#00ff6640] hover:bg-[#00ff6604]"
+                      style={{ borderColor: "var(--border)", background: "#050505" }}
+                    >
+                      <div className="flex items-center justify-between mb-1.5">
+                        <span className="text-xs font-bold" style={{ color: "var(--text-primary)" }}>{ex.title}</span>
+                        <span className="text-[10px] px-1.5 py-0.5 font-mono rounded" style={{ background: "var(--surface-raised)", color: "var(--text-muted)", border: "1px solid var(--border)" }}>{ex.board}</span>
+                      </div>
+                      <p className="text-xs leading-normal line-clamp-2" style={{ color: "var(--text-muted)" }}>
+                        {ex.description}
+                      </p>
+                    </button>
+                  ))}
+                </div>
               </div>
-            </div>
 
-            <div className="space-y-3.5 p-4 rounded-xl border text-xs" style={{ borderColor: "var(--border)", background: "rgba(0,0,0,0.2)" }}>
-              <div className="flex items-center gap-1.5">
-                <HelpCircle size={13} style={{ color: "var(--text-muted)" }} />
-                <span className="font-semibold" style={{ color: "var(--text-primary)" }}>Which microcontroller?</span>
+              <div className="space-y-3.5 p-4 rounded-xl border text-xs" style={{ borderColor: "var(--border)", background: "rgba(0,0,0,0.2)" }}>
+                <div className="flex items-center gap-1.5">
+                  <HelpCircle size={13} style={{ color: "var(--text-muted)" }} />
+                  <span className="font-semibold" style={{ color: "var(--text-primary)" }}>Which microcontroller?</span>
+                </div>
+                <p style={{ color: "var(--text-muted)", lineHeight: "1.5" }}>
+                  Choose **ESP32** for Wi-Fi/BT IoT. Choose **Arduino Uno** for standard 5V logic shields and basics. Choose **STM32** for advanced, high-performance industrial controller tasks.
+                </p>
               </div>
-              <p style={{ color: "var(--text-muted)", lineHeight: "1.5" }}>
-                Choose **ESP32** for Wi-Fi/BT IoT. Choose **Arduino Uno** for standard 5V logic shields and basics. Choose **STM32** for advanced, high-performance industrial controller tasks.
-              </p>
             </div>
           </div>
         </div>
@@ -394,13 +393,6 @@ export default function Home() {
 
       <main className="flex-1 grid grid-cols-1 lg:grid-cols-2 min-h-0">
         <div className="flex flex-col justify-center px-10 lg:px-16 py-14 fade-up">
-          <div
-            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium mb-6 self-start"
-            style={{ background: "var(--accent-glow)", color: "var(--accent)", border: "1px solid #00ff6625" }}
-          >
-            <span className="w-1.5 h-1.5 rounded-full" style={{ background: "var(--accent)" }} />
-            AI · Multi-Agent · Real-Time
-          </div>
 
           <h1
             className="glitch-text font-bold mb-4"
