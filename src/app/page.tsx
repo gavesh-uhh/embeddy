@@ -23,6 +23,7 @@ import {
   Sparkles,
   BookOpen,
   HelpCircle,
+  X,
 } from "lucide-react";
 
 const BOARDS: BoardType[] = [
@@ -43,6 +44,89 @@ const FEATURES = [
   { icon: Wrench,       label: "Compatibility",       desc: "Board + component check" },
   { icon: Code2,        label: "Code Skeleton",       desc: "Compilable starter code" },
   { icon: Bot,          label: "9 AI Agents",         desc: "Running in parallel" },
+];
+
+const FEATURE_DETAILS = [
+  {
+    id: "schematic",
+    title: "Circuit Schematic",
+    category: "hardware",
+    icon: Zap,
+    shortDesc: "Interactive Canvas & Real-time Routing",
+    longDesc: "Embeddy generates high-fidelity circuit schematics drawn directly on an interactive Konva canvas. Pan, zoom, and click individual components to highlight connected power, ground, and data wiring networks.",
+    badge: "Konva.js Engine",
+    color: "var(--accent)"
+  },
+  {
+    id: "pinout",
+    title: "Pin Diagram",
+    category: "hardware",
+    icon: PinIcon,
+    shortDesc: "Signal-Typed Hardware Pinouts",
+    longDesc: "Get complete mappings of microcontroller pin connections. Signals are categorized (Analog, Digital, I2C, SPI, UART, Power) and color-coded with physical alignment diagrams.",
+    badge: "Signal-Typed Map",
+    color: "var(--accent-blue)"
+  },
+  {
+    id: "power",
+    title: "Power Budget",
+    category: "diagnostics",
+    icon: Zap,
+    shortDesc: "Current Draw & Voltage Validation",
+    longDesc: "Analyze system current loads dynamically. Embeddy features a 20-segment LED load visualizer, individual voltage rail breakdowns, and intelligent alerts if USB power limits (500mA) are exceeded.",
+    badge: "LED Load Analyzer",
+    color: "var(--accent-red)"
+  },
+  {
+    id: "bom",
+    title: "BOM & Sourcing",
+    category: "diagnostics",
+    icon: ShoppingCart,
+    shortDesc: "Procurement & Cost Estimation",
+    longDesc: "Instantly compile a Bill of Materials (BOM) including quantities, description details, standard unit pricing, and estimated total project cost in Rupees.",
+    badge: "LKR Sourced Lists",
+    color: "var(--accent)"
+  },
+  {
+    id: "safety",
+    title: "Safety Analysis",
+    category: "diagnostics",
+    icon: ShieldAlert,
+    shortDesc: "Voltage Conflict & Fault Detections",
+    longDesc: "Verify component safety automatically. Detects short circuits, severe logic mismatches, missing pull-ups, and highlights critical hardware faults in red alert logs.",
+    badge: "Threat Scanner",
+    color: "var(--accent-red)"
+  },
+  {
+    id: "compatibility",
+    title: "Compatibility Checks",
+    category: "diagnostics",
+    icon: Wrench,
+    shortDesc: "Pin-to-Shield Hardware Verifications",
+    longDesc: "Ensures selected components are electrically compatible with target boards. Checks interface types, voltage tolerances, and provides detailed logic level shifter resolutions.",
+    badge: "Tolerance Checked",
+    color: "var(--accent-yellow)"
+  },
+  {
+    id: "code",
+    title: "Code Skeleton",
+    category: "software",
+    icon: Code2,
+    shortDesc: "Compilable Starter Firmware",
+    longDesc: "Generates fully documented, ready-to-flash firmware templates. Automatically imports required libraries, defines hardware pin configurations, and sets up communication lines.",
+    badge: "C++ / MicroPython",
+    color: "#a855f7"
+  },
+  {
+    id: "agents",
+    title: "9 AI Agents",
+    category: "software",
+    icon: Bot,
+    shortDesc: "Parallel Multi-Agent Generation",
+    longDesc: "Embeddy orchestrates 9 specialized agents in parallel (BOM Agent, Pins Agent, Power Agent, etc.). Generations complete in under 30 seconds, delivering highly coherent plans.",
+    badge: "Parallel Pipeline",
+    color: "var(--accent)"
+  }
 ];
 
 const EXAMPLES = [
@@ -70,6 +154,11 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
   const [files, setFiles] = useState<File[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const [showFeaturesModal, setShowFeaturesModal] = useState(false);
+  const [selectedFeatureTab, setSelectedFeatureTab] = useState<string>("all");
+  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [activeFeatureId, setActiveFeatureId] = useState<string | null>(null);
 
   const [form, setForm] = useState({
     title: "",
@@ -427,8 +516,8 @@ export default function Home() {
               Start a Project
               <ArrowRight size={15} strokeWidth={2.5} />
             </button>
-            <a
-              href="#features"
+            <button
+              onClick={() => setShowFeaturesModal(true)}
               className="flex items-center gap-2 px-4 py-3 rounded-lg text-sm font-medium transition-colors"
               style={{ color: "var(--text-muted)", border: "1px solid var(--border)" }}
               onMouseEnter={e => {
@@ -441,7 +530,7 @@ export default function Home() {
               }}
             >
               See features
-            </a>
+            </button>
           </div>
 
           <div className="flex items-center gap-6 mt-10 pt-8" style={{ borderTop: "1px solid var(--border)" }}>
@@ -511,7 +600,17 @@ export default function Home() {
           return (
             <div
               key={i}
-              className="flex flex-col items-start gap-2 p-4 border-r card-hover cursor-default"
+              onClick={() => {
+                const ids = ["schematic", "pinout", "power", "bom", "safety", "compatibility", "code", "agents"];
+                const matchedId = ids[i];
+                if (matchedId) {
+                  setActiveFeatureId(matchedId);
+                  const detail = FEATURE_DETAILS.find(d => d.id === matchedId);
+                  if (detail) setSelectedFeatureTab(detail.category);
+                  setShowFeaturesModal(true);
+                }
+              }}
+              className="flex flex-col items-start gap-2 p-4 border-r card-hover cursor-pointer"
               style={{ borderColor: "var(--border)" }}
             >
               <div className="w-6 h-6 rounded flex items-center justify-center" style={{ background: "var(--accent-glow)", color: "var(--accent)" }}>
@@ -527,6 +626,200 @@ export default function Home() {
       <footer className="py-3 text-center text-xs" style={{ color: "var(--text-dim)", borderTop: "1px solid var(--border)" }}>
         Powered by Gemini AI · Built for engineers
       </footer>
+
+      {showFeaturesModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: "rgba(0, 0, 0, 0.75)", backdropFilter: "blur(12px)" }}>
+          <div className="rounded-xl border flex flex-col max-w-4xl w-full max-h-[85vh] overflow-hidden transition-all duration-300 relative animate-fade-in"
+            style={{ background: "var(--surface)", borderColor: "var(--border)", boxShadow: "0 0 50px rgba(0, 255, 102, 0.08)" }}>
+            
+            {/* Modal Header */}
+            <div className="flex-shrink-0 px-6 py-4 border-b flex items-center justify-between" style={{ borderColor: "var(--border)" }}>
+              <div className="flex items-center gap-2">
+                <Sparkles size={16} style={{ color: "var(--accent)" }} />
+                <span className="font-mono text-xs uppercase tracking-widest" style={{ color: "var(--text-muted)" }}>[EMBEDDY_SYSTEM_FEATURES]</span>
+              </div>
+              <button onClick={() => { setShowFeaturesModal(false); setActiveFeatureId(null); }} className="p-1 rounded border hover:bg-white/5 transition-colors"
+                style={{ borderColor: "var(--border)", color: "var(--text-muted)" }}>
+                <X size={14} />
+              </button>
+            </div>
+
+            {/* Sub-Header: Search and Tabs */}
+            <div className="flex-shrink-0 px-6 py-3.5 border-b flex flex-col md:flex-row md:items-center justify-between gap-3" style={{ borderColor: "var(--border)", background: "var(--surface-raised)" }}>
+              {/* Category tabs */}
+              <div className="flex flex-wrap gap-1">
+                {[
+                  { id: "all", label: "ALL FEATURES" },
+                  { id: "hardware", label: "HARDWARE & WIRING" },
+                  { id: "software", label: "CODE & SOFTWARE" },
+                  { id: "diagnostics", label: "DIAGNOSTICS & ANALYTICS" }
+                ].map((tab) => (
+                  <button
+                    key={tab.id}
+                    onClick={() => { setSelectedFeatureTab(tab.id); setActiveFeatureId(null); }}
+                    className="px-3 py-1.5 rounded text-[10px] font-mono font-bold tracking-wider transition-all"
+                    style={{
+                      background: selectedFeatureTab === tab.id ? "#00ff6610" : "transparent",
+                      color: selectedFeatureTab === tab.id ? "var(--accent)" : "var(--text-muted)",
+                      border: `1px solid ${selectedFeatureTab === tab.id ? "#00ff6630" : "transparent"}`
+                    }}
+                  >
+                    {tab.label}
+                  </button>
+                ))}
+              </div>
+
+              {/* Search input */}
+              <input
+                type="text"
+                placeholder="Search features..."
+                value={searchQuery}
+                onChange={(e) => { setSearchQuery(e.target.value); setActiveFeatureId(null); }}
+                className="px-3 py-1.5 rounded text-xs outline-none w-full md:w-48 font-mono border"
+                style={{ background: "var(--bg)", borderColor: "var(--border)", color: "var(--text-primary)" }}
+              />
+            </div>
+
+            {/* Modal Body */}
+            <div className="flex-1 overflow-y-auto p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+              {(() => {
+                const filtered = FEATURE_DETAILS.filter((f) => {
+                  const matchesTab = selectedFeatureTab === "all" || f.category === selectedFeatureTab;
+                  const matchesSearch = f.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                                       f.shortDesc.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                                       f.longDesc.toLowerCase().includes(searchQuery.toLowerCase());
+                  return matchesTab && matchesSearch;
+                });
+
+                if (filtered.length === 0) {
+                  return (
+                    <div className="col-span-2 py-12 text-center text-xs font-mono" style={{ color: "var(--text-muted)" }}>
+                      NO COMPILING SYSTEM MATCHED THIS QUERY
+                    </div>
+                  );
+                }
+
+                return filtered.map((f) => {
+                  const Icon = f.icon;
+                  const isActive = activeFeatureId === f.id;
+
+                  return (
+                    <div
+                      key={f.id}
+                      onClick={() => setActiveFeatureId(isActive ? null : f.id)}
+                      className="rounded-lg border p-4 cursor-pointer transition-all duration-300 card-hover relative overflow-hidden"
+                      style={{
+                        background: isActive ? "rgba(0, 255, 102, 0.02)" : "var(--bg)",
+                        borderColor: isActive ? "var(--accent)" : "var(--border)",
+                        boxShadow: isActive ? "0 0 16px rgba(0, 255, 102, 0.04)" : "none"
+                      }}
+                    >
+                      <div className="absolute top-0 right-0 w-16 h-16 rounded-full filter blur-xl opacity-10 pointer-events-none"
+                        style={{ background: f.color }} />
+                        
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center gap-2">
+                          <span className="w-7 h-7 rounded flex items-center justify-center"
+                            style={{ background: "rgba(255, 255, 255, 0.03)", border: "1px solid var(--border)", color: f.color }}>
+                            <Icon size={12} strokeWidth={2.5} />
+                          </span>
+                          <h4 className="text-sm font-semibold text-white">{f.title}</h4>
+                        </div>
+                        <span className="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded uppercase"
+                          style={{ background: `${f.color}15`, color: f.color, border: `1px solid ${f.color}30` }}>
+                          {f.badge}
+                        </span>
+                      </div>
+
+                      <p className="text-xs font-medium mb-1.5" style={{ color: "var(--text-primary)" }}>{f.shortDesc}</p>
+                      <p className="text-xs leading-relaxed" style={{ color: "var(--text-muted)" }}>{f.longDesc}</p>
+                      
+                      {/* Interactive indicator for visual feedback */}
+                      <div className="mt-3 flex items-center gap-1 text-[9px] font-mono font-bold uppercase transition-colors"
+                        style={{ color: isActive ? "var(--accent)" : "var(--text-dim)" }}>
+                        <span>{isActive ? "[ACTIVE_EXPANSION]" : "[CLICK_TO_EXPAND_METRICS]"}</span>
+                      </div>
+
+                      {/* Visual Sub-Widget Shown When Expanded */}
+                      {isActive && (
+                        <div className="mt-3 pt-3 border-t space-y-2.5 animate-fadeIn" style={{ borderColor: "var(--border)" }}>
+                          {f.id === "schematic" && (
+                            <div className="p-2.5 rounded bg-black/40 border border-white/5 font-mono text-[9px]" style={{ color: "var(--text-muted)", borderColor: "var(--border)" }}>
+                              <div className="text-[var(--accent)]">{"// Dynamic routing initialization"}</div>
+                              <div>$ renderer.stage.zoom(1.2);</div>
+                              <div>$ connectionGroup.highlight(&quot;comp_ESP32&quot;);</div>
+                            </div>
+                          )}
+                          {f.id === "power" && (
+                            <div className="p-2.5 rounded bg-black/40 border border-white/5 space-y-1.5" style={{ borderColor: "var(--border)" }}>
+                              <div className="flex justify-between text-[9px] font-mono" style={{ color: "var(--text-muted)" }}>
+                                <span>SIMULATED_LOAD</span>
+                                <span>320mA / 500mA</span>
+                              </div>
+                              <div className="flex gap-0.5">
+                                {Array.from({ length: 15 }).map((_, idx) => (
+                                  <div key={idx} className="h-1.5 flex-1 rounded-sm" style={{ background: idx < 10 ? "var(--accent)" : "rgba(255,255,255,0.05)" }} />
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                          {f.id === "compatibility" && (
+                            <div className="p-2 rounded bg-black/40 border border-white/5 flex items-center justify-between text-[9px] font-mono" style={{ borderColor: "var(--border)" }}>
+                              <span style={{ color: "var(--accent)" }}>✓ I2C Bus Tolerances verified</span>
+                              <span style={{ color: "var(--text-muted)" }}>3.3V Logic</span>
+                            </div>
+                          )}
+                          {f.id === "bom" && (
+                            <div className="p-2 rounded bg-black/40 border border-white/5 flex items-center justify-between text-[9px] font-mono" style={{ borderColor: "var(--border)", color: "var(--text-muted)" }}>
+                              <span>Est. Cost: Rs. 1,450.00</span>
+                              <span>4 Lines</span>
+                            </div>
+                          )}
+                          {f.id === "safety" && (
+                            <div className="p-2 rounded bg-black/40 border border-white/5 flex items-center justify-between text-[9px] font-mono text-[var(--accent)]" style={{ borderColor: "var(--border)" }}>
+                              <span>✓ No voltage conflicts compiled</span>
+                            </div>
+                          )}
+                          {f.id === "code" && (
+                            <div className="p-2.5 rounded bg-black/40 border border-white/5 font-mono text-[9px]" style={{ color: "var(--text-muted)", borderColor: "var(--border)" }}>
+                              <div className="text-purple-400">#include &lt;Wire.h&gt;</div>
+                              <div>void setup() &#123; Wire.begin(); &#125;</div>
+                            </div>
+                          )}
+                          {f.id === "agents" && (
+                            <div className="p-2 rounded bg-black/40 border border-white/5 flex items-center justify-between text-[9px] font-mono" style={{ borderColor: "var(--border)", color: "var(--text-muted)" }}>
+                              <span>9 Pipelines compiling...</span>
+                              <span style={{ color: "var(--accent)" }}>READY in 28.4s</span>
+                            </div>
+                          )}
+                          {f.id === "pinout" && (
+                            <div className="p-2 rounded bg-black/40 border border-white/5 flex gap-1.5 flex-wrap" style={{ borderColor: "var(--border)" }}>
+                              {["GPIO21", "GPIO22", "3V3", "GND"].map((p, idx) => (
+                                <span key={idx} className="px-1 py-0.5 rounded text-[8px] font-mono bg-white/5" style={{ color: idx === 2 ? "var(--accent-red)" : idx === 3 ? "var(--text-muted)" : "var(--accent)" }}>{p}</span>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  );
+                });
+              })()}
+            </div>
+
+            {/* Modal Footer */}
+            <div className="flex-shrink-0 px-6 py-4 border-t flex items-center justify-end" style={{ borderColor: "var(--border)", background: "var(--surface-raised)" }}>
+              <button
+                onClick={() => { setShowFeaturesModal(false); setActiveFeatureId(null); }}
+                className="px-4 py-2 rounded-lg text-xs font-semibold"
+                style={{ background: "var(--accent)", color: "#000", boxShadow: "0 0 16px var(--accent-glow-strong)" }}
+              >
+                Close Diagnostics
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

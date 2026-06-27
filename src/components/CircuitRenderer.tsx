@@ -31,13 +31,20 @@ const COMPONENT_BORDER_COLORS: Record<string, string> = {
   module: "#3b82f6",
 };
 
-// Component dimensions based on pins
-function getCompDims(type: string, pinCount: number) {
+// Component dimensions based on pins and pin label lengths to prevent text overlaps
+function getCompDims(type: string, pinCount: number, maxLeftPinLen: number = 0, maxRightPinLen: number = 0) {
   let w = 120;
   if (type === "mcu") w = 180;
   else if (type === "power") w = 110;
   
-  const h = Math.max(type === "mcu" ? 140 : 80, pinCount * 25 + 35);
+  const leftLabelW = maxLeftPinLen > 0 ? maxLeftPinLen * 5.8 + 6 : 0;
+  const rightLabelW = maxRightPinLen > 0 ? maxRightPinLen * 5.8 + 6 : 0;
+  const neededWidth = leftLabelW + rightLabelW + 20; // 20px spacer in the middle
+  
+  w = Math.max(w, Math.ceil(neededWidth));
+  
+  // Leave 45px at top for header (preventing component name overlap), 20px at bottom for ID label
+  const h = Math.max(type === "mcu" ? 140 : 90, pinCount * 25 + 65);
   return { w, h };
 }
 
@@ -91,7 +98,9 @@ function getComponentPins(comp: SchematicComponent, connections: SchematicConnec
 // Get connection point on exact pin coordinates
 function getConnectionPoint(comp: SchematicComponent, pinName: string | undefined, layout: { left: string[], right: string[] }) {
   const maxPins = Math.max(layout.left.length, layout.right.length);
-  const dims = getCompDims(comp.type, maxPins);
+  const maxLeftPinLen = Math.max(0, ...layout.left.map(p => p.length));
+  const maxRightPinLen = Math.max(0, ...layout.right.map(p => p.length));
+  const dims = getCompDims(comp.type, maxPins, maxLeftPinLen, maxRightPinLen);
 
   if (!pinName) {
     return { x: comp.x + dims.w / 2, y: comp.y + dims.h / 2 };
@@ -101,7 +110,7 @@ function getConnectionPoint(comp: SchematicComponent, pinName: string | undefine
   if (leftIdx !== -1) {
     return {
       x: comp.x - 6,
-      y: comp.y + 25 + leftIdx * 25
+      y: comp.y + 45 + leftIdx * 25
     };
   }
 
@@ -109,7 +118,7 @@ function getConnectionPoint(comp: SchematicComponent, pinName: string | undefine
   if (rightIdx !== -1) {
     return {
       x: comp.x + dims.w + 6,
-      y: comp.y + 25 + rightIdx * 25
+      y: comp.y + 45 + rightIdx * 25
     };
   }
 
@@ -142,7 +151,9 @@ function resolveOverlaps(
   const getRect = (c: SchematicComponent) => {
     const layout = compPinMap.get(c.id) || { left: [], right: [] };
     const maxPins = Math.max(layout.left.length, layout.right.length);
-    const dims = getCompDims(c.type, maxPins);
+    const maxLeftPinLen = Math.max(0, ...layout.left.map(p => p.length));
+    const maxRightPinLen = Math.max(0, ...layout.right.map(p => p.length));
+    const dims = getCompDims(c.type, maxPins, maxLeftPinLen, maxRightPinLen);
     return { x: c.x, y: c.y, w: dims.w, h: dims.h };
   };
 
@@ -289,7 +300,9 @@ export default function CircuitRenderer({ schematic, error, onRetry }: Props) {
     laidOut.forEach((comp) => {
       const layout = compPinMap.get(comp.id) || { left: [], right: [] };
       const maxPins = Math.max(layout.left.length, layout.right.length);
-      const dims = getCompDims(comp.type, maxPins);
+      const maxLeftPinLen = Math.max(0, ...layout.left.map(p => p.length));
+      const maxRightPinLen = Math.max(0, ...layout.right.map(p => p.length));
+      const dims = getCompDims(comp.type, maxPins, maxLeftPinLen, maxRightPinLen);
       
       const bg = COMPONENT_COLORS[comp.type] || COMPONENT_COLORS.module;
       const border = COMPONENT_BORDER_COLORS[comp.type] || "#334155";
@@ -363,7 +376,7 @@ export default function CircuitRenderer({ schematic, error, onRetry }: Props) {
 
       // Draw left pins
       layout.left.forEach((pin, idx) => {
-        const y = 25 + idx * 25;
+        const y = 45 + idx * 25;
         
         // Horizontal stub line extending left
         const stub = new K.default.Line({
@@ -380,10 +393,13 @@ export default function CircuitRenderer({ schematic, error, onRetry }: Props) {
           fill: border,
         });
 
+        const leftLabelW = maxLeftPinLen > 0 ? maxLeftPinLen * 5.8 : 50;
+
         // Pin label text inside the box (aligned left)
         const pinTxt = new K.default.Text({
           x: 6,
           y: y - 5,
+          width: leftLabelW,
           text: pin,
           fontSize: 8,
           fontFamily: "JetBrains Mono, monospace",
@@ -396,7 +412,7 @@ export default function CircuitRenderer({ schematic, error, onRetry }: Props) {
 
       // Draw right pins
       layout.right.forEach((pin, idx) => {
-        const y = 25 + idx * 25;
+        const y = 45 + idx * 25;
         
         // Horizontal stub line extending right
         const stub = new K.default.Line({
@@ -413,11 +429,13 @@ export default function CircuitRenderer({ schematic, error, onRetry }: Props) {
           fill: border,
         });
 
+        const rightLabelW = maxRightPinLen > 0 ? maxRightPinLen * 5.8 : 50;
+
         // Pin label text inside the box (aligned right)
         const pinTxt = new K.default.Text({
-          x: dims.w - 56,
+          x: dims.w - rightLabelW - 6,
           y: y - 5,
-          width: 50,
+          width: rightLabelW,
           text: pin,
           fontSize: 8,
           fontFamily: "JetBrains Mono, monospace",
