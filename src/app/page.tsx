@@ -631,8 +631,6 @@ export default function Home() {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: "rgba(0, 0, 0, 0.75)", backdropFilter: "blur(12px)" }}>
           <div className="rounded-xl border flex flex-col max-w-4xl w-full max-h-[85vh] overflow-hidden transition-all duration-300 relative animate-fade-in"
             style={{ background: "var(--surface)", borderColor: "var(--border)", boxShadow: "0 0 50px rgba(0, 255, 102, 0.08)" }}>
-            
-            {/* Modal Header */}
             <div className="flex-shrink-0 px-6 py-4 border-b flex items-center justify-between" style={{ borderColor: "var(--border)" }}>
               <div className="flex items-center gap-2">
                 <Sparkles size={16} style={{ color: "var(--accent)" }} />
@@ -644,9 +642,7 @@ export default function Home() {
               </button>
             </div>
 
-            {/* Sub-Header: Search and Tabs */}
             <div className="flex-shrink-0 px-6 py-3.5 border-b flex flex-col md:flex-row md:items-center justify-between gap-3" style={{ borderColor: "var(--border)", background: "var(--surface-raised)" }}>
-              {/* Category tabs */}
               <div className="flex flex-wrap gap-1">
                 {[
                   { id: "all", label: "ALL FEATURES" },
@@ -669,7 +665,6 @@ export default function Home() {
                 ))}
               </div>
 
-              {/* Search input */}
               <input
                 type="text"
                 placeholder="Search features..."
@@ -680,7 +675,6 @@ export default function Home() {
               />
             </div>
 
-            {/* Modal Body */}
             <div className="flex-1 overflow-y-auto p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
               {(() => {
                 const filtered = FEATURE_DETAILS.filter((f) => {
@@ -734,13 +728,11 @@ export default function Home() {
                       <p className="text-xs font-medium mb-1.5" style={{ color: "var(--text-primary)" }}>{f.shortDesc}</p>
                       <p className="text-xs leading-relaxed" style={{ color: "var(--text-muted)" }}>{f.longDesc}</p>
                       
-                      {/* Interactive indicator for visual feedback */}
                       <div className="mt-3 flex items-center gap-1 text-[9px] font-mono font-bold uppercase transition-colors"
                         style={{ color: isActive ? "var(--accent)" : "var(--text-dim)" }}>
                         <span>{isActive ? "[ACTIVE_EXPANSION]" : "[CLICK_TO_EXPAND_METRICS]"}</span>
                       </div>
 
-                      {/* Visual Sub-Widget Shown When Expanded */}
                       {isActive && (
                         <div className="mt-3 pt-3 border-t space-y-2.5 animate-fadeIn" style={{ borderColor: "var(--border)" }}>
                           {f.id === "schematic" && (
@@ -807,7 +799,6 @@ export default function Home() {
               })()}
             </div>
 
-            {/* Modal Footer */}
             <div className="flex-shrink-0 px-6 py-4 border-t flex items-center justify-end" style={{ borderColor: "var(--border)", background: "var(--surface-raised)" }}>
               <button
                 onClick={() => { setShowFeaturesModal(false); setActiveFeatureId(null); }}

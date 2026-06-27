@@ -53,7 +53,6 @@ export default function CompatibilityPanel({ compatibility, error, onRetry }: Pr
   return (
     <div className="rounded-lg border overflow-hidden card-hover transition-all duration-300 relative" 
       style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
-      {/* Decorative left accent border line */}
       <div className="absolute top-0 bottom-0 left-0 w-[3px]" style={{ background: `linear-gradient(180deg, ${leftBorderColor} 0%, transparent 100%)` }} />
       
       <div className="px-4 py-2.5 border-b flex items-center gap-2 pl-5" style={{ borderColor: "var(--border)" }}>

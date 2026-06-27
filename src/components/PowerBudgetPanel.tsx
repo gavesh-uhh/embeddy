@@ -53,7 +53,6 @@ export default function PowerBudgetPanel({ powerBudget, error, onRetry }: Props)
   return (
     <div className="rounded-lg border overflow-hidden card-hover transition-all duration-300 relative" 
       style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
-      {/* Decorative left accent border line */}
       <div className="absolute top-0 bottom-0 left-0 w-[3px]" style={{ background: `linear-gradient(180deg, ${accentColor} 0%, transparent 100%)` }} />
       
       <div className="px-4 py-2.5 border-b flex items-center gap-2 pl-5" style={{ borderColor: "var(--border)" }}>
@@ -66,7 +65,6 @@ export default function PowerBudgetPanel({ powerBudget, error, onRetry }: Props)
       </div>
 
       <div className="p-4 pl-5 space-y-5">
-        {/* LED Segment Display bar */}
         <div className="space-y-2">
           <div className="flex justify-between items-center text-xs" style={{ color: "var(--text-muted)" }}>
             <span className="font-mono text-[10px] tracking-wider uppercase">[POWER_LEVELS]</span>
@@ -83,7 +81,6 @@ export default function PowerBudgetPanel({ powerBudget, error, onRetry }: Props)
                   bg = "var(--accent-red)";
                   shadow = "0 0 6px rgba(255, 59, 59, 0.6)";
                 } else if (idx > 15) {
-                  // Amber caution warning zone for higher load
                   bg = "var(--accent-yellow)";
                   shadow = "0 0 6px rgba(245, 197, 24, 0.6)";
                 } else {
@@ -102,7 +99,6 @@ export default function PowerBudgetPanel({ powerBudget, error, onRetry }: Props)
           </div>
         </div>
 
-        {/* Component breakdown */}
         <div className="space-y-3">
           <div className="text-[10px] font-mono tracking-wider uppercase" style={{ color: "var(--text-muted)" }}>[LOAD_DISTRIBUTION]</div>
           <div className="space-y-2.5">
@@ -128,7 +124,6 @@ export default function PowerBudgetPanel({ powerBudget, error, onRetry }: Props)
           </div>
         </div>
 
-        {/* Advisory Recommendation */}
         <div className="rounded-lg p-3 border transition-all duration-200" 
           style={{ background: "var(--surface-raised)", borderColor: "var(--border)" }}
           onMouseEnter={e => (e.currentTarget.style.borderColor = "var(--border-bright)")}

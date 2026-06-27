@@ -49,7 +49,6 @@ export default function ProjectOverviewCard({ overview, error, onRetry }: Props)
   return (
     <div className="rounded-lg border overflow-hidden card-hover transition-all duration-300 relative" 
       style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
-      {/* Decorative left accent border line */}
       <div className="absolute top-0 bottom-0 left-0 w-[3px]" style={{ background: "linear-gradient(180deg, var(--accent) 0%, transparent 100%)" }} />
       
       <div className="px-4 py-2.5 border-b flex items-center gap-2 pl-5" style={{ borderColor: "var(--border)" }}>
@@ -58,7 +57,6 @@ export default function ProjectOverviewCard({ overview, error, onRetry }: Props)
       </div>
       
       <div className="p-4 pl-5 space-y-5">
-        {/* System Summary Block */}
         <div className="space-y-1.5">
           <div className="text-[9px] font-mono tracking-widest uppercase" style={{ color: "var(--text-muted)" }}>[SYS_SUMMARY]</div>
           <p className="text-sm leading-relaxed font-sans" style={{ color: "var(--text-primary)" }}>
@@ -66,7 +64,6 @@ export default function ProjectOverviewCard({ overview, error, onRetry }: Props)
           </p>
         </div>
 
-        {/* Goals Checklist */}
         {overview.goals.length > 0 && (
           <div className="space-y-2">
             <div className="flex items-center gap-1.5">
@@ -91,7 +88,6 @@ export default function ProjectOverviewCard({ overview, error, onRetry }: Props)
           </div>
         )}
 
-        {/* Components Grid */}
         {overview.components.length > 0 && (
           <div className="space-y-2.5">
             <div className="flex items-center gap-1.5">
@@ -119,7 +115,6 @@ export default function ProjectOverviewCard({ overview, error, onRetry }: Props)
           </div>
         )}
 
-        {/* System Warnings Block */}
         {overview.warnings.length > 0 && (
           <div className="rounded-lg p-3 border space-y-2"
             style={{ background: "rgba(245, 197, 24, 0.03)", borderColor: "rgba(245, 197, 24, 0.15)" }}>
