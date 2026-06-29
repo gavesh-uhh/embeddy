@@ -89,6 +89,17 @@ const FEATURE_DETAILS = [
     color: "var(--accent-blue)",
   },
   {
+    id: "pcb",
+    title: "PCB Layout",
+    category: "hardware",
+    icon: Layers,
+    shortDesc: "Auto-Generated Board Layout & Routing",
+    longDesc:
+      "Auto-generate component placement and double-sided routing. Export netlists and production-ready designs for custom physical microcontrollers.",
+    badge: "BETA",
+    color: "var(--accent)",
+  },
+  {
     id: "power",
     title: "Power Budget",
     category: "diagnostics",
@@ -156,6 +167,25 @@ const FEATURE_DETAILS = [
   },
 ];
 
+const FAQS = [
+  {
+    question: "How does the AI parallel generation work?",
+    answer: "Embeddy spins up specialized agents simultaneously. While one agent routes the PCB, another verifies power budgets, and a third writes firmware—reducing design time from weeks to hours."
+  },
+  {
+    question: "Which microcontrollers are supported?",
+    answer: "We currently support Arduino Uno, Mega, ESP32, ESP32-S3, STM32F103, and STM32F4. We are constantly adding new architectures to our AI training pipeline."
+  },
+  {
+    question: "Can I export the generated designs to my EDA tool?",
+    answer: "Yes, you can export schematics and PCB layouts in industry-standard formats compatible with Altium Designer, KiCad, and Eagle."
+  },
+  {
+    question: "Is the generated firmware ready to compile?",
+    answer: "Absolutely. The code skeleton agent provides fully compilable C/C++ firmware based on your selected microcontroller and hardware peripherals."
+  }
+];
+
 const EXAMPLES: Array<{
   title: string;
   board: BoardType;
@@ -187,6 +217,7 @@ const EXAMPLES: Array<{
 
 export default function Home() {
   const router = useRouter();
+  const [openFaq, setOpenFaq] = useState<number | null>(null);
   const { user, loading: authLoading, signOut } = useAuth();
   const [showForm, setShowForm] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -992,8 +1023,8 @@ export default function Home() {
         </div>
       </nav>
 
-      <main className="flex-1 grid grid-cols-1 lg:grid-cols-2 min-h-0">
-        <div className="flex flex-col justify-center px-10 lg:px-16 py-14 fade-up">
+      <main className="grid grid-cols-1 lg:grid-cols-2 border-b" style={{ borderColor: "var(--border)" }}>
+        <div className="flex flex-col justify-center px-10 lg:px-16 py-20 lg:py-28 fade-up">
           <h1
             className="glitch-text font-bold mb-4"
             data-text="Embeddy"
@@ -1084,7 +1115,7 @@ export default function Home() {
         </div>
 
         <div
-          className="hidden lg:flex items-center justify-center p-10 relative overflow-hidden"
+          className="hidden lg:flex items-center justify-center p-10 py-20 lg:py-28 relative overflow-hidden"
           style={{
             borderLeft: "1px solid var(--border)",
             background: "var(--surface)",
@@ -1210,74 +1241,67 @@ export default function Home() {
         </div>
       </main>
 
-      <div
-        id="features"
-        className="border-t grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8"
-        style={{ borderColor: "var(--border)", background: "var(--surface)" }}
+
+      {/* FAQ Section */}
+      <section 
+        className="py-24 px-8 border-b"
+        style={{ borderColor: "var(--border)", background: "var(--bg)" }}
       >
-        {FEATURES.map((f, i) => {
-          const Icon = f.icon;
-          return (
-            <div
-              key={i}
-              onClick={() => {
-                const ids = [
-                  "schematic",
-                  "pinout",
-                  "power",
-                  "bom",
-                  "safety",
-                  "compatibility",
-                  "code",
-                  "agents",
-                ];
-                const matchedId = ids[i];
-                if (matchedId) {
-                  setActiveFeatureId(matchedId);
-                  const detail = FEATURE_DETAILS.find(
-                    (d) => d.id === matchedId,
-                  );
-                  if (detail) setSelectedFeatureTab(detail.category);
-                  setShowFeaturesModal(true);
-                }
-              }}
-              className="flex flex-col items-start gap-2 p-4 border-r card-hover cursor-pointer"
-              style={{ borderColor: "var(--border)" }}
-            >
-              <div
-                className="w-6 h-6 rounded flex items-center justify-center"
-                style={{
-                  background: "var(--accent-glow)",
-                  color: "var(--accent)",
+        <div className="max-w-3xl mx-auto space-y-12">
+          <div className="text-center space-y-3">
+            <h2 className="text-3xl font-bold tracking-tight" style={{ fontFamily: "Outfit, sans-serif", color: "var(--text-primary)" }}>
+              Frequently Asked Questions
+            </h2>
+            <p className="text-xs max-w-xl mx-auto" style={{ color: "var(--text-muted)" }}>
+              Everything you need to know about Embeddy's AI hardware design engine.
+            </p>
+          </div>
+
+          <div className="space-y-4">
+            {FAQS.map((faq, idx) => (
+              <div 
+                key={idx}
+                className="border rounded-xl overflow-hidden transition-all duration-300"
+                style={{ 
+                  borderColor: openFaq === idx ? "var(--accent)" : "var(--border)",
+                  background: "var(--surface)" 
                 }}
               >
-                <Icon size={12} strokeWidth={2} />
-              </div>
-              <div
-                className="text-xs font-semibold flex items-center gap-1.5"
-                style={{ color: "var(--text-primary)" }}
-              >
-                {f.label}
-                {f.badge && (
-                  <span
-                    className="text-[8px] px-1 py-0.5 rounded"
-                    style={{
-                      background: "var(--accent-blue-glow)",
-                      color: "var(--accent-blue)",
-                      border: "1px solid var(--accent-blue)30",
+                <button
+                  onClick={() => setOpenFaq(openFaq === idx ? null : idx)}
+                  className="w-full flex items-center justify-between p-6 text-left hover:bg-white/5 transition-colors"
+                >
+                  <span className="font-bold text-sm" style={{ color: "var(--text-primary)" }}>{faq.question}</span>
+                  <div 
+                    className="p-1.5 rounded-full transition-transform duration-300"
+                    style={{ 
+                      background: openFaq === idx ? "var(--accent-glow)" : "rgba(255,255,255,0.03)",
+                      color: openFaq === idx ? "var(--accent)" : "var(--text-muted)",
+                      transform: openFaq === idx ? "rotate(45deg)" : "rotate(0deg)"
                     }}
                   >
-                    {f.badge}
-                  </span>
-                )}
+                    <Plus size={16} />
+                  </div>
+                </button>
+                
+                <div 
+                  className="px-6 transition-all duration-300 ease-in-out"
+                  style={{ 
+                    maxHeight: openFaq === idx ? "200px" : "0px",
+                    opacity: openFaq === idx ? 1 : 0,
+                    paddingBottom: openFaq === idx ? "24px" : "0px"
+                  }}
+                >
+                  <p className="text-xs leading-relaxed" style={{ color: "var(--text-muted)" }}>
+                    {faq.answer}
+                  </p>
+                </div>
               </div>
-              <div className="text-xs" style={{ color: "var(--text-muted)" }}>
-                {f.desc}
-              </div>
-            </div>
-          );
-        })}
-      </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
 
       <footer
         className="py-3 text-center text-xs"
@@ -1517,6 +1541,17 @@ export default function Home() {
                                 $
                                 connectionGroup.highlight(&quot;comp_ESP32&quot;);
                               </div>
+                            </div>
+                          )}
+                          {f.id === "pcb" && (
+                            <div
+                              className="p-2 rounded bg-black/40 border border-white/5 flex items-center justify-between text-[9px] font-mono text-[var(--accent)]"
+                              style={{ borderColor: "var(--border)" }}
+                            >
+                              <span>✓ PCB auto-routing constraints met</span>
+                              <span style={{ color: "var(--text-muted)" }}>
+                                2 Layers
+                              </span>
                             </div>
                           )}
                           {f.id === "power" && (
