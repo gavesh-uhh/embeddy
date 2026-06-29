@@ -184,16 +184,10 @@ export default function ProjectPage() {
       >
         <button
           onClick={() => router.push("/")}
-          className="flex items-center gap-2 text-sm transition-colors"
-          style={{ color: "var(--text-muted)" }}
-          onMouseEnter={e => (e.currentTarget.style.color = "var(--accent)")}
-          onMouseLeave={e => (e.currentTarget.style.color = "var(--text-muted)")}
+          className="flex items-center gap-2 hover:opacity-80 transition-opacity"
         >
-          <div
-            className="w-6 h-6 rounded flex items-center justify-center"
-            style={{ background: "var(--accent)", color: "#000" }}
-          >
-            <Cpu size={12} strokeWidth={2.5} />
+          <div className="w-7 h-7 rounded-lg border border-[#00ff6630] bg-[#050505] shadow-[0_0_12px_rgba(0,255,102,0.15)] flex items-center justify-center p-0.5">
+            <img src="/icon.png" alt="Embeddy" className="w-full h-full object-contain" />
           </div>
           <span className="font-bold" style={{ color: "var(--text-primary)" }}>Embeddy</span>
         </button>
