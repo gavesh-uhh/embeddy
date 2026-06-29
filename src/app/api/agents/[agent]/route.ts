@@ -78,6 +78,8 @@ export async function POST(
           projectContext.board,
           projectContext.components,
           projectContext.pins || [],
+          projectContext.language,
+          projectContext.framework,
         );
         break;
       default:

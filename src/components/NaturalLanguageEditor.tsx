@@ -3,15 +3,14 @@
 import { useState, useRef, useEffect } from "react";
 import { ProjectData, ProjectContext } from "@/lib/types";
 import {
-  Bot,
   Send,
-  Sparkles,
   X,
   AlertTriangle,
   Check,
   RotateCcw,
   Undo2,
   Redo2,
+  Code2,
 } from "lucide-react";
 
 interface Message {
@@ -47,6 +46,10 @@ const SUGGESTED_COMMANDS = [
   "Add WiFi connectivity",
   "Explain the pin choices",
   "Suggest improvements",
+  "Switch to Arduino code",
+  "Use MicroPython",
+  "Regenerate code skeleton",
+  "Add serial debug output",
 ];
 
 export default function NaturalLanguageEditor({
@@ -90,6 +93,8 @@ export default function NaturalLanguageEditor({
     warnings: project.overview?.warnings || [],
     bomItems: project.bom?.items || [],
     fileContents: [],
+    language: project.codeSkeleton?.language,
+    framework: project.codeSkeleton?.framework,
   });
 
   const handleSend = async (command: string) => {
@@ -183,6 +188,11 @@ export default function NaturalLanguageEditor({
       }
 
       // Update components list based on operations
+      // Track if we need to force code regeneration
+      let forceCodeRegen = false;
+      let newCodeLanguage: "C++" | "MicroPython" | undefined;
+      let newCodeFramework: "Arduino" | "ESP-IDF" | "STM32 HAL" | undefined;
+
       for (const op of operations) {
         const operation = op as {
           type: string;
@@ -194,6 +204,8 @@ export default function NaturalLanguageEditor({
           newSpecs?: string;
           aspect?: string;
           feature?: string;
+          language?: "C++" | "MicroPython";
+          framework?: "Arduino" | "ESP-IDF" | "STM32 HAL";
         };
         switch (operation.type) {
           case "add_component":
@@ -250,6 +262,22 @@ export default function NaturalLanguageEditor({
             if (operation.feature) {
               updatedContext.description = `${updatedContext.description}\n\nAdditional feature requested: ${operation.feature}`;
             }
+            break;
+          case "change_code_language":
+            // Update code generation preferences
+            if (operation.language) {
+              newCodeLanguage = operation.language;
+              forceCodeRegen = true;
+              // Store in description for context
+              updatedContext.description = `${updatedContext.description}\n\nCode language preference: ${operation.language}${operation.framework ? ` with ${operation.framework} framework` : ""}`;
+            }
+            if (operation.framework) {
+              newCodeFramework = operation.framework;
+            }
+            break;
+          case "regenerate_code":
+            // Force code regeneration
+            forceCodeRegen = true;
             break;
           case "explain_design":
           case "suggest_improvements":
@@ -360,7 +388,7 @@ export default function NaturalLanguageEditor({
         });
       }
 
-      if (regenerated.codeSkeleton) {
+      if (regenerated.codeSkeleton || forceCodeRegen) {
         agentsToRun.push({
           name: "codeSkeleton",
           key: "codeSkeleton",
@@ -373,6 +401,8 @@ export default function NaturalLanguageEditor({
                   board: updatedContext.board,
                   components: updatedContext.components,
                   pins: updatedContext.pins,
+                  language: newCodeLanguage || updatedContext.language,
+                  framework: newCodeFramework || updatedContext.framework,
                 },
               }),
             }).then((r) => r.json()),
@@ -538,6 +568,7 @@ export default function NaturalLanguageEditor({
             boxShadow: "0 4px 24px var(--accent-glow-strong)",
           }}
         >
+          <Code2 size={18} strokeWidth={2.5} />
           <span className="font-semibold text-sm">Redesign with AI</span>
         </button>
       )}
@@ -563,6 +594,12 @@ export default function NaturalLanguageEditor({
             }}
           >
             <div className="flex items-center gap-2">
+              <div
+                className="w-8 h-8 rounded-lg flex items-center justify-center"
+                style={{ background: "var(--accent)", color: "#000" }}
+              >
+                <Code2 size={16} strokeWidth={2.5} />
+              </div>
               <div>
                 <h3
                   className="font-semibold text-sm"

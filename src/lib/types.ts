@@ -119,6 +119,8 @@ export interface ProjectContext {
   pins?: Pin[];
   warnings?: string[];
   bomItems?: BOMItem[];
+  language?: "C++" | "MicroPython";
+  framework?: "Arduino" | "ESP-IDF" | "STM32 HAL";
 }
 
 export interface ProjectData {
