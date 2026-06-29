@@ -1302,43 +1302,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Supported Microcontrollers Banner */}
-      <section 
-        className="py-16 flex flex-col items-center justify-center gap-4 border-b"
-        style={{ borderColor: "var(--border)", background: "var(--surface)" }}
-      >
-        <span 
-          className="text-[10px] tracking-widest font-mono font-bold" 
-          style={{ color: "var(--text-dim)" }}
-        >
-          SUPPORTED MICROCONTROLLER BOARDS
-        </span>
-        <div className="flex flex-wrap justify-center gap-3">
-          {BOARDS.map((b) => (
-            <div 
-              key={b}
-              className="px-4 py-2 rounded-lg border text-xs font-mono transition-all duration-300"
-              style={{
-                borderColor: "var(--border)",
-                background: "rgba(255, 255, 255, 0.02)",
-                color: "var(--text-muted)",
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.borderColor = "#00ff6630";
-                e.currentTarget.style.color = "var(--text-primary)";
-                e.currentTarget.style.boxShadow = "0 0 12px rgba(0, 255, 102, 0.05)";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.borderColor = "var(--border)";
-                e.currentTarget.style.color = "var(--text-muted)";
-                e.currentTarget.style.boxShadow = "none";
-              }}
-            >
-              {b}
-            </div>
-          ))}
-        </div>
-      </section>
 
       <footer
         className="py-3 text-center text-xs"
