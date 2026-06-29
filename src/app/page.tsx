@@ -616,7 +616,7 @@ export default function Home() {
         </div>
       </nav>
 
-      <main className={`flex-1 grid grid-cols-1 ${user ? "lg:grid-cols-2" : "max-w-4xl mx-auto w-full"} min-h-0`}>
+      <main className="flex-1 grid grid-cols-1 lg:grid-cols-2 min-h-0">
         <div className="flex flex-col justify-center px-10 lg:px-16 py-14 fade-up">
 
           <h1
@@ -683,122 +683,120 @@ export default function Home() {
           </div>
         </div>
 
-        {user && (
-          <div
-            className="hidden lg:flex items-center justify-center p-10 relative overflow-hidden"
-            style={{ borderLeft: "1px solid var(--border)", background: "var(--surface)" }}
-          >
-            <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'radial-gradient(var(--accent) 1px, transparent 0)', backgroundSize: '24px 24px' }} />
+        <div
+          className="hidden lg:flex items-center justify-center p-10 relative overflow-hidden"
+          style={{ borderLeft: "1px solid var(--border)", background: "var(--surface)" }}
+        >
+          <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'radial-gradient(var(--accent) 1px, transparent 0)', backgroundSize: '24px 24px' }} />
 
-            {myProjects.length === 0 ? (
+          {!user || myProjects.length === 0 ? (
+            <div
+              className="w-full max-w-lg rounded-xl overflow-hidden relative group"
+              style={{ 
+                border: "1px solid var(--border-bright)", 
+                boxShadow: "0 0 50px rgba(0,255,102,0.05), inset 0 0 20px rgba(255,255,255,0.02)",
+                background: "#050505"
+              }}
+            >
               <div
-                className="w-full max-w-lg rounded-xl overflow-hidden relative group"
-                style={{ 
-                  border: "1px solid var(--border-bright)", 
-                  boxShadow: "0 0 50px rgba(0,255,102,0.05), inset 0 0 20px rgba(255,255,255,0.02)",
-                  background: "#050505"
-                }}
+                className="flex items-center justify-between px-4 py-3"
+                style={{ background: "#0a0a0a", borderBottom: "1px solid var(--border)" }}
               >
-                <div
-                  className="flex items-center justify-between px-4 py-3"
-                  style={{ background: "#0a0a0a", borderBottom: "1px solid var(--border)" }}
-                >
-                  <div className="flex gap-1.5">
-                    <div className="w-3 h-3 rounded-full" style={{ background: "#333" }} />
-                    <div className="w-3 h-3 rounded-full" style={{ background: "#333" }} />
-                    <div className="w-3 h-3 rounded-full" style={{ background: "#333" }} />
-                  </div>
-                  <span className="text-[10px] tracking-widest font-mono uppercase" style={{ color: "var(--text-muted)" }}>
-                    Circuit Visualizer
+                <div className="flex gap-1.5">
+                  <div className="w-3 h-3 rounded-full" style={{ background: "#333" }} />
+                  <div className="w-3 h-3 rounded-full" style={{ background: "#333" }} />
+                  <div className="w-3 h-3 rounded-full" style={{ background: "#333" }} />
+                </div>
+                <span className="text-[10px] tracking-widest font-mono uppercase" style={{ color: "var(--text-muted)" }}>
+                  Circuit Visualizer
+                </span>
+                <div className="w-12 h-1.5 bg-[#111] rounded-full" />
+              </div>
+
+              <div className="relative aspect-[4/3] w-full overflow-hidden bg-black p-4 flex items-center justify-center">
+                <img 
+                  src="/circuit_schematic.png" 
+                  alt="Circuit Schematic preview" 
+                  className="w-full h-full object-cover rounded-lg border"
+                  style={{ borderColor: "var(--border)" }}
+                />
+                <div className="absolute inset-0 pointer-events-none bg-gradient-to-b from-transparent via-transparent to-[rgba(0,255,102,0.03)]" />
+              </div>
+            </div>
+          ) : (
+            <div
+              className="w-full max-w-lg rounded-xl border p-6 relative group"
+              style={{ 
+                borderColor: "var(--border-bright)", 
+                boxShadow: "0 0 50px rgba(0,255,102,0.05), inset 0 0 20px rgba(255,255,255,0.01)",
+                background: "#050505"
+              }}
+            >
+              <div className="flex items-center justify-between mb-5 pb-3 border-b" style={{ borderColor: "var(--border)" }}>
+                <div className="flex items-center gap-2">
+                  <FolderOpen size={15} style={{ color: "var(--accent)" }} />
+                  <span className="text-xs font-bold uppercase tracking-wider" style={{ color: "var(--text-primary)", fontFamily: "Outfit, sans-serif" }}>
+                    My Projects
                   </span>
-                  <div className="w-12 h-1.5 bg-[#111] rounded-full" />
                 </div>
-
-                <div className="relative aspect-[4/3] w-full overflow-hidden bg-black p-4 flex items-center justify-center">
-                  <img 
-                    src="/circuit_schematic.png" 
-                    alt="Circuit Schematic preview" 
-                    className="w-full h-full object-cover rounded-lg border"
-                    style={{ borderColor: "var(--border)" }}
-                  />
-                  <div className="absolute inset-0 pointer-events-none bg-gradient-to-b from-transparent via-transparent to-[rgba(0,255,102,0.03)]" />
+                <div className="flex items-center gap-1.5">
+                  {cloudStatus === "loading" && (
+                    <><Loader2 size={11} className="animate-spin" style={{ color: "var(--text-muted)" }} />
+                    <span className="text-[10px]" style={{ color: "var(--text-muted)" }}>Syncing…</span></>
+                  )}
+                  {cloudStatus === "ok" && (
+                    <><Cloud size={11} style={{ color: "var(--accent)" }} />
+                    <span className="text-[10px]" style={{ color: "var(--accent)" }}>Cloud Synced</span></>
+                  )}
+                  {cloudStatus === "offline" && (
+                    <><CloudOff size={11} style={{ color: "var(--text-muted)" }} />
+                    <span className="text-[10px]" style={{ color: "var(--text-muted)" }}>Offline</span></>
+                  )}
                 </div>
               </div>
-            ) : (
-              <div
-                className="w-full max-w-lg rounded-xl border p-6 relative group"
-                style={{ 
-                  borderColor: "var(--border-bright)", 
-                  boxShadow: "0 0 50px rgba(0,255,102,0.05), inset 0 0 20px rgba(255,255,255,0.01)",
-                  background: "#050505"
-                }}
-              >
-                <div className="flex items-center justify-between mb-5 pb-3 border-b" style={{ borderColor: "var(--border)" }}>
-                  <div className="flex items-center gap-2">
-                    <FolderOpen size={15} style={{ color: "var(--accent)" }} />
-                    <span className="text-xs font-bold uppercase tracking-wider" style={{ color: "var(--text-primary)", fontFamily: "Outfit, sans-serif" }}>
-                      My Projects
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    {cloudStatus === "loading" && (
-                      <><Loader2 size={11} className="animate-spin" style={{ color: "var(--text-muted)" }} />
-                      <span className="text-[10px]" style={{ color: "var(--text-muted)" }}>Syncing…</span></>
-                    )}
-                    {cloudStatus === "ok" && (
-                      <><Cloud size={11} style={{ color: "var(--accent)" }} />
-                      <span className="text-[10px]" style={{ color: "var(--accent)" }}>Cloud Synced</span></>
-                    )}
-                    {cloudStatus === "offline" && (
-                      <><CloudOff size={11} style={{ color: "var(--text-muted)" }} />
-                      <span className="text-[10px]" style={{ color: "var(--text-muted)" }}>Offline</span></>
-                    )}
-                  </div>
-                </div>
 
-                {projectsLoading ? (
-                  <div className="flex items-center gap-2 py-8 justify-center" style={{ color: "var(--text-dim)" }}>
-                    <Loader2 size={15} className="animate-spin" />
-                    <span className="text-xs">Loading cloud projects…</span>
-                  </div>
-                ) : (
-                  <div className="space-y-2.5 max-h-[380px] overflow-y-auto pr-1">
-                    {myProjects.map((p) => (
-                      <div
-                        key={p.id}
-                        className="flex items-center justify-between rounded-lg border px-3.5 py-3 group transition-all"
-                        style={{ borderColor: "var(--border)", background: "var(--surface)" }}
-                        onMouseEnter={e => (e.currentTarget.style.borderColor = "#00ff6630")}
-                        onMouseLeave={e => (e.currentTarget.style.borderColor = "var(--border)")}
-                      >
-                        <div className="flex-1 min-w-0">
-                          <p className="text-xs font-semibold truncate" style={{ color: "var(--text-primary)" }}>{p.title}</p>
-                          <p className="text-[10px] mt-1 font-mono" style={{ color: "var(--text-muted)" }}>
-                            {p.board} · {new Date(p.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
-                          </p>
-                        </div>
-                        <div className="flex items-center gap-2 ml-2">
-                          <button onClick={() => router.push(`/project/${p.id}`)} title="Open project"
-                            className="p-1.5 rounded transition-colors" style={{ color: "var(--text-muted)" }}
-                            onMouseEnter={e => (e.currentTarget.style.color = "var(--accent)")}
-                            onMouseLeave={e => (e.currentTarget.style.color = "var(--text-muted)")}
-                          ><ExternalLink size={13} /></button>
-                          <button onClick={() => handleDelete(p.id)} title="Delete project" disabled={deletingId === p.id}
-                            className="p-1.5 rounded transition-colors" style={{ color: "var(--text-muted)" }}
-                            onMouseEnter={e => (e.currentTarget.style.color = "var(--accent-red)")}
-                            onMouseLeave={e => (e.currentTarget.style.color = "var(--text-muted)")}
-                          >
-                            {deletingId === p.id ? <Loader2 size={13} className="animate-spin" /> : <Trash2 size={13} />}
-                          </button>
-                        </div>
+              {projectsLoading ? (
+                <div className="flex items-center gap-2 py-8 justify-center" style={{ color: "var(--text-dim)" }}>
+                  <Loader2 size={15} className="animate-spin" />
+                  <span className="text-xs">Loading cloud projects…</span>
+                </div>
+              ) : (
+                <div className="space-y-2.5 max-h-[380px] overflow-y-auto pr-1">
+                  {myProjects.map((p) => (
+                    <div
+                      key={p.id}
+                      className="flex items-center justify-between rounded-lg border px-3.5 py-3 group transition-all"
+                      style={{ borderColor: "var(--border)", background: "var(--surface)" }}
+                      onMouseEnter={e => (e.currentTarget.style.borderColor = "#00ff6630")}
+                      onMouseLeave={e => (e.currentTarget.style.borderColor = "var(--border)")}
+                    >
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-semibold truncate" style={{ color: "var(--text-primary)" }}>{p.title}</p>
+                        <p className="text-[10px] mt-1 font-mono" style={{ color: "var(--text-muted)" }}>
+                          {p.board} · {new Date(p.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+                        </p>
                       </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-        )}
+                      <div className="flex items-center gap-2 ml-2">
+                        <button onClick={() => router.push(`/project/${p.id}`)} title="Open project"
+                          className="p-1.5 rounded transition-colors" style={{ color: "var(--text-muted)" }}
+                          onMouseEnter={e => (e.currentTarget.style.color = "var(--accent)")}
+                          onMouseLeave={e => (e.currentTarget.style.color = "var(--text-muted)")}
+                        ><ExternalLink size={13} /></button>
+                        <button onClick={() => handleDelete(p.id)} title="Delete project" disabled={deletingId === p.id}
+                          className="p-1.5 rounded transition-colors" style={{ color: "var(--text-muted)" }}
+                          onMouseEnter={e => (e.currentTarget.style.color = "var(--accent-red)")}
+                          onMouseLeave={e => (e.currentTarget.style.color = "var(--text-muted)")}
+                        >
+                          {deletingId === p.id ? <Loader2 size={13} className="animate-spin" /> : <Trash2 size={13} />}
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
       </main>
 
       <div
