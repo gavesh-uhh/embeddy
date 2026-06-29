@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { parseFile } from "@/lib/parsePDF";
-import { saveProject } from "@/lib/projectStore";
+import { saveProject, listProjects, deleteProject } from "@/lib/projectStore";
 import { ProjectData, BoardType } from "@/lib/types";
+import { useAuth } from "@/context/AuthContext";
 import {
   Cpu,
   Zap,
@@ -24,6 +25,13 @@ import {
   BookOpen,
   HelpCircle,
   X,
+  Cloud,
+  Trash2,
+  ExternalLink,
+  CloudOff,
+  FolderOpen,
+  LogOut,
+  User,
 } from "lucide-react";
 
 const BOARDS: BoardType[] = [
@@ -149,22 +157,67 @@ const EXAMPLES = [
 
 export default function Home() {
   const router = useRouter();
+  const { user, signOut } = useAuth();
   const [showForm, setShowForm] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [files, setFiles] = useState<File[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
 
   const [showFeaturesModal, setShowFeaturesModal] = useState(false);
   const [selectedFeatureTab, setSelectedFeatureTab] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [activeFeatureId, setActiveFeatureId] = useState<string | null>(null);
 
+  const [myProjects, setMyProjects] = useState<ProjectData[]>([]);
+  const [projectsLoading, setProjectsLoading] = useState(true);
+  const [cloudStatus, setCloudStatus] = useState<"ok" | "offline" | "loading">("loading");
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+
   const [form, setForm] = useState({
     title: "",
     board: "ESP32" as BoardType,
     description: "",
   });
+
+  const initials = user?.displayName
+    ? user.displayName.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2)
+    : user?.email?.[0]?.toUpperCase() ?? "U";
+
+  useEffect(() => {
+    let cancelled = false;
+    async function init() {
+      try {
+        const { migrateLocalStorageToFirestore } = await import("@/lib/migrateLocalStorage");
+        await migrateLocalStorageToFirestore();
+      } catch {}
+
+      try {
+        const projects = await listProjects();
+        if (!cancelled) {
+          setMyProjects(projects);
+          setCloudStatus("ok");
+        }
+      } catch {
+        if (!cancelled) setCloudStatus("offline");
+      } finally {
+        if (!cancelled) setProjectsLoading(false);
+      }
+    }
+    init();
+    return () => { cancelled = true; };
+  }, []);
+
+  const handleDelete = async (id: string) => {
+    setDeletingId(id);
+    try {
+      await deleteProject(id);
+      setMyProjects((prev) => prev.filter((p) => p.id !== id));
+    } catch {} finally {
+      setDeletingId(null);
+    }
+  };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selected = Array.from(e.target.files || []).slice(0, 2);
@@ -207,7 +260,7 @@ export default function Home() {
         throw new Error(err.error || "Failed to create project");
       }
       const project: ProjectData = await res.json();
-      saveProject(project);
+      await saveProject(project);
       router.push(`/project/${project.id}`);
     } catch (err) {
       setError((err as Error).message);
@@ -469,15 +522,96 @@ export default function Home() {
             BETA
           </span>
         </div>
-        <button
-          id="new-project-header-btn"
-          onClick={() => setShowForm(true)}
-          className="btn-accent flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-bold"
-          style={{ color: "#000" }}
-        >
-          <Plus size={12} strokeWidth={3} />
-          New Project
-        </button>
+
+        <div className="flex items-center gap-3">
+          {user ? (
+            <>
+              <button
+                id="new-project-header-btn"
+                onClick={() => setShowForm(true)}
+                className="btn-accent flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-bold"
+                style={{ color: "#000" }}
+              >
+                <Plus size={12} strokeWidth={3} />
+                New Project
+              </button>
+
+              <div className="relative">
+                <button
+                  id="user-avatar-btn"
+                  onClick={() => setUserMenuOpen((o) => !o)}
+                  className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all"
+                  style={{
+                    background: "var(--accent)",
+                    color: "#000",
+                    boxShadow: userMenuOpen ? "0 0 0 2px #00ff6650" : "none",
+                  }}
+                  title={user.email ?? ""}
+                >
+                  {initials}
+                </button>
+
+                {userMenuOpen && (
+                  <>
+                    <div className="fixed inset-0 z-40" onClick={() => setUserMenuOpen(false)} />
+                    <div
+                      className="absolute right-0 top-10 z-50 rounded-xl border p-2 min-w-52"
+                      style={{
+                        background: "var(--surface)",
+                        borderColor: "var(--border-bright)",
+                        boxShadow: "0 8px 32px rgba(0,0,0,0.6), 0 0 20px rgba(0,255,102,0.04)",
+                      }}
+                    >
+                      <div className="px-3 py-2.5 mb-1 border-b" style={{ borderColor: "var(--border)" }}>
+                        <div className="flex items-center gap-2.5">
+                          <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0" style={{ background: "var(--accent)", color: "#000" }}>
+                            {initials}
+                          </div>
+                          <div className="min-w-0">
+                            {user.displayName && (
+                              <p className="text-xs font-semibold truncate" style={{ color: "var(--text-primary)" }}>{user.displayName}</p>
+                            )}
+                            <p className="text-[10px] truncate" style={{ color: "var(--text-muted)" }}>{user.email}</p>
+                          </div>
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => { setUserMenuOpen(false); setShowForm(true); }}
+                        className="flex items-center gap-2 w-full px-3 py-2 rounded-lg text-xs font-medium transition-colors text-left"
+                        style={{ color: "var(--text-muted)" }}
+                        onMouseEnter={e => (e.currentTarget.style.color = "var(--text-primary)")}
+                        onMouseLeave={e => (e.currentTarget.style.color = "var(--text-muted)")}
+                      >
+                        <Plus size={13} /> New Project
+                      </button>
+                      <button
+                        onClick={() => { setUserMenuOpen(false); signOut(); }}
+                        className="flex items-center gap-2 w-full px-3 py-2 rounded-lg text-xs font-medium transition-colors text-left"
+                        style={{ color: "var(--text-muted)" }}
+                        onMouseEnter={e => (e.currentTarget.style.color = "var(--accent-red)")}
+                        onMouseLeave={e => (e.currentTarget.style.color = "var(--text-muted)")}
+                      >
+                        <LogOut size={13} /> Sign Out
+                      </button>
+                    </div>
+                  </>
+                )}
+              </div>
+            </>
+          ) : (
+            <button
+              id="nav-signin-btn"
+              onClick={() => router.push("/auth/login")}
+              className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-bold transition-all"
+              style={{ border: "1px solid var(--border-bright)", color: "var(--text-primary)" }}
+              onMouseEnter={e => { e.currentTarget.style.borderColor = "#00ff6650"; e.currentTarget.style.color = "var(--accent)"; }}
+              onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--border-bright)"; e.currentTarget.style.color = "var(--text-primary)"; }}
+            >
+              <User size={12} />
+              Sign In
+            </button>
+          )}
+        </div>
       </nav>
 
       <main className="flex-1 grid grid-cols-1 lg:grid-cols-2 min-h-0">
@@ -509,11 +643,11 @@ export default function Home() {
           <div className="flex items-center gap-3">
             <button
               id="hero-new-project-btn"
-              onClick={() => setShowForm(true)}
+              onClick={() => user ? setShowForm(true) : router.push("/auth/login")}
               className="btn-accent flex items-center gap-2 px-6 py-3 rounded-lg font-bold text-sm"
               style={{ color: "#000" }}
             >
-              Start a Project
+              {user ? "Start a Project" : "Get Started"}
               <ArrowRight size={15} strokeWidth={2.5} />
             </button>
             <button
@@ -545,6 +679,79 @@ export default function Home() {
               </div>
             ))}
           </div>
+
+          {user && (
+          <div className="mt-10 pt-8" style={{ borderTop: "1px solid var(--border)" }}>
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <FolderOpen size={14} style={{ color: "var(--accent)" }} />
+                <span className="text-xs font-bold uppercase tracking-wider" style={{ color: "var(--text-primary)", fontFamily: "Outfit, sans-serif" }}>
+                  My Projects
+                </span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                {cloudStatus === "loading" && (
+                  <><Loader2 size={11} className="animate-spin" style={{ color: "var(--text-muted)" }} />
+                  <span className="text-[10px]" style={{ color: "var(--text-muted)" }}>Syncing…</span></>
+                )}
+                {cloudStatus === "ok" && (
+                  <><Cloud size={11} style={{ color: "var(--accent)" }} />
+                  <span className="text-[10px]" style={{ color: "var(--accent)" }}>Cloud Synced</span></>
+                )}
+                {cloudStatus === "offline" && (
+                  <><CloudOff size={11} style={{ color: "var(--text-muted)" }} />
+                  <span className="text-[10px]" style={{ color: "var(--text-muted)" }}>Offline</span></>
+                )}
+              </div>
+            </div>
+
+            {projectsLoading ? (
+              <div className="flex items-center gap-2 py-6" style={{ color: "var(--text-dim)" }}>
+                <Loader2 size={13} className="animate-spin" />
+                <span className="text-xs">Loading your projects…</span>
+              </div>
+            ) : myProjects.length === 0 ? (
+              <div className="rounded-lg border border-dashed p-5 text-center" style={{ borderColor: "var(--border)" }}>
+                <Cloud size={18} className="mx-auto mb-2" style={{ color: "var(--text-dim)" }} />
+                <p className="text-xs" style={{ color: "var(--text-muted)" }}>No cloud projects yet.</p>
+                <p className="text-[11px] mt-1" style={{ color: "var(--text-dim)" }}>Start a project — it’ll appear here across all your devices.</p>
+              </div>
+            ) : (
+              <div className="space-y-2 max-h-52 overflow-y-auto pr-1">
+                {myProjects.map((p) => (
+                  <div
+                    key={p.id}
+                    className="flex items-center justify-between rounded-lg border px-3 py-2.5 group transition-all"
+                    style={{ borderColor: "var(--border)", background: "var(--surface-raised)" }}
+                    onMouseEnter={e => (e.currentTarget.style.borderColor = "#00ff6630")}
+                    onMouseLeave={e => (e.currentTarget.style.borderColor = "var(--border)")}
+                  >
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs font-semibold truncate" style={{ color: "var(--text-primary)" }}>{p.title}</p>
+                      <p className="text-[10px] mt-0.5 font-mono" style={{ color: "var(--text-muted)" }}>
+                        {p.board} · {new Date(p.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-1.5 ml-2">
+                      <button onClick={() => router.push(`/project/${p.id}`)} title="Open project"
+                        className="p-1.5 rounded transition-colors" style={{ color: "var(--text-muted)" }}
+                        onMouseEnter={e => (e.currentTarget.style.color = "var(--accent)")}
+                        onMouseLeave={e => (e.currentTarget.style.color = "var(--text-muted)")}
+                      ><ExternalLink size={12} /></button>
+                      <button onClick={() => handleDelete(p.id)} title="Delete project" disabled={deletingId === p.id}
+                        className="p-1.5 rounded transition-colors" style={{ color: "var(--text-muted)" }}
+                        onMouseEnter={e => (e.currentTarget.style.color = "var(--accent-red)")}
+                        onMouseLeave={e => (e.currentTarget.style.color = "var(--text-muted)")}
+                      >
+                        {deletingId === p.id ? <Loader2 size={12} className="animate-spin" /> : <Trash2 size={12} />}
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+          )}
         </div>
 
         <div

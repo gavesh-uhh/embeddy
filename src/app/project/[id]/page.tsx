@@ -2,8 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { loadProject } from "@/lib/projectStore";
+import { loadProject, saveProject } from "@/lib/projectStore";
 import { ProjectData } from "@/lib/types";
+import { useAuth } from "@/context/AuthContext";
 import BoardBadge from "@/components/BoardBadge";
 import ProjectOverviewCard from "@/components/ProjectOverviewCard";
 import FatalIssuesPanel from "@/components/FatalIssuesPanel";
@@ -25,6 +26,10 @@ import {
   Heart,
   Zap,
   Boxes,
+  Share2,
+  Check,
+  Cloud,
+  LogOut,
 } from "lucide-react";
 
 type DashboardSection = "overview" | "hardware" | "procurement" | "software";
@@ -39,21 +44,42 @@ const NAV_ITEMS: { key: DashboardSection; label: string; icon: React.ElementType
 export default function ProjectPage() {
   const params = useParams();
   const router = useRouter();
+  const { user, signOut } = useAuth();
   const id = params.id as string;
 
   const [project, setProject] = useState<ProjectData | null>(null);
   const [notFound, setNotFound] = useState(false);
   const [activeTab, setActiveTab] = useState<DashboardSection>("overview");
   const [retrying, setRetrying] = useState<Record<string, boolean>>({});
+  const [shareCopied, setShareCopied] = useState(false);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
+
+  // User initials
+  const initials = user?.displayName
+    ? user.displayName.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2)
+    : user?.email?.[0]?.toUpperCase() ?? "U";
 
   useEffect(() => {
-    const data = loadProject(id);
-    if (!data) {
-      setNotFound(true);
-    } else {
-      setProject(data);
+    let cancelled = false;
+    async function fetchProject() {
+      const data = await loadProject(id);
+      if (cancelled) return;
+      if (!data) setNotFound(true);
+      else setProject(data);
     }
+    fetchProject();
+    return () => { cancelled = true; };
   }, [id]);
+
+  const handleShare = async () => {
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      setShareCopied(true);
+      setTimeout(() => setShareCopied(false), 2500);
+    } catch {
+      /* clipboard blocked */
+    }
+  };
 
   const hasFatal = project?.fatalIssues?.issues?.some((i) => i.severity === "fatal");
 
@@ -100,7 +126,7 @@ export default function ProjectPage() {
       }
 
       const { saveProject } = await import("@/lib/projectStore");
-      saveProject(updated);
+      await saveProject(updated);
       setProject(updated);
     } catch {
     } finally {
@@ -124,7 +150,7 @@ export default function ProjectPage() {
           Project not found
         </h1>
         <p className="text-sm" style={{ color: "var(--text-muted)" }}>
-          This project ID doesn&apos;t exist in your browser storage.
+          This project ID doesn&apos;t exist or hasn&apos;t synced to this device yet.
         </p>
         <button
           onClick={() => router.push("/")}
@@ -197,6 +223,27 @@ export default function ProjectPage() {
           </span>
         )}
 
+        {/* Cloud sync indicator */}
+        <span className="flex items-center gap-1 text-[10px]" style={{ color: "var(--accent)" }}>
+          <Cloud size={11} />
+          Cloud
+        </span>
+
+        {/* Share button */}
+        <button
+          onClick={handleShare}
+          className="ml-1 flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all"
+          style={{
+            border: `1px solid ${shareCopied ? "#00ff6650" : "var(--border)"}`,
+            background: shareCopied ? "#00ff6612" : "transparent",
+            color: shareCopied ? "var(--accent)" : "var(--text-muted)",
+          }}
+          title="Copy shareable link"
+        >
+          {shareCopied ? <Check size={11} strokeWidth={3} /> : <Share2 size={11} />}
+          {shareCopied ? "Copied!" : "Share"}
+        </button>
+
         <span className="ml-auto text-xs" style={{ color: "var(--text-muted)" }}>
           {new Date(project.createdAt).toLocaleDateString("en-US", {
             year: "numeric",
@@ -204,6 +251,66 @@ export default function ProjectPage() {
             day: "numeric",
           })}
         </span>
+
+        {/* User avatar dropdown */}
+        <div className="relative ml-2">
+          <button
+            onClick={() => setUserMenuOpen((o) => !o)}
+            className="w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold transition-all"
+            style={{
+              background: "var(--accent)",
+              color: "#000",
+              boxShadow: userMenuOpen ? "0 0 0 2px #00ff6650" : "none",
+            }}
+            title={user?.email ?? ""}
+          >
+            {initials}
+          </button>
+
+          {userMenuOpen && (
+            <>
+              <div className="fixed inset-0 z-40" onClick={() => setUserMenuOpen(false)} />
+              <div
+                className="absolute right-0 top-9 z-50 rounded-xl border p-2 min-w-48"
+                style={{
+                  background: "var(--surface)",
+                  borderColor: "var(--border-bright)",
+                  boxShadow: "0 8px 32px rgba(0,0,0,0.6)",
+                }}
+              >
+                <div className="px-3 py-2 mb-1 border-b" style={{ borderColor: "var(--border)" }}>
+                  {user?.displayName && (
+                    <p className="text-xs font-semibold truncate" style={{ color: "var(--text-primary)" }}>
+                      {user.displayName}
+                    </p>
+                  )}
+                  <p className="text-[10px] truncate" style={{ color: "var(--text-muted)" }}>
+                    {user?.email}
+                  </p>
+                </div>
+                <button
+                  onClick={() => { setUserMenuOpen(false); router.push("/"); }}
+                  className="flex items-center gap-2 w-full px-3 py-2 rounded-lg text-xs font-medium transition-colors"
+                  style={{ color: "var(--text-muted)" }}
+                  onMouseEnter={e => (e.currentTarget.style.color = "var(--text-primary)")}
+                  onMouseLeave={e => (e.currentTarget.style.color = "var(--text-muted)")}
+                >
+                  My Projects
+                </button>
+                <button
+                  onClick={() => { setUserMenuOpen(false); signOut(); }}
+                  className="flex items-center gap-2 w-full px-3 py-2 rounded-lg text-xs font-medium transition-colors"
+                  style={{ color: "var(--text-muted)" }}
+                  onMouseEnter={e => (e.currentTarget.style.color = "var(--accent-red)")}
+                  onMouseLeave={e => (e.currentTarget.style.color = "var(--text-muted)")}
+                >
+                  <LogOut size={12} />
+                  Sign Out
+                </button>
+              </div>
+            </>
+          )}
+        </div>
       </header>
 
       <div className="flex flex-1 overflow-hidden">
