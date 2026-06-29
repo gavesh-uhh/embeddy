@@ -7,6 +7,9 @@ export const metadata: Metadata = {
   description:
     "AI-powered embedded systems design assistant. Generate circuit schematics, pin diagrams, BOM, power budgets, and code skeletons in seconds.",
   keywords: "embedded systems, Arduino, ESP32, circuit design, AI, electronics",
+  icons: {
+    icon: "/icon.png",
+  },
 };
 
 export default function RootLayout({
