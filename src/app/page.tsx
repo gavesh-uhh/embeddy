@@ -89,6 +89,17 @@ const FEATURE_DETAILS = [
     color: "var(--accent-blue)",
   },
   {
+    id: "pcb",
+    title: "PCB Layout",
+    category: "hardware",
+    icon: Layers,
+    shortDesc: "Auto-Generated Board Layout & Routing",
+    longDesc:
+      "Auto-generate component placement and double-sided routing. Export netlists and production-ready designs for custom physical microcontrollers.",
+    badge: "BETA",
+    color: "var(--accent)",
+  },
+  {
     id: "power",
     title: "Power Budget",
     category: "diagnostics",
@@ -992,8 +1003,8 @@ export default function Home() {
         </div>
       </nav>
 
-      <main className="flex-1 grid grid-cols-1 lg:grid-cols-2 min-h-0">
-        <div className="flex flex-col justify-center px-10 lg:px-16 py-14 fade-up">
+      <main className="grid grid-cols-1 lg:grid-cols-2 border-b" style={{ borderColor: "var(--border)" }}>
+        <div className="flex flex-col justify-center px-10 lg:px-16 py-20 lg:py-28 fade-up">
           <h1
             className="glitch-text font-bold mb-4"
             data-text="Embeddy"
@@ -1084,7 +1095,7 @@ export default function Home() {
         </div>
 
         <div
-          className="hidden lg:flex items-center justify-center p-10 relative overflow-hidden"
+          className="hidden lg:flex items-center justify-center p-10 py-20 lg:py-28 relative overflow-hidden"
           style={{
             borderLeft: "1px solid var(--border)",
             background: "var(--surface)",
@@ -1210,74 +1221,151 @@ export default function Home() {
         </div>
       </main>
 
-      <div
-        id="features"
-        className="border-t grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8"
-        style={{ borderColor: "var(--border)", background: "var(--surface)" }}
+      {/* Systems Capabilities Section */}
+      <section 
+        className="py-24 px-8 lg:px-16 border-b" 
+        style={{ borderColor: "var(--border)", background: "var(--surface-raised)" }}
       >
-        {FEATURES.map((f, i) => {
-          const Icon = f.icon;
-          return (
-            <div
-              key={i}
-              onClick={() => {
-                const ids = [
-                  "schematic",
-                  "pinout",
-                  "power",
-                  "bom",
-                  "safety",
-                  "compatibility",
-                  "code",
-                  "agents",
-                ];
-                const matchedId = ids[i];
-                if (matchedId) {
-                  setActiveFeatureId(matchedId);
-                  const detail = FEATURE_DETAILS.find(
-                    (d) => d.id === matchedId,
-                  );
-                  if (detail) setSelectedFeatureTab(detail.category);
-                  setShowFeaturesModal(true);
-                }
-              }}
-              className="flex flex-col items-start gap-2 p-4 border-r card-hover cursor-pointer"
-              style={{ borderColor: "var(--border)" }}
-            >
-              <div
-                className="w-6 h-6 rounded flex items-center justify-center"
-                style={{
-                  background: "var(--accent-glow)",
-                  color: "var(--accent)",
-                }}
-              >
-                <Icon size={12} strokeWidth={2} />
-              </div>
-              <div
-                className="text-xs font-semibold flex items-center gap-1.5"
-                style={{ color: "var(--text-primary)" }}
-              >
-                {f.label}
-                {f.badge && (
-                  <span
-                    className="text-[8px] px-1 py-0.5 rounded"
+        <div className="max-w-7xl mx-auto space-y-12">
+          <div className="text-center space-y-3">
+            <span className="text-[10px] tracking-widest font-mono font-bold text-[var(--accent)]">
+              SYSTEM CAPABILITIES
+            </span>
+            <h2 className="text-3xl font-bold tracking-tight" style={{ fontFamily: "Outfit, sans-serif", color: "var(--text-primary)" }}>
+              Engineered for Embedded Design
+            </h2>
+            <p className="text-xs max-w-xl mx-auto" style={{ color: "var(--text-muted)" }}>
+              Embeddy orchestrates 9 specialized agents in parallel to draft hardware schematics, balance electrical loads, trace PCBs, and build firmware.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {FEATURES.map((f, i) => {
+              const Icon = f.icon;
+              return (
+                <div
+                  key={i}
+                  onClick={() => {
+                    const ids = [
+                      "schematic",
+                      "pinout",
+                      "pcb",
+                      "power",
+                      "bom",
+                      "safety",
+                      "compatibility",
+                      "code",
+                      "agents",
+                    ];
+                    const matchedId = ids[i];
+                    if (matchedId) {
+                      setActiveFeatureId(matchedId);
+                      const detail = FEATURE_DETAILS.find((d) => d.id === matchedId);
+                      if (detail) setSelectedFeatureTab(detail.category);
+                      setShowFeaturesModal(true);
+                    }
+                  }}
+                  className="p-6 rounded-xl border card-hover cursor-pointer flex flex-col gap-4 text-left transition-all duration-300"
+                  style={{ borderColor: "var(--border)", background: "var(--surface)" }}
+                >
+                  <div
+                    className="w-8 h-8 rounded-lg flex items-center justify-center"
                     style={{
-                      background: "var(--accent-blue-glow)",
-                      color: "var(--accent-blue)",
-                      border: "1px solid var(--accent-blue)30",
+                      background: "var(--accent-glow)",
+                      color: "var(--accent)",
                     }}
                   >
-                    {f.badge}
-                  </span>
-                )}
-              </div>
-              <div className="text-xs" style={{ color: "var(--text-muted)" }}>
-                {f.desc}
-              </div>
+                    <Icon size={16} strokeWidth={2} />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-bold flex items-center gap-2 mb-1" style={{ color: "var(--text-primary)" }}>
+                      {f.label}
+                      {f.badge && (
+                        <span
+                          className="text-[8px] px-1.5 py-0.5 rounded font-mono font-bold"
+                          style={{
+                            background: "var(--accent-blue-glow)",
+                            color: "var(--accent-blue)",
+                            border: "1px solid var(--accent-blue)30",
+                          }}
+                        >
+                          {f.badge}
+                        </span>
+                      )}
+                    </h3>
+                    <p className="text-xs" style={{ color: "var(--text-muted)", lineHeight: "1.5" }}>
+                      {FEATURE_DETAILS.find((d) => d.id === (
+                        ["schematic", "pinout", "pcb", "power", "bom", "safety", "compatibility", "code", "agents"][i]
+                      ))?.shortDesc ?? f.desc}
+                    </p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* Call to Action Section */}
+      <section 
+        className="py-24 px-8 text-center flex flex-col items-center justify-center border-b"
+        style={{ borderColor: "var(--border)", background: "var(--bg)" }}
+      >
+        <div className="max-w-xl space-y-6">
+          <h2 className="text-3xl font-bold tracking-tight" style={{ fontFamily: "Outfit, sans-serif", color: "var(--text-primary)" }}>
+            Ready to design 10× faster?
+          </h2>
+          <p className="text-xs" style={{ color: "var(--text-muted)" }}>
+            Join thousands of developers using AI-parallelized hardware design engines. Start draft designs immediately, compile bill of materials, and export compilable firmware templates.
+          </p>
+          <button
+            onClick={() => user ? setShowForm(true) : router.push("/auth/login")}
+            className="btn-accent flex items-center gap-2 px-8 py-3.5 rounded-lg font-bold text-sm mx-auto"
+            style={{ color: "#000" }}
+          >
+            Start Designing
+            <ArrowRight size={15} strokeWidth={2.5} />
+          </button>
+        </div>
+      </section>
+
+      {/* Supported Microcontrollers Banner */}
+      <section 
+        className="py-16 flex flex-col items-center justify-center gap-4 border-b"
+        style={{ borderColor: "var(--border)", background: "var(--surface)" }}
+      >
+        <span 
+          className="text-[10px] tracking-widest font-mono font-bold" 
+          style={{ color: "var(--text-dim)" }}
+        >
+          SUPPORTED MICROCONTROLLER BOARDS
+        </span>
+        <div className="flex flex-wrap justify-center gap-3">
+          {BOARDS.map((b) => (
+            <div 
+              key={b}
+              className="px-4 py-2 rounded-lg border text-xs font-mono transition-all duration-300"
+              style={{
+                borderColor: "var(--border)",
+                background: "rgba(255, 255, 255, 0.02)",
+                color: "var(--text-muted)",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.borderColor = "#00ff6630";
+                e.currentTarget.style.color = "var(--text-primary)";
+                e.currentTarget.style.boxShadow = "0 0 12px rgba(0, 255, 102, 0.05)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.borderColor = "var(--border)";
+                e.currentTarget.style.color = "var(--text-muted)";
+                e.currentTarget.style.boxShadow = "none";
+              }}
+            >
+              {b}
             </div>
-          );
-        })}
-      </div>
+          ))}
+        </div>
+      </section>
 
       <footer
         className="py-3 text-center text-xs"
@@ -1517,6 +1605,17 @@ export default function Home() {
                                 $
                                 connectionGroup.highlight(&quot;comp_ESP32&quot;);
                               </div>
+                            </div>
+                          )}
+                          {f.id === "pcb" && (
+                            <div
+                              className="p-2 rounded bg-black/40 border border-white/5 flex items-center justify-between text-[9px] font-mono text-[var(--accent)]"
+                              style={{ borderColor: "var(--border)" }}
+                            >
+                              <span>✓ PCB auto-routing constraints met</span>
+                              <span style={{ color: "var(--text-muted)" }}>
+                                2 Layers
+                              </span>
                             </div>
                           )}
                           {f.id === "power" && (
