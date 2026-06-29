@@ -167,6 +167,25 @@ const FEATURE_DETAILS = [
   },
 ];
 
+const FAQS = [
+  {
+    question: "How does the AI parallel generation work?",
+    answer: "Embeddy spins up specialized agents simultaneously. While one agent routes the PCB, another verifies power budgets, and a third writes firmware—reducing design time from weeks to hours."
+  },
+  {
+    question: "Which microcontrollers are supported?",
+    answer: "We currently support Arduino Uno, Mega, ESP32, ESP32-S3, STM32F103, and STM32F4. We are constantly adding new architectures to our AI training pipeline."
+  },
+  {
+    question: "Can I export the generated designs to my EDA tool?",
+    answer: "Yes, you can export schematics and PCB layouts in industry-standard formats compatible with Altium Designer, KiCad, and Eagle."
+  },
+  {
+    question: "Is the generated firmware ready to compile?",
+    answer: "Absolutely. The code skeleton agent provides fully compilable C/C++ firmware based on your selected microcontroller and hardware peripherals."
+  }
+];
+
 const EXAMPLES: Array<{
   title: string;
   board: BoardType;
@@ -198,6 +217,7 @@ const EXAMPLES: Array<{
 
 export default function Home() {
   const router = useRouter();
+  const [openFaq, setOpenFaq] = useState<number | null>(null);
   const { user, loading: authLoading, signOut } = useAuth();
   const [showForm, setShowForm] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -1222,26 +1242,63 @@ export default function Home() {
       </main>
 
 
-      {/* Call to Action Section */}
+      {/* FAQ Section */}
       <section 
-        className="py-24 px-8 text-center flex flex-col items-center justify-center border-b"
+        className="py-24 px-8 border-b"
         style={{ borderColor: "var(--border)", background: "var(--bg)" }}
       >
-        <div className="max-w-xl space-y-6">
-          <h2 className="text-3xl font-bold tracking-tight" style={{ fontFamily: "Outfit, sans-serif", color: "var(--text-primary)" }}>
-            Ready to design 10× faster?
-          </h2>
-          <p className="text-xs" style={{ color: "var(--text-muted)" }}>
-            Join thousands of developers using AI-parallelized hardware design engines. Start draft designs immediately, compile bill of materials, and export compilable firmware templates.
-          </p>
-          <button
-            onClick={() => user ? setShowForm(true) : router.push("/auth/login")}
-            className="btn-accent flex items-center gap-2 px-8 py-3.5 rounded-lg font-bold text-sm mx-auto"
-            style={{ color: "#000" }}
-          >
-            Start Designing
-            <ArrowRight size={15} strokeWidth={2.5} />
-          </button>
+        <div className="max-w-3xl mx-auto space-y-12">
+          <div className="text-center space-y-3">
+            <h2 className="text-3xl font-bold tracking-tight" style={{ fontFamily: "Outfit, sans-serif", color: "var(--text-primary)" }}>
+              Frequently Asked Questions
+            </h2>
+            <p className="text-xs max-w-xl mx-auto" style={{ color: "var(--text-muted)" }}>
+              Everything you need to know about Embeddy's AI hardware design engine.
+            </p>
+          </div>
+
+          <div className="space-y-4">
+            {FAQS.map((faq, idx) => (
+              <div 
+                key={idx}
+                className="border rounded-xl overflow-hidden transition-all duration-300"
+                style={{ 
+                  borderColor: openFaq === idx ? "var(--accent)" : "var(--border)",
+                  background: "var(--surface)" 
+                }}
+              >
+                <button
+                  onClick={() => setOpenFaq(openFaq === idx ? null : idx)}
+                  className="w-full flex items-center justify-between p-6 text-left hover:bg-white/5 transition-colors"
+                >
+                  <span className="font-bold text-sm" style={{ color: "var(--text-primary)" }}>{faq.question}</span>
+                  <div 
+                    className="p-1.5 rounded-full transition-transform duration-300"
+                    style={{ 
+                      background: openFaq === idx ? "var(--accent-glow)" : "rgba(255,255,255,0.03)",
+                      color: openFaq === idx ? "var(--accent)" : "var(--text-muted)",
+                      transform: openFaq === idx ? "rotate(45deg)" : "rotate(0deg)"
+                    }}
+                  >
+                    <Plus size={16} />
+                  </div>
+                </button>
+                
+                <div 
+                  className="px-6 transition-all duration-300 ease-in-out"
+                  style={{ 
+                    maxHeight: openFaq === idx ? "200px" : "0px",
+                    opacity: openFaq === idx ? 1 : 0,
+                    paddingBottom: openFaq === idx ? "24px" : "0px"
+                  }}
+                >
+                  <p className="text-xs leading-relaxed" style={{ color: "var(--text-muted)" }}>
+                    {faq.answer}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
