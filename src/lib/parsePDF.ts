@@ -1,12 +1,7 @@
 "use client";
 
-/**
- * Client-side PDF text extraction using pdfjs-dist.
- * Called before submitting the project creation form.
- */
 export async function parsePDF(file: File): Promise<string> {
   const pdfjsLib = await import("pdfjs-dist");
-  // Use local worker to avoid CDN dependency
   pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
 
   const arrayBuffer = await file.arrayBuffer();

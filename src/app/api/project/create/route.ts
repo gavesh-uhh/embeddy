@@ -30,7 +30,6 @@ export async function POST(req: NextRequest) {
     const id = uuidv4();
     const errors: Record<string, string> = {};
 
-    // Step 1: Run overview agent first to get component list
     let overview;
     try {
       overview = await ProjectOverviewAgent(
@@ -48,7 +47,6 @@ export async function POST(req: NextRequest) {
     const components = overview.components;
     const resolvedBoard = board || overview.board;
 
-    // Step 2: Run pin diagram to get pin assignments for dependent agents
     let pinDiagram;
     try {
       pinDiagram = await PinDiagramAgent(components, resolvedBoard);
@@ -59,7 +57,6 @@ export async function POST(req: NextRequest) {
 
     const pins = pinDiagram.pins;
 
-    // Step 3: Run all remaining agents in parallel
     const [
       schematicResult,
       fatalIssuesResult,

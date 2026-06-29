@@ -7,7 +7,7 @@ export async function CircuitSchematicAgent(
   board: string
 ): Promise<CircuitSchematic> {
   const pinSummary = pins
-    .slice(0, 40) // limit context size
+    .slice(0, 40)
     .map((p) => `${p.component}.${p.pin} -> ${p.boardPin} (${p.signalType})`)
     .join("\n");
 

@@ -41,7 +41,7 @@ html, body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* Scrollbars */
+
 ::-webkit-scrollbar {
   width: 5px;
   height: 5px;
@@ -57,7 +57,7 @@ html, body {
   background: #2a2a2a;
 }
 
-/* Panel section headers */
+
 .panel-header {
   font-family: 'Outfit', sans-serif;
   font-weight: 500;
@@ -67,12 +67,12 @@ html, body {
   color: var(--text-muted);
 }
 
-/* Code blocks */
+
 code, pre {
   font-family: 'JetBrains Mono', monospace;
 }
 
-/* Accent glow button */
+
 .btn-accent {
   background: var(--accent);
   color: #000;
@@ -85,7 +85,7 @@ code, pre {
   transform: translateY(-1px);
 }
 
-/* Green glow pulse for fatal indicator */
+
 @keyframes pulse-ring {
   0% { transform: scale(0.8); opacity: 1; }
   100% { transform: scale(2.2); opacity: 0; }
@@ -99,7 +99,7 @@ code, pre {
   animation: pulse-ring 1.5s ease-out infinite;
 }
 
-/* Skeleton shimmer */
+
 @keyframes shimmer {
   0% { background-position: -200% 0; }
   100% { background-position: 200% 0; }
@@ -116,13 +116,13 @@ code, pre {
   border-radius: 6px;
 }
 
-/* Green accent scanline underline animation */
+
 @keyframes scan {
   0% { width: 0%; }
   100% { width: 100%; }
 }
 
-/* Signal type colors — green-forward palette */
+
 .signal-power   { color: #ff3b3b; }
 .signal-ground  { color: #333333; }
 .signal-digital { color: #00ff66; }
@@ -131,7 +131,7 @@ code, pre {
 .signal-spi     { color: #00b4ff; }
 .signal-uart    { color: #a3e635; }
 
-/* Board badges — black/green theme */
+
 .badge-arduino {
   background: #00ff6615;
   color: #00ff66;
@@ -148,14 +148,14 @@ code, pre {
   border: 1px solid #00b4ff30;
 }
 
-/* Highlight.js theme override — pitch black */
+
 .hljs {
   background: #050505 !important;
   color: #a3e635;
   padding: 0 !important;
 }
 
-/* Micro hover glow for interactive cards */
+
 .card-hover {
   transition: border-color 0.2s, box-shadow 0.2s;
 }
@@ -164,12 +164,12 @@ code, pre {
   box-shadow: 0 0 16px rgba(0, 255, 102, 0.06);
 }
 
-/* Green text glow */
+
 .text-glow {
   text-shadow: 0 0 12px rgba(0, 255, 102, 0.5);
 }
 
-/* Fade in animation */
+
 @keyframes fadeUp {
   from { opacity: 0; transform: translateY(8px); }
   to   { opacity: 1; transform: translateY(0); }
@@ -178,7 +178,7 @@ code, pre {
   animation: fadeUp 0.4s ease forwards;
 }
 
-/* Hero logo animations */
+
 @keyframes logoPulse {
   0%, 100% { box-shadow: 0 0 0 0 rgba(0,255,102,0.4), 0 0 20px rgba(0,255,102,0.2); }
   50%       { box-shadow: 0 0 0 10px rgba(0,255,102,0), 0 0 40px rgba(0,255,102,0.4); }
@@ -219,7 +219,7 @@ code, pre {
   opacity: 0;
 }
 
-/* ── Glitch effect ── */
+
 @keyframes glitch-1 {
   0%   { clip: rect(20px, 930px, 56px, 0); }
   5%   { clip: rect(30px, 930px, 16px, 0); }
@@ -288,7 +288,7 @@ code, pre {
   letter-spacing: inherit;
 }
 
-/* Green-shifted ghost — runs glitch-1 */
+
 .glitch-text::before {
   left: 2px;
   color: #00ff66;
@@ -297,7 +297,7 @@ code, pre {
   opacity: 0.75;
 }
 
-/* Red-shifted ghost — runs glitch-2 */
+
 .glitch-text::after {
   left: -2px;
   color: #ff3b3b;

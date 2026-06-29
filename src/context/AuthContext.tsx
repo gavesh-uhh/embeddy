@@ -22,7 +22,6 @@ const AuthContext = createContext<AuthContextValue>({
   signOut: async () => {},
 });
 
-// Routes that never require authentication
 const PUBLIC_ROUTES = ["/", "/auth/login", "/auth/register", "/project"];
 
 export function AuthProvider({ children }: { children: ReactNode }) {

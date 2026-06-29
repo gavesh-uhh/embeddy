@@ -157,7 +157,7 @@ const EXAMPLES = [
 
 export default function Home() {
   const router = useRouter();
-  const { user, signOut } = useAuth();
+  const { user, loading: authLoading, signOut } = useAuth();
   const [showForm, setShowForm] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -295,7 +295,9 @@ export default function Home() {
             </button>
             <span style={{ color: "var(--border)" }}>|</span>
             <div className="flex items-center gap-2">
-              <Cpu size={14} style={{ color: "var(--accent)" }} />
+              <div className="w-6 h-6 rounded-md border border-[#00ff6630] bg-[#050505] shadow-[0_0_10px_rgba(0,255,102,0.15)] flex items-center justify-center p-0.5">
+                <img src="/icon.png" alt="Embeddy" className="w-full h-full object-contain" />
+              </div>
               <span className="font-bold text-sm tracking-tight" style={{ color: "var(--text-primary)" }}>
                 New Design Pipeline
               </span>
@@ -512,8 +514,8 @@ export default function Home() {
         style={{ borderColor: "var(--border)", background: "var(--surface)" }}
       >
         <div className="flex items-center gap-2.5">
-          <div className="w-6 h-6 rounded flex items-center justify-center" style={{ background: "var(--accent)", color: "#000" }}>
-            <Cpu size={13} strokeWidth={2.5} />
+          <div className="w-7 h-7 rounded-lg border border-[#00ff6630] bg-[#050505] shadow-[0_0_12px_rgba(0,255,102,0.15)] flex items-center justify-center p-0.5">
+            <img src="/icon.png" alt="Embeddy" className="w-full h-full object-contain" />
           </div>
           <span className="font-bold text-sm tracking-tight" style={{ fontFamily: "Outfit, sans-serif", color: "var(--text-primary)" }}>
             Embeddy
@@ -679,79 +681,6 @@ export default function Home() {
               </div>
             ))}
           </div>
-
-          {user && (
-          <div className="mt-10 pt-8" style={{ borderTop: "1px solid var(--border)" }}>
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2">
-                <FolderOpen size={14} style={{ color: "var(--accent)" }} />
-                <span className="text-xs font-bold uppercase tracking-wider" style={{ color: "var(--text-primary)", fontFamily: "Outfit, sans-serif" }}>
-                  My Projects
-                </span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                {cloudStatus === "loading" && (
-                  <><Loader2 size={11} className="animate-spin" style={{ color: "var(--text-muted)" }} />
-                  <span className="text-[10px]" style={{ color: "var(--text-muted)" }}>Syncing…</span></>
-                )}
-                {cloudStatus === "ok" && (
-                  <><Cloud size={11} style={{ color: "var(--accent)" }} />
-                  <span className="text-[10px]" style={{ color: "var(--accent)" }}>Cloud Synced</span></>
-                )}
-                {cloudStatus === "offline" && (
-                  <><CloudOff size={11} style={{ color: "var(--text-muted)" }} />
-                  <span className="text-[10px]" style={{ color: "var(--text-muted)" }}>Offline</span></>
-                )}
-              </div>
-            </div>
-
-            {projectsLoading ? (
-              <div className="flex items-center gap-2 py-6" style={{ color: "var(--text-dim)" }}>
-                <Loader2 size={13} className="animate-spin" />
-                <span className="text-xs">Loading your projects…</span>
-              </div>
-            ) : myProjects.length === 0 ? (
-              <div className="rounded-lg border border-dashed p-5 text-center" style={{ borderColor: "var(--border)" }}>
-                <Cloud size={18} className="mx-auto mb-2" style={{ color: "var(--text-dim)" }} />
-                <p className="text-xs" style={{ color: "var(--text-muted)" }}>No cloud projects yet.</p>
-                <p className="text-[11px] mt-1" style={{ color: "var(--text-dim)" }}>Start a project — it’ll appear here across all your devices.</p>
-              </div>
-            ) : (
-              <div className="space-y-2 max-h-52 overflow-y-auto pr-1">
-                {myProjects.map((p) => (
-                  <div
-                    key={p.id}
-                    className="flex items-center justify-between rounded-lg border px-3 py-2.5 group transition-all"
-                    style={{ borderColor: "var(--border)", background: "var(--surface-raised)" }}
-                    onMouseEnter={e => (e.currentTarget.style.borderColor = "#00ff6630")}
-                    onMouseLeave={e => (e.currentTarget.style.borderColor = "var(--border)")}
-                  >
-                    <div className="flex-1 min-w-0">
-                      <p className="text-xs font-semibold truncate" style={{ color: "var(--text-primary)" }}>{p.title}</p>
-                      <p className="text-[10px] mt-0.5 font-mono" style={{ color: "var(--text-muted)" }}>
-                        {p.board} · {new Date(p.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-1.5 ml-2">
-                      <button onClick={() => router.push(`/project/${p.id}`)} title="Open project"
-                        className="p-1.5 rounded transition-colors" style={{ color: "var(--text-muted)" }}
-                        onMouseEnter={e => (e.currentTarget.style.color = "var(--accent)")}
-                        onMouseLeave={e => (e.currentTarget.style.color = "var(--text-muted)")}
-                      ><ExternalLink size={12} /></button>
-                      <button onClick={() => handleDelete(p.id)} title="Delete project" disabled={deletingId === p.id}
-                        className="p-1.5 rounded transition-colors" style={{ color: "var(--text-muted)" }}
-                        onMouseEnter={e => (e.currentTarget.style.color = "var(--accent-red)")}
-                        onMouseLeave={e => (e.currentTarget.style.color = "var(--text-muted)")}
-                      >
-                        {deletingId === p.id ? <Loader2 size={12} className="animate-spin" /> : <Trash2 size={12} />}
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-          )}
         </div>
 
         <div
@@ -759,41 +688,122 @@ export default function Home() {
           style={{ borderLeft: "1px solid var(--border)", background: "var(--surface)" }}
         >
           <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'radial-gradient(var(--accent) 1px, transparent 0)', backgroundSize: '24px 24px' }} />
-          
-          <div
-            className="w-full max-w-lg rounded-xl overflow-hidden relative group"
-            style={{ 
-              border: "1px solid var(--border-bright)", 
-              boxShadow: "0 0 50px rgba(0,255,102,0.05), inset 0 0 20px rgba(255,255,255,0.02)",
-              background: "#050505"
-            }}
-          >
-            <div
-              className="flex items-center justify-between px-4 py-3"
-              style={{ background: "#0a0a0a", borderBottom: "1px solid var(--border)" }}
-            >
-              <div className="flex gap-1.5">
-                <div className="w-3 h-3 rounded-full" style={{ background: "#333" }} />
-                <div className="w-3 h-3 rounded-full" style={{ background: "#333" }} />
-                <div className="w-3 h-3 rounded-full" style={{ background: "#333" }} />
-              </div>
-              <span className="text-[10px] tracking-widest font-mono uppercase" style={{ color: "var(--text-muted)" }}>
-                Circuit Visualizer
-              </span>
-              <div className="w-12 h-1.5 bg-[#111] rounded-full" />
-            </div>
 
-            <div className="relative aspect-[4/3] w-full overflow-hidden bg-black p-4 flex items-center justify-center">
-              <img 
-                src="/circuit_schematic.png" 
-                alt="Circuit Schematic preview" 
-                className="w-full h-full object-cover rounded-lg border"
-                style={{ borderColor: "var(--border)" }}
-              />
-              
-              <div className="absolute inset-0 pointer-events-none bg-gradient-to-b from-transparent via-transparent to-[rgba(0,255,102,0.03)]" />
+          {authLoading ? (
+            <div
+              className="w-full max-w-lg rounded-xl border p-8 flex flex-col items-center justify-center h-[280px]"
+              style={{ borderColor: "var(--border)", background: "#050505" }}
+            >
+              <Loader2 size={20} className="animate-spin" style={{ color: "var(--accent)" }} />
+              <p className="text-xs mt-3 text-glow" style={{ color: "var(--text-muted)", fontFamily: "Outfit, sans-serif" }}>Synchronizing cloud session…</p>
             </div>
-          </div>
+          ) : !user || myProjects.length === 0 ? (
+            <div
+              className="w-full max-w-lg rounded-xl overflow-hidden relative group"
+              style={{ 
+                border: "1px solid var(--border-bright)", 
+                boxShadow: "0 0 50px rgba(0,255,102,0.05), inset 0 0 20px rgba(255,255,255,0.02)",
+                background: "#050505"
+              }}
+            >
+              <div
+                className="flex items-center justify-between px-4 py-3"
+                style={{ background: "#0a0a0a", borderBottom: "1px solid var(--border)" }}
+              >
+                <div className="flex gap-1.5">
+                  <div className="w-3 h-3 rounded-full" style={{ background: "#333" }} />
+                  <div className="w-3 h-3 rounded-full" style={{ background: "#333" }} />
+                  <div className="w-3 h-3 rounded-full" style={{ background: "#333" }} />
+                </div>
+                <span className="text-[10px] tracking-widest font-mono uppercase" style={{ color: "var(--text-muted)" }}>
+                  Circuit Visualizer
+                </span>
+                <div className="w-12 h-1.5 bg-[#111] rounded-full" />
+              </div>
+
+              <div className="relative aspect-[4/3] w-full overflow-hidden bg-black p-4 flex items-center justify-center">
+                <img 
+                  src="/circuit_schematic.png" 
+                  alt="Circuit Schematic preview" 
+                  className="w-full h-full object-cover rounded-lg border"
+                  style={{ borderColor: "var(--border)" }}
+                />
+                <div className="absolute inset-0 pointer-events-none bg-gradient-to-b from-transparent via-transparent to-[rgba(0,255,102,0.03)]" />
+              </div>
+            </div>
+          ) : (
+            <div
+              className="w-full max-w-lg rounded-xl border p-6 relative group"
+              style={{ 
+                borderColor: "var(--border-bright)", 
+                boxShadow: "0 0 50px rgba(0,255,102,0.05), inset 0 0 20px rgba(255,255,255,0.01)",
+                background: "#050505"
+              }}
+            >
+              <div className="flex items-center justify-between mb-5 pb-3 border-b" style={{ borderColor: "var(--border)" }}>
+                <div className="flex items-center gap-2">
+                  <FolderOpen size={15} style={{ color: "var(--accent)" }} />
+                  <span className="text-xs font-bold uppercase tracking-wider" style={{ color: "var(--text-primary)", fontFamily: "Outfit, sans-serif" }}>
+                    My Projects
+                  </span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  {cloudStatus === "loading" && (
+                    <><Loader2 size={11} className="animate-spin" style={{ color: "var(--text-muted)" }} />
+                    <span className="text-[10px]" style={{ color: "var(--text-muted)" }}>Syncing…</span></>
+                  )}
+                  {cloudStatus === "ok" && (
+                    <><Cloud size={11} style={{ color: "var(--accent)" }} />
+                    <span className="text-[10px]" style={{ color: "var(--accent)" }}>Cloud Synced</span></>
+                  )}
+                  {cloudStatus === "offline" && (
+                    <><CloudOff size={11} style={{ color: "var(--text-muted)" }} />
+                    <span className="text-[10px]" style={{ color: "var(--text-muted)" }}>Offline</span></>
+                  )}
+                </div>
+              </div>
+
+              {projectsLoading ? (
+                <div className="flex items-center gap-2 py-8 justify-center" style={{ color: "var(--text-dim)" }}>
+                  <Loader2 size={15} className="animate-spin" />
+                  <span className="text-xs">Loading cloud projects…</span>
+                </div>
+              ) : (
+                <div className="space-y-2.5 max-h-[380px] overflow-y-auto pr-1">
+                  {myProjects.map((p) => (
+                    <div
+                      key={p.id}
+                      className="flex items-center justify-between rounded-lg border px-3.5 py-3 group transition-all"
+                      style={{ borderColor: "var(--border)", background: "var(--surface)" }}
+                      onMouseEnter={e => (e.currentTarget.style.borderColor = "#00ff6630")}
+                      onMouseLeave={e => (e.currentTarget.style.borderColor = "var(--border)")}
+                    >
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-semibold truncate" style={{ color: "var(--text-primary)" }}>{p.title}</p>
+                        <p className="text-[10px] mt-1 font-mono" style={{ color: "var(--text-muted)" }}>
+                          {p.board} · {new Date(p.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-2 ml-2">
+                        <button onClick={() => router.push(`/project/${p.id}`)} title="Open project"
+                          className="p-1.5 rounded transition-colors" style={{ color: "var(--text-muted)" }}
+                          onMouseEnter={e => (e.currentTarget.style.color = "var(--accent)")}
+                          onMouseLeave={e => (e.currentTarget.style.color = "var(--text-muted)")}
+                        ><ExternalLink size={13} /></button>
+                        <button onClick={() => handleDelete(p.id)} title="Delete project" disabled={deletingId === p.id}
+                          className="p-1.5 rounded transition-colors" style={{ color: "var(--text-muted)" }}
+                          onMouseEnter={e => (e.currentTarget.style.color = "var(--accent-red)")}
+                          onMouseLeave={e => (e.currentTarget.style.color = "var(--text-muted)")}
+                        >
+                          {deletingId === p.id ? <Loader2 size={13} className="animate-spin" /> : <Trash2 size={13} />}
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </main>
 
