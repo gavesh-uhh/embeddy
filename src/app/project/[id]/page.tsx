@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { loadProject, saveProject } from "@/lib/projectStore";
+import { loadProject } from "@/lib/projectStore";
 import { ProjectData } from "@/lib/types";
 import { useAuth } from "@/context/AuthContext";
 import BoardBadge from "@/components/BoardBadge";
