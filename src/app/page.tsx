@@ -157,7 +157,7 @@ const EXAMPLES = [
 
 export default function Home() {
   const router = useRouter();
-  const { user, signOut } = useAuth();
+  const { user, loading: authLoading, signOut } = useAuth();
   const [showForm, setShowForm] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -689,7 +689,15 @@ export default function Home() {
         >
           <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'radial-gradient(var(--accent) 1px, transparent 0)', backgroundSize: '24px 24px' }} />
 
-          {!user || myProjects.length === 0 ? (
+          {authLoading ? (
+            <div
+              className="w-full max-w-lg rounded-xl border p-8 flex flex-col items-center justify-center h-[280px]"
+              style={{ borderColor: "var(--border)", background: "#050505" }}
+            >
+              <Loader2 size={20} className="animate-spin" style={{ color: "var(--accent)" }} />
+              <p className="text-xs mt-3 text-glow" style={{ color: "var(--text-muted)", fontFamily: "Outfit, sans-serif" }}>Synchronizing cloud session…</p>
+            </div>
+          ) : !user || myProjects.length === 0 ? (
             <div
               className="w-full max-w-lg rounded-xl overflow-hidden relative group"
               style={{ 

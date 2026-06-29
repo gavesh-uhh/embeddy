@@ -15,7 +15,6 @@ import CodeSkeletonPanel from "@/components/CodeSkeletonPanel";
 import PinDiagramPanel from "@/components/PinDiagramPanel";
 import CircuitRenderer from "@/components/CircuitRenderer";
 import {
-  Cpu,
   LayoutDashboard,
   CircuitBoard,
   ShoppingCart,
