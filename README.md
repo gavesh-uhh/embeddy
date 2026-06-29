@@ -43,27 +43,7 @@ NEXT_PUBLIC_FB_SENDER_ID=
 NEXT_PUBLIC_FB_APP_ID=
 ```
 
-### Firebase setup
-
-1. Create a project at [console.firebase.google.com](https://console.firebase.google.com)
-2. Enable **Authentication → Email/Password**
-3. Create a **Firestore Database** (test mode)
-4. Copy the web app config into `.env.local`
-5. Paste `firestore.rules` into the Firestore Rules tab and publish
-
 ```bash
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) — register an account and start designing.
-
-## Supported boards
-
-| Board | Notes |
-|---|---|
-| Arduino Uno | Standard 5V logic |
-| Arduino Mega | Extended I/O |
-| ESP32 | Wi-Fi / Bluetooth IoT |
-| ESP32-S3 | USB OTG, AI accelerator |
-| STM32F103 | Blue Pill, industrial |
-| STM32F4 | High performance, FPU |
