@@ -11,7 +11,7 @@ import {
   updateProfile,
 } from "@/lib/firebase";
 import {
-  Cpu, Mail, Lock, User, ArrowRight, Loader2, ShieldAlert, CheckCircle2, Eye, EyeOff,
+  Mail, Lock, User, ArrowRight, Loader2, ShieldAlert, CheckCircle2, Eye, EyeOff,
 } from "lucide-react";
 
 export default function RegisterPage() {
@@ -96,11 +96,8 @@ export default function RegisterPage() {
   return (
     <div className="fade-up">
       <div className="flex items-center gap-3 mb-8 justify-center">
-        <div
-          className="w-9 h-9 rounded-xl flex items-center justify-center hero-icon"
-          style={{ background: "var(--accent)", color: "#000" }}
-        >
-          <Cpu size={18} strokeWidth={2.5} />
+        <div className="w-9 h-9 rounded-xl border border-[#00ff6630] bg-[#050505] shadow-[0_0_15px_rgba(0,255,102,0.18)] flex items-center justify-center p-0.5">
+          <img src="/icon.png" alt="Embeddy" className="w-full h-full object-contain" />
         </div>
         <span
           className="font-bold text-2xl tracking-tight"

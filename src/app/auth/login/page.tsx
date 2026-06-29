@@ -9,7 +9,7 @@ import {
   signInWithPopup,
   googleProvider,
 } from "@/lib/firebase";
-import { Cpu, Mail, Lock, ArrowRight, Loader2, ShieldAlert, Eye, EyeOff } from "lucide-react";
+import { Mail, Lock, ArrowRight, Loader2, ShieldAlert, Eye, EyeOff } from "lucide-react";
 
 const inputStyle = {
   background: "var(--surface-raised)",
@@ -174,8 +174,8 @@ export default function LoginPage() {
   return (
     <div className="fade-up">
       <div className="flex items-center gap-3 mb-8 justify-center">
-        <div className="w-9 h-9 rounded-xl flex items-center justify-center hero-icon" style={{ background: "var(--accent)", color: "#000" }}>
-          <Cpu size={18} strokeWidth={2.5} />
+        <div className="w-9 h-9 rounded-xl border border-[#00ff6630] bg-[#050505] shadow-[0_0_15px_rgba(0,255,102,0.18)] flex items-center justify-center p-0.5">
+          <img src="/icon.png" alt="Embeddy" className="w-full h-full object-contain" />
         </div>
         <span className="font-bold text-2xl tracking-tight" style={{ fontFamily: "Outfit, sans-serif", color: "var(--text-primary)" }}>
           Embeddy
