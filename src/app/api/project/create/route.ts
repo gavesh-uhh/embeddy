@@ -8,16 +8,18 @@ import { CompatibilityCheckAgent } from "@/lib/agents/CompatibilityCheckAgent";
 import { PowerBudgetAgent } from "@/lib/agents/PowerBudgetAgent";
 import { BOMAgent } from "@/lib/agents/BOMAgent";
 import { CodeSkeletonAgent } from "@/lib/agents/CodeSkeletonAgent";
+import { PCBLayoutAgent } from "@/lib/agents/PCBLayoutAgent";
 import { ProjectData, BoardType } from "@/lib/types";
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { title, board, description, fileContents } = body as {
+    const { title, board, description, fileContents, generatePCB } = body as {
       title: string;
       board: BoardType;
       description: string;
       fileContents: string[];
+      generatePCB?: boolean;
     };
 
     if (!title || !description) {
@@ -116,6 +118,21 @@ export async function POST(req: NextRequest) {
     if (codeSkeletonResult.status === "rejected")
       errors.codeSkeleton = codeSkeletonResult.reason?.message;
 
+    // Step 4: Generate PCB layout if schematic succeeded and generation requested
+    let pcbLayout;
+    if (schematic && generatePCB) {
+      try {
+        pcbLayout = await PCBLayoutAgent(
+          components,
+          pins,
+          schematic,
+          resolvedBoard,
+        );
+      } catch (e) {
+        errors.pcbLayout = (e as Error).message;
+      }
+    }
+
     const project: ProjectData = {
       id,
       title,
@@ -130,6 +147,7 @@ export async function POST(req: NextRequest) {
       powerBudget,
       bom,
       codeSkeleton,
+      pcbLayout,
       errors: Object.keys(errors).length > 0 ? errors : undefined,
     };
 

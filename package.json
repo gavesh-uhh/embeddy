@@ -10,7 +10,10 @@
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
+    "@tscircuit/capacity-autorouter": "^0.0.618",
+    "@tscircuit/footprinter": "^0.0.360",
     "firebase": "^12.15.0",
+    "format-si-unit": "^0.0.10",
     "highlight.js": "^11.11.1",
     "konva": "^10.3.0",
     "lucide-react": "^1.21.0",

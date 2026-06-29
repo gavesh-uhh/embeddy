@@ -110,6 +110,66 @@ export interface ComponentSource {
   notes: string;
 }
 
+export interface PCBTrace {
+  id: string;
+  points: { x: number; y: number }[];
+  width: number;
+  layer: "top" | "bottom" | "via";
+  netName: string;
+}
+
+export interface PCBPad {
+  id: string;
+  componentId: string;
+  pinName: string;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  shape: "rect" | "circle" | "oval";
+  layer: "top" | "bottom" | "both";
+  netName?: string;
+}
+
+export interface PCBComponentPlacement {
+  id: string;
+  componentId: string;
+  name: string;
+  x: number;
+  y: number;
+  rotation: number;
+  footprint: string;
+  layer: "top" | "bottom";
+}
+
+export interface PCBLayers {
+  topCopper: boolean;
+  bottomCopper: boolean;
+  topSilkscreen: boolean;
+  bottomSilkscreen: boolean;
+  topMask: boolean;
+  bottomMask: boolean;
+}
+
+export interface PCBDesignRules {
+  minTraceWidth: number;
+  minViaSize: number;
+  minClearance: number;
+  preferredTraceWidth: number;
+}
+
+export interface PCBLayout {
+  version: string;
+  boardWidth: number;
+  boardHeight: number;
+  placements: PCBComponentPlacement[];
+  traces: PCBTrace[];
+  pads: PCBPad[];
+  layers: PCBLayers;
+  designRules: PCBDesignRules;
+  mountingHoles: { x: number; y: number; diameter: number }[];
+}
+
 export interface ProjectContext {
   title: string;
   board: BoardType;
@@ -137,5 +197,6 @@ export interface ProjectData {
   powerBudget?: PowerBudget;
   bom?: BOM;
   codeSkeleton?: CodeSkeleton;
+  pcbLayout?: PCBLayout;
   errors?: Record<string, string>;
 }

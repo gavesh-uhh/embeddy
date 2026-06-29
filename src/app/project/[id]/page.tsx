@@ -14,7 +14,9 @@ import BOMPanel from "@/components/BOMPanel";
 import CodeSkeletonPanel from "@/components/CodeSkeletonPanel";
 import PinDiagramPanel from "@/components/PinDiagramPanel";
 import CircuitRenderer from "@/components/CircuitRenderer";
+import PCBLayoutPanel from "@/components/PCBLayoutPanel";
 import NaturalLanguageEditor from "@/components/NaturalLanguageEditor";
+import { saveProject } from "@/lib/projectStore";
 import {
   LayoutDashboard,
   CircuitBoard,
@@ -95,6 +97,44 @@ export default function ProjectPage() {
     (i) => i.severity === "fatal",
   );
 
+  const handlePCBGenerate = async () => {
+    if (!project) return;
+    setRetrying((prev) => ({ ...prev, pcbLayout: true }));
+
+    try {
+      const context = {
+        title: project.title,
+        board: project.board,
+        description: project.description,
+        components: project.overview?.components || [],
+        pins: project.pinDiagram?.pins || [],
+        schematic: project.schematic || { components: [], connections: [] },
+        fileContents: [],
+      };
+
+      const res = await fetch("/api/agents/pcbLayout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ projectContext: context }),
+      });
+
+      if (!res.ok) throw new Error("PCB Layout generation failed");
+      const result = await res.json();
+
+      const updated: ProjectData = { ...project, pcbLayout: result };
+      if (updated.errors) {
+        delete updated.errors.pcbLayout;
+      }
+
+      await saveProject(updated);
+      setProject(updated);
+    } catch {
+      // Error handled silently
+    } finally {
+      setRetrying((prev) => ({ ...prev, pcbLayout: false }));
+    }
+  };
+
   const handleRetry = async (agentKey: string, agentName: string) => {
     if (!project) return;
     setRetrying((prev) => ({ ...prev, [agentKey]: true }));
@@ -132,12 +172,13 @@ export default function ProjectPage() {
       const field = fieldMap[agentKey];
       if (field) {
         (updated as unknown as Record<string, unknown>)[field] = result;
+      } else if (agentKey === "pcbLayout") {
+        updated.pcbLayout = result;
       }
       if (updated.errors) {
         delete updated.errors[agentKey];
       }
 
-      const { saveProject } = await import("@/lib/projectStore");
       await saveProject(updated);
       setProject(updated);
     } catch {
@@ -758,6 +799,18 @@ export default function ProjectPage() {
                 <PinDiagramPanel
                   pinDiagram={project.pinDiagram}
                   error={errors.pinDiagram}
+                />
+                <PCBLayoutPanel
+                  pcbLayout={project.pcbLayout}
+                  error={retrying.pcbLayout ? "Generating…" : errors.pcbLayout}
+                  onRetry={
+                    errors.pcbLayout
+                      ? () => handleRetry("pcbLayout", "pcbLayout")
+                      : undefined
+                  }
+                  onGenerate={
+                    !project.pcbLayout ? () => handlePCBGenerate() : undefined
+                  }
                 />
               </div>
             )}
