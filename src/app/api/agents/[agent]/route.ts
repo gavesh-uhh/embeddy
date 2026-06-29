@@ -16,7 +16,8 @@ type AgentName =
   | "compatibility"
   | "powerBudget"
   | "bom"
-  | "codeSkeleton";
+  | "codeSkeleton"
+  | "naturalLanguage";
 
 export async function POST(
   req: NextRequest,

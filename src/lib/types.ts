@@ -115,6 +115,10 @@ export interface ProjectContext {
   board: BoardType;
   description: string;
   fileContents: string[];
+  components?: string[];
+  pins?: Pin[];
+  warnings?: string[];
+  bomItems?: BOMItem[];
 }
 
 export interface ProjectData {

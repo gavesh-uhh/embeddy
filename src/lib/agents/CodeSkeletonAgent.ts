@@ -10,6 +10,8 @@ export async function CodeSkeletonAgent(
     boardPin: string;
     signalType: string;
   }>,
+  preferredLanguage?: "C++" | "MicroPython",
+  preferredFramework?: "Arduino" | "ESP-IDF" | "STM32 HAL",
 ): Promise<CodeSkeleton> {
   const pinDefs = pins
     .filter((p) => !["power", "ground"].includes(p.signalType))
@@ -17,13 +19,22 @@ export async function CodeSkeletonAgent(
     .map((p) => `// ${p.component} ${p.pin} -> ${p.boardPin}`)
     .join("\n");
 
-  const isMicropython = board.startsWith("ESP32");
-  const language = isMicropython ? "C++" : "C++";
-  const framework = board.startsWith("Arduino")
-    ? "Arduino"
-    : board.startsWith("ESP32")
-      ? "Arduino"
-      : "STM32 HAL";
+  // Determine language and framework, using preferences if provided
+  const detectFramework = (): "Arduino" | "ESP-IDF" | "STM32 HAL" => {
+    if (preferredFramework) return preferredFramework;
+    if (board.startsWith("Arduino")) return "Arduino";
+    if (board.startsWith("ESP32")) return "Arduino";
+    return "STM32 HAL";
+  };
+
+  const detectLanguage = (): "C++" | "MicroPython" => {
+    if (preferredLanguage) return preferredLanguage;
+    // Default to C++ for most boards
+    return "C++";
+  };
+
+  const language = detectLanguage();
+  const framework = detectFramework();
 
   const prompt = `You are an expert embedded systems programmer. Generate a complete code skeleton for this project.
 
