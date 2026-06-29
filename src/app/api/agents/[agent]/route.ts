@@ -7,6 +7,7 @@ import { CompatibilityCheckAgent } from "@/lib/agents/CompatibilityCheckAgent";
 import { PowerBudgetAgent } from "@/lib/agents/PowerBudgetAgent";
 import { BOMAgent } from "@/lib/agents/BOMAgent";
 import { CodeSkeletonAgent } from "@/lib/agents/CodeSkeletonAgent";
+import { PCBLayoutAgent } from "@/lib/agents/PCBLayoutAgent";
 
 type AgentName =
   | "overview"
@@ -17,6 +18,7 @@ type AgentName =
   | "powerBudget"
   | "bom"
   | "codeSkeleton"
+  | "pcbLayout"
   | "naturalLanguage";
 
 export async function POST(
@@ -80,6 +82,14 @@ export async function POST(
           projectContext.pins || [],
           projectContext.language,
           projectContext.framework,
+        );
+        break;
+      case "pcbLayout":
+        result = await PCBLayoutAgent(
+          projectContext.components,
+          projectContext.pins || [],
+          projectContext.schematic,
+          projectContext.board,
         );
         break;
       default:

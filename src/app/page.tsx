@@ -32,6 +32,7 @@ import {
   FolderOpen,
   LogOut,
   User,
+  Layers,
 } from "lucide-react";
 
 const BOARDS: BoardType[] = [
@@ -44,14 +45,24 @@ const BOARDS: BoardType[] = [
 ];
 
 const FEATURES = [
-  { icon: Zap,          label: "Circuit Schematic",  desc: "Interactive canvas" },
-  { icon: PinIcon,      label: "Pin Diagram",         desc: "Signal-typed wiring" },
-  { icon: Zap,          label: "Power Budget",        desc: "Current draw analysis" },
-  { icon: ShoppingCart, label: "BOM + Sourcing",      desc: "Estimated LKR costs" },
-  { icon: ShieldAlert,  label: "Safety Analysis",     desc: "Voltage conflict flags" },
-  { icon: Wrench,       label: "Compatibility",       desc: "Board + component check" },
-  { icon: Code2,        label: "Code Skeleton",       desc: "Compilable starter code" },
-  { icon: Bot,          label: "9 AI Agents",         desc: "Running in parallel" },
+  { icon: Zap, label: "Circuit Schematic", desc: "Interactive canvas" },
+  { icon: PinIcon, label: "Pin Diagram", desc: "Signal-typed wiring" },
+  {
+    icon: Layers,
+    label: "PCB Layout",
+    desc: "Auto-generated routing",
+    badge: "BETA",
+  },
+  { icon: Zap, label: "Power Budget", desc: "Current draw analysis" },
+  { icon: ShoppingCart, label: "BOM + Sourcing", desc: "Estimated LKR costs" },
+  {
+    icon: ShieldAlert,
+    label: "Safety Analysis",
+    desc: "Voltage conflict flags",
+  },
+  { icon: Wrench, label: "Compatibility", desc: "Board + component check" },
+  { icon: Code2, label: "Code Skeleton", desc: "Compilable starter code" },
+  { icon: Bot, label: "10 AI Agents", desc: "Running in parallel" },
 ];
 
 const FEATURE_DETAILS = [
@@ -61,9 +72,10 @@ const FEATURE_DETAILS = [
     category: "hardware",
     icon: Zap,
     shortDesc: "Interactive Canvas & Real-time Routing",
-    longDesc: "Embeddy generates high-fidelity circuit schematics drawn directly on an interactive Konva canvas. Pan, zoom, and click individual components to highlight connected power, ground, and data wiring networks.",
+    longDesc:
+      "Embeddy generates high-fidelity circuit schematics drawn directly on an interactive Konva canvas. Pan, zoom, and click individual components to highlight connected power, ground, and data wiring networks.",
     badge: "Konva.js Engine",
-    color: "var(--accent)"
+    color: "var(--accent)",
   },
   {
     id: "pinout",
@@ -71,9 +83,10 @@ const FEATURE_DETAILS = [
     category: "hardware",
     icon: PinIcon,
     shortDesc: "Signal-Typed Hardware Pinouts",
-    longDesc: "Get complete mappings of microcontroller pin connections. Signals are categorized (Analog, Digital, I2C, SPI, UART, Power) and color-coded with physical alignment diagrams.",
+    longDesc:
+      "Get complete mappings of microcontroller pin connections. Signals are categorized (Analog, Digital, I2C, SPI, UART, Power) and color-coded with physical alignment diagrams.",
     badge: "Signal-Typed Map",
-    color: "var(--accent-blue)"
+    color: "var(--accent-blue)",
   },
   {
     id: "power",
@@ -81,9 +94,10 @@ const FEATURE_DETAILS = [
     category: "diagnostics",
     icon: Zap,
     shortDesc: "Current Draw & Voltage Validation",
-    longDesc: "Analyze system current loads dynamically. Embeddy features a 20-segment LED load visualizer, individual voltage rail breakdowns, and intelligent alerts if USB power limits (500mA) are exceeded.",
+    longDesc:
+      "Analyze system current loads dynamically. Embeddy features a 20-segment LED load visualizer, individual voltage rail breakdowns, and intelligent alerts if USB power limits (500mA) are exceeded.",
     badge: "LED Load Analyzer",
-    color: "var(--accent-red)"
+    color: "var(--accent-red)",
   },
   {
     id: "bom",
@@ -91,9 +105,10 @@ const FEATURE_DETAILS = [
     category: "diagnostics",
     icon: ShoppingCart,
     shortDesc: "Procurement & Cost Estimation",
-    longDesc: "Instantly compile a Bill of Materials (BOM) including quantities, description details, standard unit pricing, and estimated total project cost in Rupees.",
+    longDesc:
+      "Instantly compile a Bill of Materials (BOM) including quantities, description details, standard unit pricing, and estimated total project cost in Rupees.",
     badge: "LKR Sourced Lists",
-    color: "var(--accent)"
+    color: "var(--accent)",
   },
   {
     id: "safety",
@@ -101,9 +116,10 @@ const FEATURE_DETAILS = [
     category: "diagnostics",
     icon: ShieldAlert,
     shortDesc: "Voltage Conflict & Fault Detections",
-    longDesc: "Verify component safety automatically. Detects short circuits, severe logic mismatches, missing pull-ups, and highlights critical hardware faults in red alert logs.",
+    longDesc:
+      "Verify component safety automatically. Detects short circuits, severe logic mismatches, missing pull-ups, and highlights critical hardware faults in red alert logs.",
     badge: "Threat Scanner",
-    color: "var(--accent-red)"
+    color: "var(--accent-red)",
   },
   {
     id: "compatibility",
@@ -111,9 +127,10 @@ const FEATURE_DETAILS = [
     category: "diagnostics",
     icon: Wrench,
     shortDesc: "Pin-to-Shield Hardware Verifications",
-    longDesc: "Ensures selected components are electrically compatible with target boards. Checks interface types, voltage tolerances, and provides detailed logic level shifter resolutions.",
+    longDesc:
+      "Ensures selected components are electrically compatible with target boards. Checks interface types, voltage tolerances, and provides detailed logic level shifter resolutions.",
     badge: "Tolerance Checked",
-    color: "var(--accent-yellow)"
+    color: "var(--accent-yellow)",
   },
   {
     id: "code",
@@ -121,37 +138,50 @@ const FEATURE_DETAILS = [
     category: "software",
     icon: Code2,
     shortDesc: "Compilable Starter Firmware",
-    longDesc: "Generates fully documented, ready-to-flash firmware templates. Automatically imports required libraries, defines hardware pin configurations, and sets up communication lines.",
+    longDesc:
+      "Generates fully documented, ready-to-flash firmware templates. Automatically imports required libraries, defines hardware pin configurations, and sets up communication lines.",
     badge: "C++ / MicroPython",
-    color: "#a855f7"
+    color: "#a855f7",
   },
   {
     id: "agents",
-    title: "9 AI Agents",
+    title: "10 AI Agents",
     category: "software",
     icon: Bot,
     shortDesc: "Parallel Multi-Agent Generation",
-    longDesc: "Embeddy orchestrates 9 specialized agents in parallel (BOM Agent, Pins Agent, Power Agent, etc.). Generations complete in under 30 seconds, delivering highly coherent plans.",
+    longDesc:
+      "Embeddy orchestrates 10 specialized agents in parallel (BOM Agent, Pins Agent, Power Agent, PCB Layout Agent, etc.). Generations complete in under 30 seconds, delivering highly coherent plans.",
     badge: "Parallel Pipeline",
-    color: "var(--accent)"
-  }
+    color: "var(--accent)",
+  },
 ];
 
-const EXAMPLES = [
+const EXAMPLES: Array<{
+  title: string;
+  board: BoardType;
+  description: string;
+  generatePCB?: boolean;
+}> = [
   {
     title: "IoT Weather Monitor",
-    board: "ESP32" as BoardType,
-    description: "An ESP32-based weather station. Reads temperature and humidity from a DHT22 sensor, displays the data on an I2C OLED (SSD1306) screen, and transmits measurements over Wi-Fi.",
+    board: "ESP32",
+    description:
+      "An ESP32-based weather station. Reads temperature and humidity from a DHT22 sensor, displays the data on an I2C OLED (SSD1306) screen, and transmits measurements over Wi-Fi.",
+    generatePCB: true,
   },
   {
     title: "Automatic Plant Watering",
-    board: "Arduino Uno" as BoardType,
-    description: "Arduino Uno system with a capacitive soil moisture sensor, a 5V relay driving a mini submersible water pump, and indicator LEDs showing status (soil wet/dry).",
+    board: "Arduino Uno",
+    description:
+      "Arduino Uno system with a capacitive soil moisture sensor, a 5V relay driving a mini submersible water pump, and indicator LEDs showing status (soil wet/dry).",
+    generatePCB: true,
   },
   {
     title: "4-Axis Robotic Arm Control",
-    board: "STM32F4" as BoardType,
-    description: "STM32F4 based 4-axis robotic arm controller. Uses four servo motors controlled via PWM, reading positions from dual analog joystick inputs and using UART for debugging.",
+    board: "STM32F4",
+    description:
+      "STM32F4 based 4-axis robotic arm controller. Uses four servo motors controlled via PWM, reading positions from dual analog joystick inputs and using UART for debugging.",
+    generatePCB: true,
   },
 ];
 
@@ -172,24 +202,33 @@ export default function Home() {
 
   const [myProjects, setMyProjects] = useState<ProjectData[]>([]);
   const [projectsLoading, setProjectsLoading] = useState(true);
-  const [cloudStatus, setCloudStatus] = useState<"ok" | "offline" | "loading">("loading");
+  const [cloudStatus, setCloudStatus] = useState<"ok" | "offline" | "loading">(
+    "loading",
+  );
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const [form, setForm] = useState({
     title: "",
     board: "ESP32" as BoardType,
     description: "",
+    generatePCB: false,
   });
 
   const initials = user?.displayName
-    ? user.displayName.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2)
-    : user?.email?.[0]?.toUpperCase() ?? "U";
+    ? user.displayName
+        .split(" ")
+        .map((n) => n[0])
+        .join("")
+        .toUpperCase()
+        .slice(0, 2)
+    : (user?.email?.[0]?.toUpperCase() ?? "U");
 
   useEffect(() => {
     let cancelled = false;
     async function init() {
       try {
-        const { migrateLocalStorageToFirestore } = await import("@/lib/migrateLocalStorage");
+        const { migrateLocalStorageToFirestore } =
+          await import("@/lib/migrateLocalStorage");
         await migrateLocalStorageToFirestore();
       } catch {}
 
@@ -206,7 +245,9 @@ export default function Home() {
       }
     }
     init();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const handleDelete = async (id: string) => {
@@ -214,7 +255,8 @@ export default function Home() {
     try {
       await deleteProject(id);
       setMyProjects((prev) => prev.filter((p) => p.id !== id));
-    } catch {} finally {
+    } catch {
+    } finally {
       setDeletingId(null);
     }
   };
@@ -232,11 +274,12 @@ export default function Home() {
     setFiles(dropped);
   };
 
-  const loadExample = (ex: typeof EXAMPLES[0]) => {
+  const loadExample = (ex: (typeof EXAMPLES)[0]) => {
     setForm({
       title: ex.title,
       board: ex.board,
       description: ex.description,
+      generatePCB: ex.generatePCB ?? false,
     });
   };
 
@@ -253,7 +296,13 @@ export default function Home() {
       const res = await fetch("/api/project/create", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title: form.title, board: form.board, description: form.description, fileContents }),
+        body: JSON.stringify({
+          title: form.title,
+          board: form.board,
+          description: form.description,
+          fileContents,
+          generatePCB: form.generatePCB,
+        }),
       });
       if (!res.ok) {
         const err = await res.json();
@@ -270,21 +319,29 @@ export default function Home() {
 
   if (showForm) {
     return (
-      <div className="h-screen flex flex-col overflow-hidden" style={{ background: "var(--bg)" }}>
+      <div
+        className="h-screen flex flex-col overflow-hidden"
+        style={{ background: "var(--bg)" }}
+      >
         <nav
           className="flex-shrink-0 flex items-center justify-between px-8 py-3.5 border-b"
           style={{ borderColor: "var(--border)", background: "var(--surface)" }}
         >
           <div className="flex items-center gap-3">
             <button
-              onClick={() => { if (!loading) setShowForm(false); }}
+              onClick={() => {
+                if (!loading) setShowForm(false);
+              }}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all"
-              style={{ border: "1px solid var(--border)", color: "var(--text-muted)" }}
-              onMouseEnter={e => {
+              style={{
+                border: "1px solid var(--border)",
+                color: "var(--text-muted)",
+              }}
+              onMouseEnter={(e) => {
                 e.currentTarget.style.color = "var(--text-primary)";
                 e.currentTarget.style.borderColor = "var(--border-bright)";
               }}
-              onMouseLeave={e => {
+              onMouseLeave={(e) => {
                 e.currentTarget.style.color = "var(--text-muted)";
                 e.currentTarget.style.borderColor = "var(--border)";
               }}
@@ -296,47 +353,83 @@ export default function Home() {
             <span style={{ color: "var(--border)" }}>|</span>
             <div className="flex items-center gap-2">
               <Cpu size={14} style={{ color: "var(--accent)" }} />
-              <span className="font-bold text-sm tracking-tight" style={{ color: "var(--text-primary)" }}>
+              <span
+                className="font-bold text-sm tracking-tight"
+                style={{ color: "var(--text-primary)" }}
+              >
                 New Design Pipeline
               </span>
             </div>
           </div>
-          <span className="text-xs px-2.5 py-0.5 rounded font-bold tracking-wider" style={{ background: "#00ff6610", color: "var(--accent)", border: "1px solid #00ff6620" }}>
+          <span
+            className="text-xs px-2.5 py-0.5 rounded font-bold tracking-wider"
+            style={{
+              background: "#00ff6610",
+              color: "var(--accent)",
+              border: "1px solid #00ff6620",
+            }}
+          >
             AI DESIGN ENGINE ACTIVE
           </span>
         </nav>
 
         <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 min-h-0 overflow-hidden">
-          <div className="lg:col-span-7 p-8 lg:p-12 overflow-y-auto h-full flex flex-col justify-center" style={{ borderRight: "1px solid var(--border)" }}>
+          <div
+            className="lg:col-span-7 p-8 lg:p-12 overflow-y-auto h-full flex flex-col justify-center"
+            style={{ borderRight: "1px solid var(--border)" }}
+          >
             <div className="max-w-xl mx-auto w-full space-y-5">
               <div>
-                <h1 className="text-2xl font-bold mb-1" style={{ color: "var(--text-primary)", fontFamily: "Outfit, sans-serif" }}>
+                <h1
+                  className="text-2xl font-bold mb-1"
+                  style={{
+                    color: "var(--text-primary)",
+                    fontFamily: "Outfit, sans-serif",
+                  }}
+                >
                   Create New Project
                 </h1>
                 <p className="text-xs" style={{ color: "var(--text-muted)" }}>
-                  Provide hardware details below to start the multi-agent design generation.
+                  Provide hardware details below to start the multi-agent design
+                  generation.
                 </p>
               </div>
 
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                  <label className="panel-header block mb-1.5">Project Title</label>
+                  <label className="panel-header block mb-1.5">
+                    Project Title
+                  </label>
                   <input
                     id="project-title-input"
                     type="text"
                     value={form.title}
-                    onChange={(e) => setForm({ ...form, title: e.target.value })}
+                    onChange={(e) =>
+                      setForm({ ...form, title: e.target.value })
+                    }
                     placeholder="e.g. Temperature Monitor with OLED"
                     disabled={loading}
                     className="w-full px-4 py-2.5 rounded-lg text-sm outline-none transition-all"
-                    style={{ background: "var(--surface-raised)", border: "1px solid var(--border-bright)", color: "var(--text-primary)", fontFamily: "Outfit, sans-serif" }}
-                    onFocus={e => (e.currentTarget.style.borderColor = "#00ff6650")}
-                    onBlur={e => (e.currentTarget.style.borderColor = "var(--border-bright)")}
+                    style={{
+                      background: "var(--surface-raised)",
+                      border: "1px solid var(--border-bright)",
+                      color: "var(--text-primary)",
+                      fontFamily: "Outfit, sans-serif",
+                    }}
+                    onFocus={(e) =>
+                      (e.currentTarget.style.borderColor = "#00ff6650")
+                    }
+                    onBlur={(e) =>
+                      (e.currentTarget.style.borderColor =
+                        "var(--border-bright)")
+                    }
                   />
                 </div>
 
                 <div>
-                  <label className="panel-header block mb-1.5">Target Board</label>
+                  <label className="panel-header block mb-1.5">
+                    Target Board
+                  </label>
                   <div className="grid grid-cols-3 gap-2">
                     {BOARDS.map((b) => (
                       <button
@@ -348,9 +441,18 @@ export default function Home() {
                         className="flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-lg text-xs font-medium transition-all"
                         style={{
                           border: `1px solid ${form.board === b ? "#00ff6650" : "var(--border-bright)"}`,
-                          background: form.board === b ? "#00ff6612" : "var(--surface-raised)",
-                          color: form.board === b ? "var(--accent)" : "var(--text-muted)",
-                          boxShadow: form.board === b ? "0 0 12px rgba(0,255,102,0.1)" : "none",
+                          background:
+                            form.board === b
+                              ? "#00ff6612"
+                              : "var(--surface-raised)",
+                          color:
+                            form.board === b
+                              ? "var(--accent)"
+                              : "var(--text-muted)",
+                          boxShadow:
+                            form.board === b
+                              ? "0 0 12px rgba(0,255,102,0.1)"
+                              : "none",
                         }}
                       >
                         <Cpu size={11} strokeWidth={2} />
@@ -361,54 +463,163 @@ export default function Home() {
                 </div>
 
                 <div>
-                  <label className="panel-header block mb-1.5">Project Description</label>
+                  <label className="panel-header block mb-1.5">
+                    Project Description
+                  </label>
                   <textarea
                     id="project-description-input"
                     value={form.description}
-                    onChange={(e) => setForm({ ...form, description: e.target.value })}
+                    onChange={(e) =>
+                      setForm({ ...form, description: e.target.value })
+                    }
                     placeholder="Describe your embedded system project — components, sensors, displays, motors, connectivity needs, etc."
                     disabled={loading}
                     rows={4}
                     className="w-full px-4 py-2.5 rounded-lg text-sm outline-none resize-none transition-all"
-                    style={{ background: "var(--surface-raised)", border: "1px solid var(--border-bright)", color: "var(--text-primary)", fontFamily: "Outfit, sans-serif" }}
-                    onFocus={e => (e.currentTarget.style.borderColor = "#00ff6650")}
-                    onBlur={e => (e.currentTarget.style.borderColor = "var(--border-bright)")}
+                    style={{
+                      background: "var(--surface-raised)",
+                      border: "1px solid var(--border-bright)",
+                      color: "var(--text-primary)",
+                      fontFamily: "Outfit, sans-serif",
+                    }}
+                    onFocus={(e) =>
+                      (e.currentTarget.style.borderColor = "#00ff6650")
+                    }
+                    onBlur={(e) =>
+                      (e.currentTarget.style.borderColor =
+                        "var(--border-bright)")
+                    }
                   />
                 </div>
 
                 <div>
-                  <label className="panel-header block mb-1.5">Supporting Documents (optional, max 2)</label>
+                  <label className="panel-header block mb-1.5">
+                    Supporting Documents (optional, max 2)
+                  </label>
                   <div
                     className="relative rounded-lg border-2 border-dashed p-4 text-center cursor-pointer transition-all"
-                    style={{ borderColor: "var(--border-bright)", background: "var(--surface-raised)" }}
+                    style={{
+                      borderColor: "var(--border-bright)",
+                      background: "var(--surface-raised)",
+                    }}
                     onDrop={handleDrop}
                     onDragOver={(e) => e.preventDefault()}
                     onClick={() => !loading && fileInputRef.current?.click()}
-                    onMouseEnter={e => (e.currentTarget.style.borderColor = "#00ff6640")}
-                    onMouseLeave={e => (e.currentTarget.style.borderColor = "var(--border-bright)")}
+                    onMouseEnter={(e) =>
+                      (e.currentTarget.style.borderColor = "#00ff6640")
+                    }
+                    onMouseLeave={(e) =>
+                      (e.currentTarget.style.borderColor =
+                        "var(--border-bright)")
+                    }
                   >
-                    <input ref={fileInputRef} type="file" id="file-upload-input" accept=".pdf,.txt" multiple className="hidden" onChange={handleFileChange} disabled={loading} />
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      id="file-upload-input"
+                      accept=".pdf,.txt"
+                      multiple
+                      className="hidden"
+                      onChange={handleFileChange}
+                      disabled={loading}
+                    />
                     {files.length > 0 ? (
                       <div className="space-y-1">
                         {files.map((f, i) => (
-                          <div key={i} className="text-xs flex items-center justify-center gap-2" style={{ color: "var(--accent)" }}>
+                          <div
+                            key={i}
+                            className="text-xs flex items-center justify-center gap-2"
+                            style={{ color: "var(--accent)" }}
+                          >
                             <FileText size={12} /> {f.name}
                           </div>
                         ))}
                       </div>
                     ) : (
                       <div className="flex flex-col items-center gap-1.5">
-                        <Upload size={16} style={{ color: "var(--text-muted)" }} />
-                        <span className="text-xs font-medium" style={{ color: "var(--text-primary)" }}>Upload component data sheets</span>
-                        <span className="text-[10px]" style={{ color: "var(--text-muted)" }}>Supports PDF or TXT up to 2MB</span>
+                        <Upload
+                          size={16}
+                          style={{ color: "var(--text-muted)" }}
+                        />
+                        <span
+                          className="text-xs font-medium"
+                          style={{ color: "var(--text-primary)" }}
+                        >
+                          Upload component data sheets
+                        </span>
+                        <span
+                          className="text-[10px]"
+                          style={{ color: "var(--text-muted)" }}
+                        >
+                          Supports PDF or TXT up to 2MB
+                        </span>
                       </div>
                     )}
                   </div>
                 </div>
 
+                {/* PCB Generation Option */}
+                <div
+                  className="flex items-center gap-3 px-3 py-3 rounded-lg border"
+                  style={{
+                    borderColor: form.generatePCB
+                      ? "var(--accent)40"
+                      : "var(--border)",
+                    background: form.generatePCB
+                      ? "var(--accent-green-glow)"
+                      : "var(--surface-raised)",
+                  }}
+                >
+                  <div className="relative flex items-center">
+                    <input
+                      type="checkbox"
+                      id="generate-pcb"
+                      checked={form.generatePCB}
+                      onChange={(e) =>
+                        setForm({ ...form, generatePCB: e.target.checked })
+                      }
+                      disabled={loading}
+                      className="w-4 h-4 rounded cursor-pointer"
+                      style={{
+                        accentColor: "var(--accent-green)",
+                      }}
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <label
+                      htmlFor="generate-pcb"
+                      className="flex items-center gap-2 cursor-pointer"
+                    >
+                      <Layers
+                        size={14}
+                        style={{ color: "var(--accent-green)" }}
+                      />
+                      <span
+                        className="text-xs font-medium"
+                        style={{ color: "var(--text-primary)" }}
+                      >
+                        Generate PCB Layout
+                      </span>
+                    </label>
+                    <p
+                      className="text-[10px] mt-0.5"
+                      style={{ color: "var(--text-muted)" }}
+                    >
+                      Creates a basic PCB design with component placements and
+                      auto-routed traces
+                    </p>
+                  </div>
+                </div>
+
                 {error && (
-                  <div className="rounded-lg p-3 text-xs flex items-center gap-2"
-                    style={{ background: "var(--accent-red-glow)", color: "var(--accent-red)", border: "1px solid #ff3b3b30" }}>
+                  <div
+                    className="rounded-lg p-3 text-xs flex items-center gap-2"
+                    style={{
+                      background: "var(--accent-red-glow)",
+                      color: "var(--accent-red)",
+                      border: "1px solid #ff3b3b30",
+                    }}
+                  >
                     <ShieldAlert size={13} /> {error}
                   </div>
                 )}
@@ -419,43 +630,106 @@ export default function Home() {
                   disabled={loading}
                   className="w-full py-3 rounded-lg font-bold text-sm flex items-center justify-center gap-2 transition-all"
                   style={{
-                    background: loading ? "var(--surface-raised)" : "var(--accent)",
+                    background: loading
+                      ? "var(--surface-raised)"
+                      : "var(--accent)",
                     color: loading ? "var(--text-muted)" : "#000",
                     cursor: loading ? "not-allowed" : "pointer",
-                    boxShadow: loading ? "none" : "0 0 24px var(--accent-glow-strong)",
+                    boxShadow: loading
+                      ? "none"
+                      : "0 0 24px var(--accent-glow-strong)",
                   }}
                 >
                   {loading ? (
-                    <><Loader2 size={15} className="animate-spin" /> Running AI Pipeline (30-60s)…</>
+                    <>
+                      <Loader2 size={15} className="animate-spin" /> Running AI
+                      Pipeline (30-60s)…
+                    </>
                   ) : (
-                    <>Generate Project Infrastructure <ArrowRight size={15} strokeWidth={2.5} /></>
+                    <>
+                      Generate Project Infrastructure{" "}
+                      <ArrowRight size={15} strokeWidth={2.5} />
+                    </>
                   )}
                 </button>
               </form>
             </div>
           </div>
 
-          <div className="lg:col-span-5 p-8 lg:p-12 h-full flex flex-col justify-start space-y-6 overflow-hidden" style={{ background: "var(--surface)" }}>
+          <div
+            className="lg:col-span-5 p-8 lg:p-12 h-full flex flex-col justify-start space-y-6 overflow-hidden"
+            style={{ background: "var(--surface)" }}
+          >
             <div className="space-y-3 flex-shrink-0">
               <div className="flex items-center gap-2">
                 <BookOpen size={16} style={{ color: "var(--accent)" }} />
-                <h3 className="font-bold text-xs tracking-wide uppercase" style={{ color: "var(--text-primary)", fontFamily: "Outfit, sans-serif" }}>
+                <h3
+                  className="font-bold text-xs tracking-wide uppercase"
+                  style={{
+                    color: "var(--text-primary)",
+                    fontFamily: "Outfit, sans-serif",
+                  }}
+                >
                   Prompting Guide
                 </h3>
               </div>
-              <div className="rounded-xl border p-4 space-y-3.5" style={{ borderColor: "var(--border)", background: "#050505" }}>
+              <div
+                className="rounded-xl border p-4 space-y-3.5"
+                style={{ borderColor: "var(--border)", background: "#050505" }}
+              >
                 <div className="flex gap-3">
-                  <span className="text-xs px-2 py-0.5 rounded h-fit font-bold" style={{ background: "#00ff6615", color: "var(--accent)", border: "1px solid #00ff6625" }}>1</span>
+                  <span
+                    className="text-xs px-2 py-0.5 rounded h-fit font-bold"
+                    style={{
+                      background: "#00ff6615",
+                      color: "var(--accent)",
+                      border: "1px solid #00ff6625",
+                    }}
+                  >
+                    1
+                  </span>
                   <div>
-                    <h4 className="text-xs font-semibold mb-0.5" style={{ color: "var(--text-primary)" }}>State components clearly</h4>
-                    <p className="text-[11px] leading-relaxed" style={{ color: "var(--text-muted)" }}>Include parts like &quot;SSD1306 OLED screen&quot; or &quot;DHT11 sensor&quot; so AI knows exactly what to route.</p>
+                    <h4
+                      className="text-xs font-semibold mb-0.5"
+                      style={{ color: "var(--text-primary)" }}
+                    >
+                      State components clearly
+                    </h4>
+                    <p
+                      className="text-[11px] leading-relaxed"
+                      style={{ color: "var(--text-muted)" }}
+                    >
+                      Include parts like &quot;SSD1306 OLED screen&quot; or
+                      &quot;DHT11 sensor&quot; so AI knows exactly what to
+                      route.
+                    </p>
                   </div>
                 </div>
                 <div className="flex gap-3">
-                  <span className="text-xs px-2 py-0.5 rounded h-fit font-bold" style={{ background: "#00ff6615", color: "var(--accent)", border: "1px solid #00ff6625" }}>2</span>
+                  <span
+                    className="text-xs px-2 py-0.5 rounded h-fit font-bold"
+                    style={{
+                      background: "#00ff6615",
+                      color: "var(--accent)",
+                      border: "1px solid #00ff6625",
+                    }}
+                  >
+                    2
+                  </span>
                   <div>
-                    <h4 className="text-xs font-semibold mb-0.5" style={{ color: "var(--text-primary)" }}>Define logic thresholds</h4>
-                    <p className="text-[11px] leading-relaxed" style={{ color: "var(--text-muted)" }}>Operational guidelines: e.g. &quot;when moisture drops below 30%, trigger relay.&quot;</p>
+                    <h4
+                      className="text-xs font-semibold mb-0.5"
+                      style={{ color: "var(--text-primary)" }}
+                    >
+                      Define logic thresholds
+                    </h4>
+                    <p
+                      className="text-[11px] leading-relaxed"
+                      style={{ color: "var(--text-muted)" }}
+                    >
+                      Operational guidelines: e.g. &quot;when moisture drops
+                      below 30%, trigger relay.&quot;
+                    </p>
                   </div>
                 </div>
               </div>
@@ -465,7 +739,13 @@ export default function Home() {
               <div className="space-y-3">
                 <div className="flex items-center gap-2">
                   <Sparkles size={16} style={{ color: "var(--accent)" }} />
-                  <h3 className="font-bold text-xs tracking-wide uppercase" style={{ color: "var(--text-primary)", fontFamily: "Outfit, sans-serif" }}>
+                  <h3
+                    className="font-bold text-xs tracking-wide uppercase"
+                    style={{
+                      color: "var(--text-primary)",
+                      fontFamily: "Outfit, sans-serif",
+                    }}
+                  >
                     Interactive Examples
                   </h3>
                 </div>
@@ -475,13 +755,33 @@ export default function Home() {
                       key={i}
                       onClick={() => loadExample(ex)}
                       className="w-full p-3.5 rounded-xl border text-left transition-all hover:border-[#00ff6640] hover:bg-[#00ff6604]"
-                      style={{ borderColor: "var(--border)", background: "#050505" }}
+                      style={{
+                        borderColor: "var(--border)",
+                        background: "#050505",
+                      }}
                     >
                       <div className="flex items-center justify-between mb-1.5">
-                        <span className="text-xs font-bold" style={{ color: "var(--text-primary)" }}>{ex.title}</span>
-                        <span className="text-[10px] px-1.5 py-0.5 font-mono rounded" style={{ background: "var(--surface-raised)", color: "var(--text-muted)", border: "1px solid var(--border)" }}>{ex.board}</span>
+                        <span
+                          className="text-xs font-bold"
+                          style={{ color: "var(--text-primary)" }}
+                        >
+                          {ex.title}
+                        </span>
+                        <span
+                          className="text-[10px] px-1.5 py-0.5 font-mono rounded"
+                          style={{
+                            background: "var(--surface-raised)",
+                            color: "var(--text-muted)",
+                            border: "1px solid var(--border)",
+                          }}
+                        >
+                          {ex.board}
+                        </span>
                       </div>
-                      <p className="text-xs leading-normal line-clamp-2" style={{ color: "var(--text-muted)" }}>
+                      <p
+                        className="text-xs leading-normal line-clamp-2"
+                        style={{ color: "var(--text-muted)" }}
+                      >
                         {ex.description}
                       </p>
                     </button>
@@ -489,13 +789,29 @@ export default function Home() {
                 </div>
               </div>
 
-              <div className="space-y-3.5 p-4 rounded-xl border text-xs" style={{ borderColor: "var(--border)", background: "rgba(0,0,0,0.2)" }}>
+              <div
+                className="space-y-3.5 p-4 rounded-xl border text-xs"
+                style={{
+                  borderColor: "var(--border)",
+                  background: "rgba(0,0,0,0.2)",
+                }}
+              >
                 <div className="flex items-center gap-1.5">
-                  <HelpCircle size={13} style={{ color: "var(--text-muted)" }} />
-                  <span className="font-semibold" style={{ color: "var(--text-primary)" }}>Which microcontroller?</span>
+                  <HelpCircle
+                    size={13}
+                    style={{ color: "var(--text-muted)" }}
+                  />
+                  <span
+                    className="font-semibold"
+                    style={{ color: "var(--text-primary)" }}
+                  >
+                    Which microcontroller?
+                  </span>
                 </div>
                 <p style={{ color: "var(--text-muted)", lineHeight: "1.5" }}>
-                  Choose **ESP32** for Wi-Fi/BT IoT. Choose **Arduino Uno** for standard 5V logic shields and basics. Choose **STM32** for advanced, high-performance industrial controller tasks.
+                  Choose **ESP32** for Wi-Fi/BT IoT. Choose **Arduino Uno** for
+                  standard 5V logic shields and basics. Choose **STM32** for
+                  advanced, high-performance industrial controller tasks.
                 </p>
               </div>
             </div>
@@ -506,19 +822,39 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col" style={{ background: "var(--bg)" }}>
+    <div
+      className="min-h-screen flex flex-col"
+      style={{ background: "var(--bg)" }}
+    >
       <nav
         className="flex-shrink-0 flex items-center justify-between px-8 py-3 border-b"
         style={{ borderColor: "var(--border)", background: "var(--surface)" }}
       >
         <div className="flex items-center gap-2.5">
-          <div className="w-6 h-6 rounded flex items-center justify-center" style={{ background: "var(--accent)", color: "#000" }}>
+          <div
+            className="w-6 h-6 rounded flex items-center justify-center"
+            style={{ background: "var(--accent)", color: "#000" }}
+          >
             <Cpu size={13} strokeWidth={2.5} />
           </div>
-          <span className="font-bold text-sm tracking-tight" style={{ fontFamily: "Outfit, sans-serif", color: "var(--text-primary)" }}>
+          <span
+            className="font-bold text-sm tracking-tight"
+            style={{
+              fontFamily: "Outfit, sans-serif",
+              color: "var(--text-primary)",
+            }}
+          >
             Embeddy
           </span>
-          <span className="text-xs px-1.5 py-0.5 rounded font-bold" style={{ background: "#00ff6610", color: "var(--accent)", border: "1px solid #00ff6620", letterSpacing: "0.08em" }}>
+          <span
+            className="text-xs px-1.5 py-0.5 rounded font-bold"
+            style={{
+              background: "#00ff6610",
+              color: "var(--accent)",
+              border: "1px solid #00ff6620",
+              letterSpacing: "0.08em",
+            }}
+          >
             BETA
           </span>
         </div>
@@ -553,43 +889,80 @@ export default function Home() {
 
                 {userMenuOpen && (
                   <>
-                    <div className="fixed inset-0 z-40" onClick={() => setUserMenuOpen(false)} />
+                    <div
+                      className="fixed inset-0 z-40"
+                      onClick={() => setUserMenuOpen(false)}
+                    />
                     <div
                       className="absolute right-0 top-10 z-50 rounded-xl border p-2 min-w-52"
                       style={{
                         background: "var(--surface)",
                         borderColor: "var(--border-bright)",
-                        boxShadow: "0 8px 32px rgba(0,0,0,0.6), 0 0 20px rgba(0,255,102,0.04)",
+                        boxShadow:
+                          "0 8px 32px rgba(0,0,0,0.6), 0 0 20px rgba(0,255,102,0.04)",
                       }}
                     >
-                      <div className="px-3 py-2.5 mb-1 border-b" style={{ borderColor: "var(--border)" }}>
+                      <div
+                        className="px-3 py-2.5 mb-1 border-b"
+                        style={{ borderColor: "var(--border)" }}
+                      >
                         <div className="flex items-center gap-2.5">
-                          <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0" style={{ background: "var(--accent)", color: "#000" }}>
+                          <div
+                            className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0"
+                            style={{
+                              background: "var(--accent)",
+                              color: "#000",
+                            }}
+                          >
                             {initials}
                           </div>
                           <div className="min-w-0">
                             {user.displayName && (
-                              <p className="text-xs font-semibold truncate" style={{ color: "var(--text-primary)" }}>{user.displayName}</p>
+                              <p
+                                className="text-xs font-semibold truncate"
+                                style={{ color: "var(--text-primary)" }}
+                              >
+                                {user.displayName}
+                              </p>
                             )}
-                            <p className="text-[10px] truncate" style={{ color: "var(--text-muted)" }}>{user.email}</p>
+                            <p
+                              className="text-[10px] truncate"
+                              style={{ color: "var(--text-muted)" }}
+                            >
+                              {user.email}
+                            </p>
                           </div>
                         </div>
                       </div>
                       <button
-                        onClick={() => { setUserMenuOpen(false); setShowForm(true); }}
+                        onClick={() => {
+                          setUserMenuOpen(false);
+                          setShowForm(true);
+                        }}
                         className="flex items-center gap-2 w-full px-3 py-2 rounded-lg text-xs font-medium transition-colors text-left"
                         style={{ color: "var(--text-muted)" }}
-                        onMouseEnter={e => (e.currentTarget.style.color = "var(--text-primary)")}
-                        onMouseLeave={e => (e.currentTarget.style.color = "var(--text-muted)")}
+                        onMouseEnter={(e) =>
+                          (e.currentTarget.style.color = "var(--text-primary)")
+                        }
+                        onMouseLeave={(e) =>
+                          (e.currentTarget.style.color = "var(--text-muted)")
+                        }
                       >
                         <Plus size={13} /> New Project
                       </button>
                       <button
-                        onClick={() => { setUserMenuOpen(false); signOut(); }}
+                        onClick={() => {
+                          setUserMenuOpen(false);
+                          signOut();
+                        }}
                         className="flex items-center gap-2 w-full px-3 py-2 rounded-lg text-xs font-medium transition-colors text-left"
                         style={{ color: "var(--text-muted)" }}
-                        onMouseEnter={e => (e.currentTarget.style.color = "var(--accent-red)")}
-                        onMouseLeave={e => (e.currentTarget.style.color = "var(--text-muted)")}
+                        onMouseEnter={(e) =>
+                          (e.currentTarget.style.color = "var(--accent-red)")
+                        }
+                        onMouseLeave={(e) =>
+                          (e.currentTarget.style.color = "var(--text-muted)")
+                        }
                       >
                         <LogOut size={13} /> Sign Out
                       </button>
@@ -603,9 +976,18 @@ export default function Home() {
               id="nav-signin-btn"
               onClick={() => router.push("/auth/login")}
               className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-bold transition-all"
-              style={{ border: "1px solid var(--border-bright)", color: "var(--text-primary)" }}
-              onMouseEnter={e => { e.currentTarget.style.borderColor = "#00ff6650"; e.currentTarget.style.color = "var(--accent)"; }}
-              onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--border-bright)"; e.currentTarget.style.color = "var(--text-primary)"; }}
+              style={{
+                border: "1px solid var(--border-bright)",
+                color: "var(--text-primary)",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.borderColor = "#00ff6650";
+                e.currentTarget.style.color = "var(--accent)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.borderColor = "var(--border-bright)";
+                e.currentTarget.style.color = "var(--text-primary)";
+              }}
             >
               <User size={12} />
               Sign In
@@ -616,7 +998,6 @@ export default function Home() {
 
       <main className="flex-1 grid grid-cols-1 lg:grid-cols-2 min-h-0">
         <div className="flex flex-col justify-center px-10 lg:px-16 py-14 fade-up">
-
           <h1
             className="glitch-text font-bold mb-4"
             data-text="Embeddy"
@@ -631,19 +1012,28 @@ export default function Home() {
             Embeddy
           </h1>
 
-          <p className="text-lg font-medium mb-3" style={{ color: "var(--accent)", fontFamily: "Outfit, sans-serif" }}>
+          <p
+            className="text-lg font-medium mb-3"
+            style={{ color: "var(--accent)", fontFamily: "Outfit, sans-serif" }}
+          >
             Design embedded systems 10× faster
           </p>
 
-          <p className="text-sm leading-relaxed mb-8 max-w-md" style={{ color: "var(--text-muted)" }}>
-            Describe your project. 9 AI agents generate circuit schematics, pin diagrams,
-            power budgets, BOM, and production-ready code — all in parallel.
+          <p
+            className="text-sm leading-relaxed mb-8 max-w-md"
+            style={{ color: "var(--text-muted)" }}
+          >
+            Describe your project. 9 AI agents generate circuit schematics, pin
+            diagrams, power budgets, BOM, and production-ready code — all in
+            parallel.
           </p>
 
           <div className="flex items-center gap-3">
             <button
               id="hero-new-project-btn"
-              onClick={() => user ? setShowForm(true) : router.push("/auth/login")}
+              onClick={() =>
+                user ? setShowForm(true) : router.push("/auth/login")
+              }
               className="btn-accent flex items-center gap-2 px-6 py-3 rounded-lg font-bold text-sm"
               style={{ color: "#000" }}
             >
@@ -653,12 +1043,15 @@ export default function Home() {
             <button
               onClick={() => setShowFeaturesModal(true)}
               className="flex items-center gap-2 px-4 py-3 rounded-lg text-sm font-medium transition-colors"
-              style={{ color: "var(--text-muted)", border: "1px solid var(--border)" }}
-              onMouseEnter={e => {
+              style={{
+                color: "var(--text-muted)",
+                border: "1px solid var(--border)",
+              }}
+              onMouseEnter={(e) => {
                 e.currentTarget.style.color = "var(--text-primary)";
                 e.currentTarget.style.borderColor = "var(--border-bright)";
               }}
-              onMouseLeave={e => {
+              onMouseLeave={(e) => {
                 e.currentTarget.style.color = "var(--text-muted)";
                 e.currentTarget.style.borderColor = "var(--border)";
               }}
@@ -667,130 +1060,264 @@ export default function Home() {
             </button>
           </div>
 
-          <div className="flex items-center gap-6 mt-10 pt-8" style={{ borderTop: "1px solid var(--border)" }}>
+          <div
+            className="flex items-center gap-6 mt-10 pt-8"
+            style={{ borderTop: "1px solid var(--border)" }}
+          >
             {[
-              { value: "9",    label: "AI Agents" },
+              { value: "9", label: "AI Agents" },
               { value: "~30s", label: "Full analysis" },
-              { value: "6",    label: "Board types" },
+              { value: "6", label: "Board types" },
             ].map((s, i) => (
               <div key={i}>
-                <div className="text-xl font-bold" style={{ color: "var(--accent)", fontFamily: "Outfit, sans-serif" }}>{s.value}</div>
-                <div className="text-xs" style={{ color: "var(--text-muted)" }}>{s.label}</div>
+                <div
+                  className="text-xl font-bold"
+                  style={{
+                    color: "var(--accent)",
+                    fontFamily: "Outfit, sans-serif",
+                  }}
+                >
+                  {s.value}
+                </div>
+                <div className="text-xs" style={{ color: "var(--text-muted)" }}>
+                  {s.label}
+                </div>
               </div>
             ))}
           </div>
 
           {user && (
-          <div className="mt-10 pt-8" style={{ borderTop: "1px solid var(--border)" }}>
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2">
-                <FolderOpen size={14} style={{ color: "var(--accent)" }} />
-                <span className="text-xs font-bold uppercase tracking-wider" style={{ color: "var(--text-primary)", fontFamily: "Outfit, sans-serif" }}>
-                  My Projects
-                </span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                {cloudStatus === "loading" && (
-                  <><Loader2 size={11} className="animate-spin" style={{ color: "var(--text-muted)" }} />
-                  <span className="text-[10px]" style={{ color: "var(--text-muted)" }}>Syncing…</span></>
-                )}
-                {cloudStatus === "ok" && (
-                  <><Cloud size={11} style={{ color: "var(--accent)" }} />
-                  <span className="text-[10px]" style={{ color: "var(--accent)" }}>Cloud Synced</span></>
-                )}
-                {cloudStatus === "offline" && (
-                  <><CloudOff size={11} style={{ color: "var(--text-muted)" }} />
-                  <span className="text-[10px]" style={{ color: "var(--text-muted)" }}>Offline</span></>
-                )}
-              </div>
-            </div>
-
-            {projectsLoading ? (
-              <div className="flex items-center gap-2 py-6" style={{ color: "var(--text-dim)" }}>
-                <Loader2 size={13} className="animate-spin" />
-                <span className="text-xs">Loading your projects…</span>
-              </div>
-            ) : myProjects.length === 0 ? (
-              <div className="rounded-lg border border-dashed p-5 text-center" style={{ borderColor: "var(--border)" }}>
-                <Cloud size={18} className="mx-auto mb-2" style={{ color: "var(--text-dim)" }} />
-                <p className="text-xs" style={{ color: "var(--text-muted)" }}>No cloud projects yet.</p>
-                <p className="text-[11px] mt-1" style={{ color: "var(--text-dim)" }}>Start a project — it’ll appear here across all your devices.</p>
-              </div>
-            ) : (
-              <div className="space-y-2 max-h-52 overflow-y-auto pr-1">
-                {myProjects.map((p) => (
-                  <div
-                    key={p.id}
-                    className="flex items-center justify-between rounded-lg border px-3 py-2.5 group transition-all"
-                    style={{ borderColor: "var(--border)", background: "var(--surface-raised)" }}
-                    onMouseEnter={e => (e.currentTarget.style.borderColor = "#00ff6630")}
-                    onMouseLeave={e => (e.currentTarget.style.borderColor = "var(--border)")}
+            <div
+              className="mt-10 pt-8"
+              style={{ borderTop: "1px solid var(--border)" }}
+            >
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <FolderOpen size={14} style={{ color: "var(--accent)" }} />
+                  <span
+                    className="text-xs font-bold uppercase tracking-wider"
+                    style={{
+                      color: "var(--text-primary)",
+                      fontFamily: "Outfit, sans-serif",
+                    }}
                   >
-                    <div className="flex-1 min-w-0">
-                      <p className="text-xs font-semibold truncate" style={{ color: "var(--text-primary)" }}>{p.title}</p>
-                      <p className="text-[10px] mt-0.5 font-mono" style={{ color: "var(--text-muted)" }}>
-                        {p.board} · {new Date(p.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-1.5 ml-2">
-                      <button onClick={() => router.push(`/project/${p.id}`)} title="Open project"
-                        className="p-1.5 rounded transition-colors" style={{ color: "var(--text-muted)" }}
-                        onMouseEnter={e => (e.currentTarget.style.color = "var(--accent)")}
-                        onMouseLeave={e => (e.currentTarget.style.color = "var(--text-muted)")}
-                      ><ExternalLink size={12} /></button>
-                      <button onClick={() => handleDelete(p.id)} title="Delete project" disabled={deletingId === p.id}
-                        className="p-1.5 rounded transition-colors" style={{ color: "var(--text-muted)" }}
-                        onMouseEnter={e => (e.currentTarget.style.color = "var(--accent-red)")}
-                        onMouseLeave={e => (e.currentTarget.style.color = "var(--text-muted)")}
+                    My Projects
+                  </span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  {cloudStatus === "loading" && (
+                    <>
+                      <Loader2
+                        size={11}
+                        className="animate-spin"
+                        style={{ color: "var(--text-muted)" }}
+                      />
+                      <span
+                        className="text-[10px]"
+                        style={{ color: "var(--text-muted)" }}
                       >
-                        {deletingId === p.id ? <Loader2 size={12} className="animate-spin" /> : <Trash2 size={12} />}
-                      </button>
-                    </div>
-                  </div>
-                ))}
+                        Syncing…
+                      </span>
+                    </>
+                  )}
+                  {cloudStatus === "ok" && (
+                    <>
+                      <Cloud size={11} style={{ color: "var(--accent)" }} />
+                      <span
+                        className="text-[10px]"
+                        style={{ color: "var(--accent)" }}
+                      >
+                        Cloud Synced
+                      </span>
+                    </>
+                  )}
+                  {cloudStatus === "offline" && (
+                    <>
+                      <CloudOff
+                        size={11}
+                        style={{ color: "var(--text-muted)" }}
+                      />
+                      <span
+                        className="text-[10px]"
+                        style={{ color: "var(--text-muted)" }}
+                      >
+                        Offline
+                      </span>
+                    </>
+                  )}
+                </div>
               </div>
-            )}
-          </div>
+
+              {projectsLoading ? (
+                <div
+                  className="flex items-center gap-2 py-6"
+                  style={{ color: "var(--text-dim)" }}
+                >
+                  <Loader2 size={13} className="animate-spin" />
+                  <span className="text-xs">Loading your projects…</span>
+                </div>
+              ) : myProjects.length === 0 ? (
+                <div
+                  className="rounded-lg border border-dashed p-5 text-center"
+                  style={{ borderColor: "var(--border)" }}
+                >
+                  <Cloud
+                    size={18}
+                    className="mx-auto mb-2"
+                    style={{ color: "var(--text-dim)" }}
+                  />
+                  <p className="text-xs" style={{ color: "var(--text-muted)" }}>
+                    No cloud projects yet.
+                  </p>
+                  <p
+                    className="text-[11px] mt-1"
+                    style={{ color: "var(--text-dim)" }}
+                  >
+                    Start a project — it’ll appear here across all your devices.
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-2 max-h-52 overflow-y-auto pr-1">
+                  {myProjects.map((p) => (
+                    <div
+                      key={p.id}
+                      className="flex items-center justify-between rounded-lg border px-3 py-2.5 group transition-all"
+                      style={{
+                        borderColor: "var(--border)",
+                        background: "var(--surface-raised)",
+                      }}
+                      onMouseEnter={(e) =>
+                        (e.currentTarget.style.borderColor = "#00ff6630")
+                      }
+                      onMouseLeave={(e) =>
+                        (e.currentTarget.style.borderColor = "var(--border)")
+                      }
+                    >
+                      <div className="flex-1 min-w-0">
+                        <p
+                          className="text-xs font-semibold truncate"
+                          style={{ color: "var(--text-primary)" }}
+                        >
+                          {p.title}
+                        </p>
+                        <p
+                          className="text-[10px] mt-0.5 font-mono"
+                          style={{ color: "var(--text-muted)" }}
+                        >
+                          {p.board} ·{" "}
+                          {new Date(p.createdAt).toLocaleDateString("en-US", {
+                            month: "short",
+                            day: "numeric",
+                            year: "numeric",
+                          })}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-1.5 ml-2">
+                        <button
+                          onClick={() => router.push(`/project/${p.id}`)}
+                          title="Open project"
+                          className="p-1.5 rounded transition-colors"
+                          style={{ color: "var(--text-muted)" }}
+                          onMouseEnter={(e) =>
+                            (e.currentTarget.style.color = "var(--accent)")
+                          }
+                          onMouseLeave={(e) =>
+                            (e.currentTarget.style.color = "var(--text-muted)")
+                          }
+                        >
+                          <ExternalLink size={12} />
+                        </button>
+                        <button
+                          onClick={() => handleDelete(p.id)}
+                          title="Delete project"
+                          disabled={deletingId === p.id}
+                          className="p-1.5 rounded transition-colors"
+                          style={{ color: "var(--text-muted)" }}
+                          onMouseEnter={(e) =>
+                            (e.currentTarget.style.color = "var(--accent-red)")
+                          }
+                          onMouseLeave={(e) =>
+                            (e.currentTarget.style.color = "var(--text-muted)")
+                          }
+                        >
+                          {deletingId === p.id ? (
+                            <Loader2 size={12} className="animate-spin" />
+                          ) : (
+                            <Trash2 size={12} />
+                          )}
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           )}
         </div>
 
         <div
           className="hidden lg:flex items-center justify-center p-10 relative overflow-hidden"
-          style={{ borderLeft: "1px solid var(--border)", background: "var(--surface)" }}
+          style={{
+            borderLeft: "1px solid var(--border)",
+            background: "var(--surface)",
+          }}
         >
-          <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'radial-gradient(var(--accent) 1px, transparent 0)', backgroundSize: '24px 24px' }} />
-          
+          <div
+            className="absolute inset-0 opacity-[0.03] pointer-events-none"
+            style={{
+              backgroundImage:
+                "radial-gradient(var(--accent) 1px, transparent 0)",
+              backgroundSize: "24px 24px",
+            }}
+          />
+
           <div
             className="w-full max-w-lg rounded-xl overflow-hidden relative group"
-            style={{ 
-              border: "1px solid var(--border-bright)", 
-              boxShadow: "0 0 50px rgba(0,255,102,0.05), inset 0 0 20px rgba(255,255,255,0.02)",
-              background: "#050505"
+            style={{
+              border: "1px solid var(--border-bright)",
+              boxShadow:
+                "0 0 50px rgba(0,255,102,0.05), inset 0 0 20px rgba(255,255,255,0.02)",
+              background: "#050505",
             }}
           >
             <div
               className="flex items-center justify-between px-4 py-3"
-              style={{ background: "#0a0a0a", borderBottom: "1px solid var(--border)" }}
+              style={{
+                background: "#0a0a0a",
+                borderBottom: "1px solid var(--border)",
+              }}
             >
               <div className="flex gap-1.5">
-                <div className="w-3 h-3 rounded-full" style={{ background: "#333" }} />
-                <div className="w-3 h-3 rounded-full" style={{ background: "#333" }} />
-                <div className="w-3 h-3 rounded-full" style={{ background: "#333" }} />
+                <div
+                  className="w-3 h-3 rounded-full"
+                  style={{ background: "#333" }}
+                />
+                <div
+                  className="w-3 h-3 rounded-full"
+                  style={{ background: "#333" }}
+                />
+                <div
+                  className="w-3 h-3 rounded-full"
+                  style={{ background: "#333" }}
+                />
               </div>
-              <span className="text-[10px] tracking-widest font-mono uppercase" style={{ color: "var(--text-muted)" }}>
+              <span
+                className="text-[10px] tracking-widest font-mono uppercase"
+                style={{ color: "var(--text-muted)" }}
+              >
                 Circuit Visualizer
               </span>
               <div className="w-12 h-1.5 bg-[#111] rounded-full" />
             </div>
 
             <div className="relative aspect-[4/3] w-full overflow-hidden bg-black p-4 flex items-center justify-center">
-              <img 
-                src="/circuit_schematic.png" 
-                alt="Circuit Schematic preview" 
+              <img
+                src="/circuit_schematic.png"
+                alt="Circuit Schematic preview"
                 className="w-full h-full object-cover rounded-lg border"
                 style={{ borderColor: "var(--border)" }}
               />
-              
+
               <div className="absolute inset-0 pointer-events-none bg-gradient-to-b from-transparent via-transparent to-[rgba(0,255,102,0.03)]" />
             </div>
           </div>
@@ -808,11 +1335,22 @@ export default function Home() {
             <div
               key={i}
               onClick={() => {
-                const ids = ["schematic", "pinout", "power", "bom", "safety", "compatibility", "code", "agents"];
+                const ids = [
+                  "schematic",
+                  "pinout",
+                  "power",
+                  "bom",
+                  "safety",
+                  "compatibility",
+                  "code",
+                  "agents",
+                ];
                 const matchedId = ids[i];
                 if (matchedId) {
                   setActiveFeatureId(matchedId);
-                  const detail = FEATURE_DETAILS.find(d => d.id === matchedId);
+                  const detail = FEATURE_DETAILS.find(
+                    (d) => d.id === matchedId,
+                  );
                   if (detail) setSelectedFeatureTab(detail.category);
                   setShowFeaturesModal(true);
                 }
@@ -820,51 +1358,126 @@ export default function Home() {
               className="flex flex-col items-start gap-2 p-4 border-r card-hover cursor-pointer"
               style={{ borderColor: "var(--border)" }}
             >
-              <div className="w-6 h-6 rounded flex items-center justify-center" style={{ background: "var(--accent-glow)", color: "var(--accent)" }}>
+              <div
+                className="w-6 h-6 rounded flex items-center justify-center"
+                style={{
+                  background: "var(--accent-glow)",
+                  color: "var(--accent)",
+                }}
+              >
                 <Icon size={12} strokeWidth={2} />
               </div>
-              <div className="text-xs font-semibold" style={{ color: "var(--text-primary)" }}>{f.label}</div>
-              <div className="text-xs" style={{ color: "var(--text-muted)" }}>{f.desc}</div>
+              <div
+                className="text-xs font-semibold flex items-center gap-1.5"
+                style={{ color: "var(--text-primary)" }}
+              >
+                {f.label}
+                {f.badge && (
+                  <span
+                    className="text-[8px] px-1 py-0.5 rounded"
+                    style={{
+                      background: "var(--accent-blue-glow)",
+                      color: "var(--accent-blue)",
+                      border: "1px solid var(--accent-blue)30",
+                    }}
+                  >
+                    {f.badge}
+                  </span>
+                )}
+              </div>
+              <div className="text-xs" style={{ color: "var(--text-muted)" }}>
+                {f.desc}
+              </div>
             </div>
           );
         })}
       </div>
 
-      <footer className="py-3 text-center text-xs" style={{ color: "var(--text-dim)", borderTop: "1px solid var(--border)" }}>
+      <footer
+        className="py-3 text-center text-xs"
+        style={{
+          color: "var(--text-dim)",
+          borderTop: "1px solid var(--border)",
+        }}
+      >
         Powered by Gemini AI · Built for engineers
       </footer>
 
       {showFeaturesModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: "rgba(0, 0, 0, 0.75)", backdropFilter: "blur(12px)" }}>
-          <div className="rounded-xl border flex flex-col max-w-4xl w-full max-h-[85vh] overflow-hidden transition-all duration-300 relative animate-fade-in"
-            style={{ background: "var(--surface)", borderColor: "var(--border)", boxShadow: "0 0 50px rgba(0, 255, 102, 0.08)" }}>
-            <div className="flex-shrink-0 px-6 py-4 border-b flex items-center justify-between" style={{ borderColor: "var(--border)" }}>
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          style={{
+            background: "rgba(0, 0, 0, 0.75)",
+            backdropFilter: "blur(12px)",
+          }}
+        >
+          <div
+            className="rounded-xl border flex flex-col max-w-4xl w-full max-h-[85vh] overflow-hidden transition-all duration-300 relative animate-fade-in"
+            style={{
+              background: "var(--surface)",
+              borderColor: "var(--border)",
+              boxShadow: "0 0 50px rgba(0, 255, 102, 0.08)",
+            }}
+          >
+            <div
+              className="flex-shrink-0 px-6 py-4 border-b flex items-center justify-between"
+              style={{ borderColor: "var(--border)" }}
+            >
               <div className="flex items-center gap-2">
                 <Sparkles size={16} style={{ color: "var(--accent)" }} />
-                <span className="font-mono text-xs uppercase tracking-widest" style={{ color: "var(--text-muted)" }}>[EMBEDDY_SYSTEM_FEATURES]</span>
+                <span
+                  className="font-mono text-xs uppercase tracking-widest"
+                  style={{ color: "var(--text-muted)" }}
+                >
+                  [EMBEDDY_SYSTEM_FEATURES]
+                </span>
               </div>
-              <button onClick={() => { setShowFeaturesModal(false); setActiveFeatureId(null); }} className="p-1 rounded border hover:bg-white/5 transition-colors"
-                style={{ borderColor: "var(--border)", color: "var(--text-muted)" }}>
+              <button
+                onClick={() => {
+                  setShowFeaturesModal(false);
+                  setActiveFeatureId(null);
+                }}
+                className="p-1 rounded border hover:bg-white/5 transition-colors"
+                style={{
+                  borderColor: "var(--border)",
+                  color: "var(--text-muted)",
+                }}
+              >
                 <X size={14} />
               </button>
             </div>
 
-            <div className="flex-shrink-0 px-6 py-3.5 border-b flex flex-col md:flex-row md:items-center justify-between gap-3" style={{ borderColor: "var(--border)", background: "var(--surface-raised)" }}>
+            <div
+              className="flex-shrink-0 px-6 py-3.5 border-b flex flex-col md:flex-row md:items-center justify-between gap-3"
+              style={{
+                borderColor: "var(--border)",
+                background: "var(--surface-raised)",
+              }}
+            >
               <div className="flex flex-wrap gap-1">
                 {[
                   { id: "all", label: "ALL FEATURES" },
                   { id: "hardware", label: "HARDWARE & WIRING" },
                   { id: "software", label: "CODE & SOFTWARE" },
-                  { id: "diagnostics", label: "DIAGNOSTICS & ANALYTICS" }
+                  { id: "diagnostics", label: "DIAGNOSTICS & ANALYTICS" },
                 ].map((tab) => (
                   <button
                     key={tab.id}
-                    onClick={() => { setSelectedFeatureTab(tab.id); setActiveFeatureId(null); }}
+                    onClick={() => {
+                      setSelectedFeatureTab(tab.id);
+                      setActiveFeatureId(null);
+                    }}
                     className="px-3 py-1.5 rounded text-[10px] font-mono font-bold tracking-wider transition-all"
                     style={{
-                      background: selectedFeatureTab === tab.id ? "#00ff6610" : "transparent",
-                      color: selectedFeatureTab === tab.id ? "var(--accent)" : "var(--text-muted)",
-                      border: `1px solid ${selectedFeatureTab === tab.id ? "#00ff6630" : "transparent"}`
+                      background:
+                        selectedFeatureTab === tab.id
+                          ? "#00ff6610"
+                          : "transparent",
+                      color:
+                        selectedFeatureTab === tab.id
+                          ? "var(--accent)"
+                          : "var(--text-muted)",
+                      border: `1px solid ${selectedFeatureTab === tab.id ? "#00ff6630" : "transparent"}`,
                     }}
                   >
                     {tab.label}
@@ -876,25 +1489,42 @@ export default function Home() {
                 type="text"
                 placeholder="Search features..."
                 value={searchQuery}
-                onChange={(e) => { setSearchQuery(e.target.value); setActiveFeatureId(null); }}
+                onChange={(e) => {
+                  setSearchQuery(e.target.value);
+                  setActiveFeatureId(null);
+                }}
                 className="px-3 py-1.5 rounded text-xs outline-none w-full md:w-48 font-mono border"
-                style={{ background: "var(--bg)", borderColor: "var(--border)", color: "var(--text-primary)" }}
+                style={{
+                  background: "var(--bg)",
+                  borderColor: "var(--border)",
+                  color: "var(--text-primary)",
+                }}
               />
             </div>
 
             <div className="flex-1 overflow-y-auto p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
               {(() => {
                 const filtered = FEATURE_DETAILS.filter((f) => {
-                  const matchesTab = selectedFeatureTab === "all" || f.category === selectedFeatureTab;
-                  const matchesSearch = f.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                                       f.shortDesc.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                                       f.longDesc.toLowerCase().includes(searchQuery.toLowerCase());
+                  const matchesTab =
+                    selectedFeatureTab === "all" ||
+                    f.category === selectedFeatureTab;
+                  const matchesSearch =
+                    f.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                    f.shortDesc
+                      .toLowerCase()
+                      .includes(searchQuery.toLowerCase()) ||
+                    f.longDesc
+                      .toLowerCase()
+                      .includes(searchQuery.toLowerCase());
                   return matchesTab && matchesSearch;
                 });
 
                 if (filtered.length === 0) {
                   return (
-                    <div className="col-span-2 py-12 text-center text-xs font-mono" style={{ color: "var(--text-muted)" }}>
+                    <div
+                      className="col-span-2 py-12 text-center text-xs font-mono"
+                      style={{ color: "var(--text-muted)" }}
+                    >
                       NO COMPILING SYSTEM MATCHED THIS QUERY
                     </div>
                   );
@@ -910,92 +1540,213 @@ export default function Home() {
                       onClick={() => setActiveFeatureId(isActive ? null : f.id)}
                       className="rounded-lg border p-4 cursor-pointer transition-all duration-300 card-hover relative overflow-hidden"
                       style={{
-                        background: isActive ? "rgba(0, 255, 102, 0.02)" : "var(--bg)",
-                        borderColor: isActive ? "var(--accent)" : "var(--border)",
-                        boxShadow: isActive ? "0 0 16px rgba(0, 255, 102, 0.04)" : "none"
+                        background: isActive
+                          ? "rgba(0, 255, 102, 0.02)"
+                          : "var(--bg)",
+                        borderColor: isActive
+                          ? "var(--accent)"
+                          : "var(--border)",
+                        boxShadow: isActive
+                          ? "0 0 16px rgba(0, 255, 102, 0.04)"
+                          : "none",
                       }}
                     >
-                      <div className="absolute top-0 right-0 w-16 h-16 rounded-full filter blur-xl opacity-10 pointer-events-none"
-                        style={{ background: f.color }} />
-                        
+                      <div
+                        className="absolute top-0 right-0 w-16 h-16 rounded-full filter blur-xl opacity-10 pointer-events-none"
+                        style={{ background: f.color }}
+                      />
+
                       <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center gap-2">
-                          <span className="w-7 h-7 rounded flex items-center justify-center"
-                            style={{ background: "rgba(255, 255, 255, 0.03)", border: "1px solid var(--border)", color: f.color }}>
+                          <span
+                            className="w-7 h-7 rounded flex items-center justify-center"
+                            style={{
+                              background: "rgba(255, 255, 255, 0.03)",
+                              border: "1px solid var(--border)",
+                              color: f.color,
+                            }}
+                          >
                             <Icon size={12} strokeWidth={2.5} />
                           </span>
-                          <h4 className="text-sm font-semibold text-white">{f.title}</h4>
+                          <h4 className="text-sm font-semibold text-white">
+                            {f.title}
+                          </h4>
                         </div>
-                        <span className="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded uppercase"
-                          style={{ background: `${f.color}15`, color: f.color, border: `1px solid ${f.color}30` }}>
+                        <span
+                          className="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded uppercase"
+                          style={{
+                            background: `${f.color}15`,
+                            color: f.color,
+                            border: `1px solid ${f.color}30`,
+                          }}
+                        >
                           {f.badge}
                         </span>
                       </div>
 
-                      <p className="text-xs font-medium mb-1.5" style={{ color: "var(--text-primary)" }}>{f.shortDesc}</p>
-                      <p className="text-xs leading-relaxed" style={{ color: "var(--text-muted)" }}>{f.longDesc}</p>
-                      
-                      <div className="mt-3 flex items-center gap-1 text-[9px] font-mono font-bold uppercase transition-colors"
-                        style={{ color: isActive ? "var(--accent)" : "var(--text-dim)" }}>
-                        <span>{isActive ? "[ACTIVE_EXPANSION]" : "[CLICK_TO_EXPAND_METRICS]"}</span>
+                      <p
+                        className="text-xs font-medium mb-1.5"
+                        style={{ color: "var(--text-primary)" }}
+                      >
+                        {f.shortDesc}
+                      </p>
+                      <p
+                        className="text-xs leading-relaxed"
+                        style={{ color: "var(--text-muted)" }}
+                      >
+                        {f.longDesc}
+                      </p>
+
+                      <div
+                        className="mt-3 flex items-center gap-1 text-[9px] font-mono font-bold uppercase transition-colors"
+                        style={{
+                          color: isActive ? "var(--accent)" : "var(--text-dim)",
+                        }}
+                      >
+                        <span>
+                          {isActive
+                            ? "[ACTIVE_EXPANSION]"
+                            : "[CLICK_TO_EXPAND_METRICS]"}
+                        </span>
                       </div>
 
                       {isActive && (
-                        <div className="mt-3 pt-3 border-t space-y-2.5 animate-fadeIn" style={{ borderColor: "var(--border)" }}>
+                        <div
+                          className="mt-3 pt-3 border-t space-y-2.5 animate-fadeIn"
+                          style={{ borderColor: "var(--border)" }}
+                        >
                           {f.id === "schematic" && (
-                            <div className="p-2.5 rounded bg-black/40 border border-white/5 font-mono text-[9px]" style={{ color: "var(--text-muted)", borderColor: "var(--border)" }}>
-                              <div className="text-[var(--accent)]">{"// Dynamic routing initialization"}</div>
+                            <div
+                              className="p-2.5 rounded bg-black/40 border border-white/5 font-mono text-[9px]"
+                              style={{
+                                color: "var(--text-muted)",
+                                borderColor: "var(--border)",
+                              }}
+                            >
+                              <div className="text-[var(--accent)]">
+                                {"// Dynamic routing initialization"}
+                              </div>
                               <div>$ renderer.stage.zoom(1.2);</div>
-                              <div>$ connectionGroup.highlight(&quot;comp_ESP32&quot;);</div>
+                              <div>
+                                $
+                                connectionGroup.highlight(&quot;comp_ESP32&quot;);
+                              </div>
                             </div>
                           )}
                           {f.id === "power" && (
-                            <div className="p-2.5 rounded bg-black/40 border border-white/5 space-y-1.5" style={{ borderColor: "var(--border)" }}>
-                              <div className="flex justify-between text-[9px] font-mono" style={{ color: "var(--text-muted)" }}>
+                            <div
+                              className="p-2.5 rounded bg-black/40 border border-white/5 space-y-1.5"
+                              style={{ borderColor: "var(--border)" }}
+                            >
+                              <div
+                                className="flex justify-between text-[9px] font-mono"
+                                style={{ color: "var(--text-muted)" }}
+                              >
                                 <span>SIMULATED_LOAD</span>
                                 <span>320mA / 500mA</span>
                               </div>
                               <div className="flex gap-0.5">
                                 {Array.from({ length: 15 }).map((_, idx) => (
-                                  <div key={idx} className="h-1.5 flex-1 rounded-sm" style={{ background: idx < 10 ? "var(--accent)" : "rgba(255,255,255,0.05)" }} />
+                                  <div
+                                    key={idx}
+                                    className="h-1.5 flex-1 rounded-sm"
+                                    style={{
+                                      background:
+                                        idx < 10
+                                          ? "var(--accent)"
+                                          : "rgba(255,255,255,0.05)",
+                                    }}
+                                  />
                                 ))}
                               </div>
                             </div>
                           )}
                           {f.id === "compatibility" && (
-                            <div className="p-2 rounded bg-black/40 border border-white/5 flex items-center justify-between text-[9px] font-mono" style={{ borderColor: "var(--border)" }}>
-                              <span style={{ color: "var(--accent)" }}>✓ I2C Bus Tolerances verified</span>
-                              <span style={{ color: "var(--text-muted)" }}>3.3V Logic</span>
+                            <div
+                              className="p-2 rounded bg-black/40 border border-white/5 flex items-center justify-between text-[9px] font-mono"
+                              style={{ borderColor: "var(--border)" }}
+                            >
+                              <span style={{ color: "var(--accent)" }}>
+                                ✓ I2C Bus Tolerances verified
+                              </span>
+                              <span style={{ color: "var(--text-muted)" }}>
+                                3.3V Logic
+                              </span>
                             </div>
                           )}
                           {f.id === "bom" && (
-                            <div className="p-2 rounded bg-black/40 border border-white/5 flex items-center justify-between text-[9px] font-mono" style={{ borderColor: "var(--border)", color: "var(--text-muted)" }}>
+                            <div
+                              className="p-2 rounded bg-black/40 border border-white/5 flex items-center justify-between text-[9px] font-mono"
+                              style={{
+                                borderColor: "var(--border)",
+                                color: "var(--text-muted)",
+                              }}
+                            >
                               <span>Est. Cost: Rs. 1,450.00</span>
                               <span>4 Lines</span>
                             </div>
                           )}
                           {f.id === "safety" && (
-                            <div className="p-2 rounded bg-black/40 border border-white/5 flex items-center justify-between text-[9px] font-mono text-[var(--accent)]" style={{ borderColor: "var(--border)" }}>
+                            <div
+                              className="p-2 rounded bg-black/40 border border-white/5 flex items-center justify-between text-[9px] font-mono text-[var(--accent)]"
+                              style={{ borderColor: "var(--border)" }}
+                            >
                               <span>✓ No voltage conflicts compiled</span>
                             </div>
                           )}
                           {f.id === "code" && (
-                            <div className="p-2.5 rounded bg-black/40 border border-white/5 font-mono text-[9px]" style={{ color: "var(--text-muted)", borderColor: "var(--border)" }}>
-                              <div className="text-purple-400">#include &lt;Wire.h&gt;</div>
-                              <div>void setup() &#123; Wire.begin(); &#125;</div>
+                            <div
+                              className="p-2.5 rounded bg-black/40 border border-white/5 font-mono text-[9px]"
+                              style={{
+                                color: "var(--text-muted)",
+                                borderColor: "var(--border)",
+                              }}
+                            >
+                              <div className="text-purple-400">
+                                #include &lt;Wire.h&gt;
+                              </div>
+                              <div>
+                                void setup() &#123; Wire.begin(); &#125;
+                              </div>
                             </div>
                           )}
                           {f.id === "agents" && (
-                            <div className="p-2 rounded bg-black/40 border border-white/5 flex items-center justify-between text-[9px] font-mono" style={{ borderColor: "var(--border)", color: "var(--text-muted)" }}>
+                            <div
+                              className="p-2 rounded bg-black/40 border border-white/5 flex items-center justify-between text-[9px] font-mono"
+                              style={{
+                                borderColor: "var(--border)",
+                                color: "var(--text-muted)",
+                              }}
+                            >
                               <span>9 Pipelines compiling...</span>
-                              <span style={{ color: "var(--accent)" }}>READY in 28.4s</span>
+                              <span style={{ color: "var(--accent)" }}>
+                                READY in 28.4s
+                              </span>
                             </div>
                           )}
                           {f.id === "pinout" && (
-                            <div className="p-2 rounded bg-black/40 border border-white/5 flex gap-1.5 flex-wrap" style={{ borderColor: "var(--border)" }}>
-                              {["GPIO21", "GPIO22", "3V3", "GND"].map((p, idx) => (
-                                <span key={idx} className="px-1 py-0.5 rounded text-[8px] font-mono bg-white/5" style={{ color: idx === 2 ? "var(--accent-red)" : idx === 3 ? "var(--text-muted)" : "var(--accent)" }}>{p}</span>
-                              ))}
+                            <div
+                              className="p-2 rounded bg-black/40 border border-white/5 flex gap-1.5 flex-wrap"
+                              style={{ borderColor: "var(--border)" }}
+                            >
+                              {["GPIO21", "GPIO22", "3V3", "GND"].map(
+                                (p, idx) => (
+                                  <span
+                                    key={idx}
+                                    className="px-1 py-0.5 rounded text-[8px] font-mono bg-white/5"
+                                    style={{
+                                      color:
+                                        idx === 2
+                                          ? "var(--accent-red)"
+                                          : idx === 3
+                                            ? "var(--text-muted)"
+                                            : "var(--accent)",
+                                    }}
+                                  >
+                                    {p}
+                                  </span>
+                                ),
+                              )}
                             </div>
                           )}
                         </div>
@@ -1006,11 +1757,24 @@ export default function Home() {
               })()}
             </div>
 
-            <div className="flex-shrink-0 px-6 py-4 border-t flex items-center justify-end" style={{ borderColor: "var(--border)", background: "var(--surface-raised)" }}>
+            <div
+              className="flex-shrink-0 px-6 py-4 border-t flex items-center justify-end"
+              style={{
+                borderColor: "var(--border)",
+                background: "var(--surface-raised)",
+              }}
+            >
               <button
-                onClick={() => { setShowFeaturesModal(false); setActiveFeatureId(null); }}
+                onClick={() => {
+                  setShowFeaturesModal(false);
+                  setActiveFeatureId(null);
+                }}
                 className="px-4 py-2 rounded-lg text-xs font-semibold"
-                style={{ background: "var(--accent)", color: "#000", boxShadow: "0 0 16px var(--accent-glow-strong)" }}
+                style={{
+                  background: "var(--accent)",
+                  color: "#000",
+                  boxShadow: "0 0 16px var(--accent-glow-strong)",
+                }}
               >
                 Close Diagnostics
               </button>
