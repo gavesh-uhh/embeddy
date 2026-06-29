@@ -53,8 +53,6 @@ export default function ProjectPage() {
   const [retrying, setRetrying] = useState<Record<string, boolean>>({});
   const [shareCopied, setShareCopied] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
-
-  // User initials
   const initials = user?.displayName
     ? user.displayName.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2)
     : user?.email?.[0]?.toUpperCase() ?? "U";
@@ -76,9 +74,7 @@ export default function ProjectPage() {
       await navigator.clipboard.writeText(window.location.href);
       setShareCopied(true);
       setTimeout(() => setShareCopied(false), 2500);
-    } catch {
-      /* clipboard blocked */
-    }
+    } catch {}
   };
 
   const hasFatal = project?.fatalIssues?.issues?.some((i) => i.severity === "fatal");
@@ -211,25 +207,19 @@ export default function ProjectPage() {
         <BoardBadge board={project.board} />
 
         {hasFatal && (
-          <span className="relative flex h-2 w-2 ml-1">
-            <span
-              className="pulse-dot absolute inline-flex h-full w-full rounded-full"
-              style={{ background: "var(--accent-red)" }}
-            />
+          <span className="relative flex h-2 w-2">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" style={{ background: "var(--accent-red)" }} />
             <span
               className="relative inline-flex rounded-full h-2 w-2"
               style={{ background: "var(--accent-red)" }}
             />
           </span>
         )}
-
-        {/* Cloud sync indicator */}
         <span className="flex items-center gap-1 text-[10px]" style={{ color: "var(--accent)" }}>
           <Cloud size={11} />
           Cloud
         </span>
 
-        {/* Share button */}
         <button
           onClick={handleShare}
           className="ml-1 flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all"
@@ -252,7 +242,6 @@ export default function ProjectPage() {
           })}
         </span>
 
-        {/* User avatar dropdown */}
         <div className="relative ml-2">
           <button
             onClick={() => setUserMenuOpen((o) => !o)}
