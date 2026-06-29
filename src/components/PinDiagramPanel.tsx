@@ -85,7 +85,6 @@ export default function PinDiagramPanel({ pinDiagram, error, onRetry }: Props) {
         </span>
       </div>
 
-      {/* Legend */}
       <div className="px-4 py-2 border-b flex flex-wrap gap-3" style={{ borderColor: "var(--border)", background: "var(--surface-raised)" }}>
         {SIGNAL_ORDER.filter((s) => grouped[s]).map((sig) => (
           <div key={sig} className="flex items-center gap-1.5 text-xs">
@@ -98,7 +97,6 @@ export default function PinDiagramPanel({ pinDiagram, error, onRetry }: Props) {
       <div className="overflow-auto">
         {SIGNAL_ORDER.filter((sig) => grouped[sig]).map((sig) => (
           <div key={sig}>
-            {/* Section header */}
             <div
               className="px-4 py-1.5 flex items-center gap-2"
               style={{ background: `${SIGNAL_COLORS[sig]}10`, borderBottom: `1px solid ${SIGNAL_COLORS[sig]}25` }}
@@ -109,7 +107,6 @@ export default function PinDiagramPanel({ pinDiagram, error, onRetry }: Props) {
               </span>
             </div>
 
-            {/* Pin rows */}
             {grouped[sig]!.map((pin, i) => (
               <div
                 key={i}
@@ -123,7 +120,6 @@ export default function PinDiagramPanel({ pinDiagram, error, onRetry }: Props) {
                 onMouseEnter={e => (e.currentTarget.style.background = "var(--surface-raised)")}
                 onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
               >
-                {/* Left: Component + pin */}
                 <div>
                   <div className="text-xs font-medium" style={{ color: "var(--text-primary)" }}>{pin.component}</div>
                   <div className="text-xs" style={{ color: "var(--text-muted)" }}>
@@ -136,14 +132,12 @@ export default function PinDiagramPanel({ pinDiagram, error, onRetry }: Props) {
                   </div>
                 </div>
 
-                {/* Center: Wire line */}
                 <div className="flex items-center gap-0.5 flex-shrink-0">
                   <div className="w-8 h-px" style={{ background: SIGNAL_COLORS[sig] }} />
                   <div className="w-1.5 h-1.5 rounded-full" style={{ background: SIGNAL_COLORS[sig], boxShadow: `0 0 4px ${SIGNAL_COLORS[sig]}` }} />
                   <div className="w-8 h-px" style={{ background: SIGNAL_COLORS[sig] }} />
                 </div>
 
-                {/* Right: Board pin */}
                 <div className="text-right">
                   <div
                     className="inline-flex items-center px-2 py-0.5 rounded text-xs font-mono font-medium"

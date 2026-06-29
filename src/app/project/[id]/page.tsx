@@ -18,7 +18,6 @@ import PCBLayoutPanel from "@/components/PCBLayoutPanel";
 import NaturalLanguageEditor from "@/components/NaturalLanguageEditor";
 import { saveProject } from "@/lib/projectStore";
 import {
-  Cpu,
   LayoutDashboard,
   CircuitBoard,
   ShoppingCart,
@@ -91,9 +90,7 @@ export default function ProjectPage() {
       await navigator.clipboard.writeText(window.location.href);
       setShareCopied(true);
       setTimeout(() => setShareCopied(false), 2500);
-    } catch {
-      /* clipboard blocked */
-    }
+    } catch {}
   };
 
   const hasFatal = project?.fatalIssues?.issues?.some(
@@ -257,18 +254,10 @@ export default function ProjectPage() {
       >
         <button
           onClick={() => router.push("/")}
-          className="flex items-center gap-2 text-sm transition-colors"
-          style={{ color: "var(--text-muted)" }}
-          onMouseEnter={(e) => (e.currentTarget.style.color = "var(--accent)")}
-          onMouseLeave={(e) =>
-            (e.currentTarget.style.color = "var(--text-muted)")
-          }
+          className="flex items-center gap-2 hover:opacity-80 transition-opacity"
         >
-          <div
-            className="w-6 h-6 rounded flex items-center justify-center"
-            style={{ background: "var(--accent)", color: "#000" }}
-          >
-            <Cpu size={12} strokeWidth={2.5} />
+          <div className="w-7 h-7 rounded-lg border border-[#00ff6630] bg-[#050505] shadow-[0_0_12px_rgba(0,255,102,0.15)] flex items-center justify-center p-0.5">
+            <img src="/icon.png" alt="Embeddy" className="w-full h-full object-contain" />
           </div>
           <span className="font-bold" style={{ color: "var(--text-primary)" }}>
             Embeddy
@@ -287,11 +276,8 @@ export default function ProjectPage() {
         <BoardBadge board={project.board} />
 
         {hasFatal && (
-          <span className="relative flex h-2 w-2 ml-1">
-            <span
-              className="pulse-dot absolute inline-flex h-full w-full rounded-full"
-              style={{ background: "var(--accent-red)" }}
-            />
+          <span className="relative flex h-2 w-2">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" style={{ background: "var(--accent-red)" }} />
             <span
               className="relative inline-flex rounded-full h-2 w-2"
               style={{ background: "var(--accent-red)" }}
@@ -308,7 +294,6 @@ export default function ProjectPage() {
           Cloud
         </span>
 
-        {/* Share button */}
         <button
           onClick={handleShare}
           className="ml-1 flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all"
@@ -338,7 +323,6 @@ export default function ProjectPage() {
           })}
         </span>
 
-        {/* User avatar dropdown */}
         <div className="relative ml-2">
           <button
             onClick={() => setUserMenuOpen((o) => !o)}

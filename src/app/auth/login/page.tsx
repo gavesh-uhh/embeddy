@@ -9,7 +9,7 @@ import {
   signInWithPopup,
   googleProvider,
 } from "@/lib/firebase";
-import { Cpu, Mail, Lock, ArrowRight, Loader2, ShieldAlert } from "lucide-react";
+import { Mail, Lock, ArrowRight, Loader2, ShieldAlert, Eye, EyeOff } from "lucide-react";
 
 const inputStyle = {
   background: "var(--surface-raised)",
@@ -31,6 +31,7 @@ function LoginForm() {
   const [password,    setPassword]    = useState("");
   const [loading,     setLoading]     = useState(false);
   const [googleLoad,  setGoogleLoad]  = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [error,       setError]       = useState<string | null>(null);
 
   const handleGoogle = async () => {
@@ -126,12 +127,23 @@ function LoginForm() {
           <label htmlFor="login-password" className="panel-header block mb-1.5">Password</label>
           <div className="relative">
             <Lock size={13} className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" style={{ color: "var(--text-muted)" }} />
-            <input id="login-password" type="password" autoComplete="current-password" value={password}
+            <input id="login-password" type={showPassword ? "text" : "password"} autoComplete="current-password" value={password}
               onChange={e => setPassword(e.target.value)} disabled={loading || googleLoad}
               placeholder="••••••••"
-              className="w-full pl-9 pr-4 py-2.5 rounded-lg text-sm outline-none transition-all"
+              className="w-full pl-9 pr-10 py-2.5 rounded-lg text-sm outline-none transition-all"
               style={inputStyle} onFocus={onFocus} onBlur={onBlur}
             />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 p-0.5 rounded transition-colors text-glow"
+              style={{ color: "var(--text-muted)" }}
+              onMouseEnter={e => (e.currentTarget.style.color = "var(--accent)")}
+              onMouseLeave={e => (e.currentTarget.style.color = "var(--text-muted)")}
+              disabled={loading || googleLoad}
+            >
+              {showPassword ? <EyeOff size={14} /> : <Eye size={14} />}
+            </button>
           </div>
         </div>
 
@@ -162,8 +174,8 @@ export default function LoginPage() {
   return (
     <div className="fade-up">
       <div className="flex items-center gap-3 mb-8 justify-center">
-        <div className="w-9 h-9 rounded-xl flex items-center justify-center hero-icon" style={{ background: "var(--accent)", color: "#000" }}>
-          <Cpu size={18} strokeWidth={2.5} />
+        <div className="w-9 h-9 rounded-xl border border-[#00ff6630] bg-[#050505] shadow-[0_0_15px_rgba(0,255,102,0.18)] flex items-center justify-center p-0.5">
+          <img src="/icon.png" alt="Embeddy" className="w-full h-full object-contain" />
         </div>
         <span className="font-bold text-2xl tracking-tight" style={{ fontFamily: "Outfit, sans-serif", color: "var(--text-primary)" }}>
           Embeddy
