@@ -66,7 +66,7 @@ export default function NaturalLanguageEditor({
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Undo/Redo state
+  
   const [undoStack, setUndoStack] = useState<ProjectSnapshot[]>([]);
   const [redoStack, setRedoStack] = useState<ProjectSnapshot[]>([]);
 
@@ -126,7 +126,7 @@ export default function NaturalLanguageEditor({
       const result = await response.json();
 
       if (!response.ok) {
-        // Handle rate limiting specifically
+        
         if (response.status === 429) {
           throw new Error(
             result.message ||
@@ -150,7 +150,7 @@ export default function NaturalLanguageEditor({
       setMessages((prev) => [...prev, assistantMessage]);
       setCommandHistory((prev) => [...prev, command]);
 
-      // If there are no questions and there are operations, auto-apply after showing explanation
+      
       if (result.questions?.length === 0 && result.operations?.length > 0) {
         await applyOperations(result.operations, result.regenerated, command);
       }
@@ -175,20 +175,20 @@ export default function NaturalLanguageEditor({
     setIsGenerating(true);
 
     try {
-      // Save snapshot before applying changes
+      
       saveSnapshot(command || "Unknown command");
 
-      // Build new project context based on operations
+      
       let updatedProject = { ...project };
       const updatedContext = buildProjectContext();
 
-      // Initialize components array if undefined
+      
       if (!updatedContext.components) {
         updatedContext.components = [];
       }
 
-      // Update components list based on operations
-      // Track if we need to force code regeneration
+      
+      
       let forceCodeRegen = false;
       let newCodeLanguage: "C++" | "MicroPython" | undefined;
       let newCodeFramework: "Arduino" | "ESP-IDF" | "STM32 HAL" | undefined;
@@ -229,7 +229,7 @@ export default function NaturalLanguageEditor({
             }
             break;
           case "modify_pin":
-            // Update pin in the pins array
+            
             if (
               operation.component &&
               operation.oldPin &&
@@ -251,24 +251,24 @@ export default function NaturalLanguageEditor({
             }
             break;
           case "update_component":
-            // Update component specs - mark for regeneration
+            
             if (operation.component && operation.newSpecs) {
-              // Add note about the spec change to description
+              
               updatedContext.description = `${updatedContext.description}\n\n${operation.component} specifications updated: ${operation.newSpecs}`;
             }
             break;
           case "add_feature":
-            // Features are treated like component additions
+            
             if (operation.feature) {
               updatedContext.description = `${updatedContext.description}\n\nAdditional feature requested: ${operation.feature}`;
             }
             break;
           case "change_code_language":
-            // Update code generation preferences
+            
             if (operation.language) {
               newCodeLanguage = operation.language;
               forceCodeRegen = true;
-              // Store in description for context
+              
               updatedContext.description = `${updatedContext.description}\n\nCode language preference: ${operation.language}${operation.framework ? ` with ${operation.framework} framework` : ""}`;
             }
             if (operation.framework) {
@@ -276,22 +276,22 @@ export default function NaturalLanguageEditor({
             }
             break;
           case "regenerate_code":
-            // Force code regeneration
+            
             forceCodeRegen = true;
             break;
           case "explain_design":
           case "suggest_improvements":
           case "optimize_power":
           case "check_compatibility":
-            // These are informational operations, no state changes needed
+            
             break;
           default:
-            // Unknown operation type, log but continue
+            
             console.warn("Unknown operation type:", operation.type);
         }
       }
 
-      // Regenerate necessary sections
+      
       const agentsToRun: {
         name: string;
         key: keyof ProjectData;
@@ -409,7 +409,7 @@ export default function NaturalLanguageEditor({
         });
       }
 
-      // Run all regeneration agents in parallel
+      
       const results = await Promise.allSettled(agentsToRun.map((a) => a.fn()));
 
       results.forEach((result, index) => {
@@ -422,7 +422,7 @@ export default function NaturalLanguageEditor({
         }
       });
 
-      // Update project metadata
+      
       updatedProject = {
         ...updatedProject,
         board: updatedContext.board,
@@ -434,12 +434,12 @@ export default function NaturalLanguageEditor({
           : undefined,
       };
 
-      // Save and notify parent
+      
       const { saveProject } = await import("@/lib/projectStore");
       await saveProject(updatedProject);
       onProjectUpdate(updatedProject);
 
-      // Mark message as applied
+      
       setMessages((prev) =>
         prev.map((m) =>
           m.id === prev[prev.length - 1]?.id ? { ...m, applied: true } : m,
@@ -464,12 +464,12 @@ export default function NaturalLanguageEditor({
       e.preventDefault();
       handleSend(input);
     }
-    // Undo: Ctrl+Z or Cmd+Z
+    
     if ((e.ctrlKey || e.metaKey) && e.key === "z" && !e.shiftKey) {
       e.preventDefault();
       handleUndo();
     }
-    // Redo: Ctrl+Y or Cmd+Shift+Z
+    
     if (
       (e.ctrlKey || e.metaKey) &&
       (e.key === "y" || (e.key === "z" && e.shiftKey))
@@ -492,15 +492,15 @@ export default function NaturalLanguageEditor({
     setRedoStack([]);
   };
 
-  // Save current project state before applying changes
+  
   const saveSnapshot = (command: string) => {
     const snapshot: ProjectSnapshot = {
-      project: JSON.parse(JSON.stringify(project)), // Deep clone
+      project: JSON.parse(JSON.stringify(project)), 
       timestamp: new Date(),
       command,
     };
     setUndoStack((prev) => [...prev, snapshot]);
-    setRedoStack([]); // Clear redo stack on new change
+    setRedoStack([]); 
   };
 
   const handleUndo = () => {
@@ -516,10 +516,10 @@ export default function NaturalLanguageEditor({
     setUndoStack((prev) => prev.slice(0, -1));
     setRedoStack((prev) => [currentSnapshot, ...prev]);
 
-    // Restore previous state
+    
     onProjectUpdate(previousSnapshot.project);
 
-    // Add system message
+    
     const undoMessage: Message = {
       id: Date.now().toString(),
       role: "system",
@@ -542,10 +542,10 @@ export default function NaturalLanguageEditor({
     setRedoStack((prev) => prev.slice(1));
     setUndoStack((prev) => [...prev, currentSnapshot]);
 
-    // Restore next state
+    
     onProjectUpdate(nextSnapshot.project);
 
-    // Add system message
+    
     const redoMessage: Message = {
       id: Date.now().toString(),
       role: "system",
@@ -557,7 +557,7 @@ export default function NaturalLanguageEditor({
 
   return (
     <>
-      {/* Floating button */}
+      
       {!isOpen && (
         <button
           onClick={() => setIsOpen(true)}
@@ -573,19 +573,19 @@ export default function NaturalLanguageEditor({
         </button>
       )}
 
-      {/* Chat panel */}
+      
       {isOpen && (
         <div
-          className="fixed bottom-6 right-6 z-50 w-96 rounded-2xl overflow-hidden shadow-2xl flex flex-col"
+          className="fixed bottom-0 right-0 left-0 sm:bottom-6 sm:right-6 sm:left-auto z-50 w-full sm:w-96 rounded-t-2xl sm:rounded-2xl overflow-hidden shadow-2xl flex flex-col"
           style={{
             background: "var(--surface)",
             border: "1px solid var(--border)",
             boxShadow: "0 25px 50px rgba(0, 0, 0, 0.5)",
-            maxHeight: "600px",
-            height: "500px",
+            maxHeight: "min(600px, 85vh)",
+            height: "min(500px, 75vh)",
           }}
         >
-          {/* Header */}
+          
           <div
             className="flex items-center justify-between px-4 py-3 border-b"
             style={{
@@ -652,7 +652,7 @@ export default function NaturalLanguageEditor({
             </div>
           </div>
 
-          {/* Messages area */}
+          
           <div className="flex-1 overflow-y-auto p-4 space-y-4">
             {messages.length === 0 && showSuggestions && (
               <div className="space-y-3">
@@ -724,7 +724,7 @@ export default function NaturalLanguageEditor({
                 >
                   <p className="text-sm leading-relaxed">{message.content}</p>
 
-                  {/* Operations badges */}
+                  
                   {message.operations && message.operations.length > 0 && (
                     <div
                       className="mt-3 pt-3 border-t flex flex-wrap gap-1.5"
@@ -754,7 +754,7 @@ export default function NaturalLanguageEditor({
                     </div>
                   )}
 
-                  {/* Warnings */}
+                  
                   {message.warnings && message.warnings.length > 0 && (
                     <div className="mt-3 space-y-1.5">
                       {message.warnings.map((warning, i) => (
@@ -777,7 +777,7 @@ export default function NaturalLanguageEditor({
                     </div>
                   )}
 
-                  {/* Questions */}
+                  
                   {message.questions && message.questions.length > 0 && (
                     <div className="mt-3 space-y-2">
                       {message.questions.map((question, i) => (
@@ -852,7 +852,7 @@ export default function NaturalLanguageEditor({
             <div ref={messagesEndRef} />
           </div>
 
-          {/* Input area */}
+          
           <div
             className="p-4 border-t"
             style={{

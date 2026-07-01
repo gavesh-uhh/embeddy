@@ -176,7 +176,7 @@ export default function PCBLayoutPanel({
           </span>
         </div>
         <div className="flex items-center gap-3">
-          <span className="text-xs" style={{ color: "var(--text-muted)" }}>
+          <span className="hidden sm:inline text-xs" style={{ color: "var(--text-muted)" }}>
             {componentCount} comps · {traceCount} traces · {padCount} pads
           </span>
           <button
@@ -202,7 +202,7 @@ export default function PCBLayoutPanel({
         </div>
       </div>
 
-      {/* Layer selector */}
+      
       <div
         className="px-4 py-2 border-b flex items-center justify-between"
         style={{
@@ -258,12 +258,12 @@ export default function PCBLayoutPanel({
         </div>
       </div>
 
-      {/* PCB Canvas */}
+      
       <div className="relative overflow-auto" style={{ maxHeight: "600px" }}>
         <PCBRenderer pcb={pcbLayout} activeLayer={activeLayer} />
       </div>
 
-      {/* Design rules summary */}
+      
       <div
         className="px-4 py-3 border-t"
         style={{
@@ -271,7 +271,7 @@ export default function PCBLayoutPanel({
           background: "var(--surface-raised)",
         }}
       >
-        <div className="grid grid-cols-4 gap-4 text-xs">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs">
           <div>
             <span style={{ color: "var(--text-muted)" }}>Min Trace Width</span>
             <div className="font-mono" style={{ color: "var(--text-primary)" }}>
@@ -298,7 +298,7 @@ export default function PCBLayoutPanel({
           </div>
         </div>
 
-        {/* Beta disclaimer */}
+        
         <div
           className="mt-3 pt-3 border-t text-xs"
           style={{ borderColor: "var(--border)", color: "var(--accent-amber)" }}

@@ -315,7 +315,7 @@ export default function Home() {
   if (showForm) {
     return (
       <div
-        className="h-screen flex flex-col overflow-hidden"
+        className="min-h-screen lg:h-screen flex flex-col lg:overflow-hidden"
         style={{ background: "var(--bg)" }}
       >
         <nav
@@ -367,10 +367,10 @@ export default function Home() {
           </span>
         </nav>
 
-        <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 min-h-0 overflow-hidden">
+        <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 min-h-0 lg:overflow-hidden">
           <div
-            className="lg:col-span-7 p-8 lg:p-12 overflow-y-auto h-full flex flex-col justify-center"
-            style={{ borderRight: "1px solid var(--border)" }}
+            className="lg:col-span-7 p-6 sm:p-8 lg:p-12 overflow-y-auto lg:h-full flex flex-col justify-center border-b lg:border-b-0 lg:border-r"
+            style={{ borderColor: "var(--border)" }}
           >
             <div className="max-w-xl mx-auto w-full space-y-5">
               <div>
@@ -552,7 +552,7 @@ export default function Home() {
                   </div>
                 </div>
 
-                {/* PCB Generation Option */}
+                
                 <div
                   className="flex items-center gap-3 px-3 py-3 rounded-lg border"
                   style={{
@@ -651,7 +651,7 @@ export default function Home() {
           </div>
 
           <div
-            className="lg:col-span-5 p-8 lg:p-12 h-full flex flex-col justify-start space-y-6 overflow-hidden"
+            className="lg:col-span-5 p-6 sm:p-8 lg:p-12 lg:h-full flex flex-col justify-start space-y-6 lg:overflow-hidden"
             style={{ background: "var(--surface)" }}
           >
             <div className="space-y-3 flex-shrink-0">
@@ -817,7 +817,7 @@ export default function Home() {
 
   return (
     <div
-      className="h-screen flex flex-col overflow-hidden"
+      className="min-h-screen lg:h-screen flex flex-col lg:overflow-hidden"
       style={{ background: "var(--bg)" }}
     >
       <nav
@@ -987,8 +987,8 @@ export default function Home() {
         </div>
       </nav>
 
-      <main className="flex-1 grid grid-cols-1 lg:grid-cols-2 border-b min-h-0 overflow-hidden" style={{ borderColor: "var(--border)" }}>
-        <div className="flex flex-col justify-center px-10 lg:px-16 py-8 lg:py-0 fade-up lg:h-full lg:overflow-y-auto">
+      <main className="flex-1 grid grid-cols-1 lg:grid-cols-2 border-b min-h-0 lg:overflow-hidden" style={{ borderColor: "var(--border)" }}>
+        <div className="flex flex-col justify-center px-6 py-12 sm:px-10 lg:px-16 lg:py-0 fade-up lg:h-full lg:overflow-y-auto">
           <h1
             className="glitch-text font-bold mb-3"
             data-text="Embeddy"
@@ -1079,9 +1079,9 @@ export default function Home() {
         </div>
 
         <div
-          className="hidden lg:flex items-center justify-center p-10 relative overflow-hidden lg:h-full"
+          className="flex items-center justify-center p-6 sm:p-10 relative overflow-hidden lg:h-full border-t lg:border-t-0 lg:border-l w-full lg:w-auto"
           style={{
-            borderLeft: "1px solid var(--border)",
+            borderColor: "var(--border)",
             background: "var(--surface)",
           }}
         >
