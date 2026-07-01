@@ -20,7 +20,7 @@ import {
   checkDesignRules,
 } from "../pcbRouter";
 
-// Board sizes by type (in mm)
+
 const BOARD_CONFIGS: Record<
   string,
   { width: number; height: number; mcuFootprint: string }
@@ -33,7 +33,7 @@ const BOARD_CONFIGS: Record<
   STM32F4: { width: 60, height: 80, mcuFootprint: "TQFP-32" },
 };
 
-// Get standard footprint for a component
+
 function getComponentFootprint(componentType: string): string {
   const type = componentType.toLowerCase();
 
@@ -59,7 +59,7 @@ function getComponentFootprint(componentType: string): string {
   return "0805";
 }
 
-// Generate component placement with collision detection
+
 function generatePlacement(
   componentId: string,
   componentType: string,
@@ -74,7 +74,7 @@ function generatePlacement(
   const footprintName = getComponentFootprint(componentType);
   const footprint = FOOTPRINTS[footprintName] || FOOTPRINTS["0805"];
 
-  // MCU goes left-center, others spread out
+  
   const preferredX = isMCU ? boardWidth * 0.25 : boardWidth * 0.6;
   const preferredY = isMCU ? boardHeight * 0.5 : undefined;
 
@@ -106,7 +106,7 @@ function generatePlacement(
   return { placement, footprint };
 }
 
-// Generate pads for a component placement
+
 function generatePads(
   placement: PCBComponentPlacement,
   footprint: (typeof FOOTPRINTS)[string],
@@ -114,7 +114,7 @@ function generatePads(
 ): PCBPad[] {
   const pads: PCBPad[] = [];
 
-  // Map schematic pins to footprint pins
+  
   const componentPins = pinData.filter(
     (p) => p.component === placement.componentId,
   );
@@ -132,7 +132,7 @@ function generatePads(
       y: snapToGrid(placement.y + fpPin.y),
       width: 1.5,
       height: 1.5,
-      shape: i === 0 ? "rect" : "circle", // First pin is square for orientation
+      shape: i === 0 ? "rect" : "circle", 
       layer: "top",
       netName: schematicPin
         ? schematicPin.signalType === "power"
@@ -148,7 +148,7 @@ function generatePads(
   return pads;
 }
 
-// Generate traces from schematic connections
+
 async function generateTraces(
   schematic: CircuitSchematic,
   placements: PCBComponentPlacement[],
@@ -159,9 +159,7 @@ async function generateTraces(
   const traces: PCBTrace[] = [];
   let traceId = 1;
 
-  // Attempt to use tscircuit autorouter for higher accuracy
   try {
-    // Dynamic import to avoid static require
     const mod = await import("@tscircuit/capacity-autorouter");
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { autoroute } = mod as any;
@@ -203,10 +201,10 @@ async function generateTraces(
 
     if (fromPads.length === 0 || toPads.length === 0) continue;
 
-    const fromPad = fromPads[0]; // Use first pad - could be smarter
+    const fromPad = fromPads[0]; 
     const toPad = toPads[0];
 
-    // Generate Manhattan route as fallback
+    
     const route = manhattanRoute(fromPad.x, fromPad.y, toPad.x, toPad.y);
 
     if (route && route.length >= 2) {
@@ -235,12 +233,12 @@ export async function PCBLayoutAgent(
   schematic: CircuitSchematic,
   board: string,
 ): Promise<PCBLayout> {
-  // Get board configuration
+  
   const boardConfig = BOARD_CONFIGS[board] || BOARD_CONFIGS["ESP32"];
   const boardWidth = boardConfig.width;
   const boardHeight = boardConfig.height;
 
-  // Track existing placements for collision detection
+  
   const existingPlacements: {
     x: number;
     y: number;
@@ -250,7 +248,7 @@ export async function PCBLayoutAgent(
   const placements: PCBComponentPlacement[] = [];
   const allPads: PCBPad[] = [];
 
-  // First, place the MCU/main board
+  
   const mcuComponent =
     schematic.components.find(
       (c) =>
@@ -292,9 +290,9 @@ export async function PCBLayoutAgent(
     }
   }
 
-  // Place other components
+  
   for (const comp of schematic.components) {
-    if (placements.some((p) => p.componentId === comp.id)) continue; // Already placed
+    if (placements.some((p) => p.componentId === comp.id)) continue; 
 
     const result = generatePlacement(
       comp.id,
@@ -327,7 +325,7 @@ export async function PCBLayoutAgent(
     }
   }
 
-  // Generate traces
+  
   const traces = await generateTraces(
     schematic,
     placements,
@@ -336,7 +334,7 @@ export async function PCBLayoutAgent(
     boardHeight,
   );
 
-  // Generate mounting holes
+  
   const mountingHoles = [
     { x: 3, y: 3, diameter: 3.2 },
     { x: boardWidth - 3, y: 3, diameter: 3.2 },
@@ -344,7 +342,7 @@ export async function PCBLayoutAgent(
     { x: boardWidth - 3, y: boardHeight - 3, diameter: 3.2 },
   ];
 
-  // Run design rule check
+  
   const drc = checkDesignRules(traces);
   if (!drc.passed) {
     console.warn("PCB Layout DRC warnings:", drc.issues);
