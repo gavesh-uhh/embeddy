@@ -94,7 +94,7 @@ export default function PinDiagramPanel({ pinDiagram, error, onRetry }: Props) {
         ))}
       </div>
 
-      <div className="overflow-auto">
+      <div className="overflow-hidden w-full">
         {SIGNAL_ORDER.filter((sig) => grouped[sig]).map((sig) => (
           <div key={sig}>
             <div
