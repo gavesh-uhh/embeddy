@@ -315,7 +315,7 @@ export default function Home() {
   if (showForm) {
     return (
       <div
-        className="h-screen flex flex-col overflow-hidden"
+        className="min-h-screen lg:h-screen flex flex-col lg:overflow-hidden"
         style={{ background: "var(--bg)" }}
       >
         <nav
@@ -367,10 +367,10 @@ export default function Home() {
           </span>
         </nav>
 
-        <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 min-h-0 overflow-hidden">
+        <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 min-h-0 lg:overflow-hidden">
           <div
-            className="lg:col-span-7 p-8 lg:p-12 overflow-y-auto h-full flex flex-col justify-center"
-            style={{ borderRight: "1px solid var(--border)" }}
+            className="lg:col-span-7 p-6 sm:p-8 lg:p-12 overflow-y-auto lg:h-full flex flex-col justify-center border-b lg:border-b-0 lg:border-r"
+            style={{ borderColor: "var(--border)" }}
           >
             <div className="max-w-xl mx-auto w-full space-y-5">
               <div>
@@ -651,7 +651,7 @@ export default function Home() {
           </div>
 
           <div
-            className="lg:col-span-5 p-8 lg:p-12 h-full flex flex-col justify-start space-y-6 overflow-hidden"
+            className="lg:col-span-5 p-6 sm:p-8 lg:p-12 lg:h-full flex flex-col justify-start space-y-6 lg:overflow-hidden"
             style={{ background: "var(--surface)" }}
           >
             <div className="space-y-3 flex-shrink-0">
