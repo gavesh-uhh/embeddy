@@ -853,7 +853,7 @@ export default function Home() {
 
   return (
     <div
-      className="min-h-screen flex flex-col"
+      className="h-screen flex flex-col overflow-hidden"
       style={{ background: "var(--bg)" }}
     >
       <nav
@@ -1023,10 +1023,10 @@ export default function Home() {
         </div>
       </nav>
 
-      <main className="grid grid-cols-1 lg:grid-cols-2 border-b" style={{ borderColor: "var(--border)" }}>
-        <div className="flex flex-col justify-center px-10 lg:px-16 py-20 lg:py-28 fade-up">
+      <main className="flex-1 grid grid-cols-1 lg:grid-cols-2 border-b min-h-0 overflow-hidden" style={{ borderColor: "var(--border)" }}>
+        <div className="flex flex-col justify-center px-10 lg:px-16 py-8 lg:py-0 fade-up lg:h-full lg:overflow-y-auto">
           <h1
-            className="glitch-text font-bold mb-4"
+            className="glitch-text font-bold mb-3"
             data-text="Embeddy"
             style={{
               fontSize: "clamp(3.5rem, 6vw, 6rem)",
@@ -1040,14 +1040,14 @@ export default function Home() {
           </h1>
 
           <p
-            className="text-lg font-medium mb-3"
+            className="text-lg font-medium mb-2"
             style={{ color: "var(--accent)", fontFamily: "Outfit, sans-serif" }}
           >
             Design embedded systems 10× faster
           </p>
 
           <p
-            className="text-sm leading-relaxed mb-8 max-w-md"
+            className="text-sm leading-relaxed mb-6 max-w-md"
             style={{ color: "var(--text-muted)" }}
           >
             Describe your project. 9 AI agents generate circuit schematics, pin
@@ -1088,7 +1088,7 @@ export default function Home() {
           </div>
 
           <div
-            className="flex items-center gap-6 mt-10 pt-8"
+            className="flex items-center gap-6 mt-6 pt-6"
             style={{ borderTop: "1px solid var(--border)" }}
           >
             {[
@@ -1115,7 +1115,7 @@ export default function Home() {
         </div>
 
         <div
-          className="hidden lg:flex items-center justify-center p-10 py-20 lg:py-28 relative overflow-hidden"
+          className="hidden lg:flex items-center justify-center p-10 relative overflow-hidden lg:h-full"
           style={{
             borderLeft: "1px solid var(--border)",
             background: "var(--surface)",
@@ -1241,66 +1241,6 @@ export default function Home() {
         </div>
       </main>
 
-
-      {/* FAQ Section */}
-      <section 
-        className="py-24 px-8 border-b"
-        style={{ borderColor: "var(--border)", background: "var(--bg)" }}
-      >
-        <div className="max-w-3xl mx-auto space-y-12">
-          <div className="text-center space-y-3">
-            <h2 className="text-3xl font-bold tracking-tight" style={{ fontFamily: "Outfit, sans-serif", color: "var(--text-primary)" }}>
-              Frequently Asked Questions
-            </h2>
-            <p className="text-xs max-w-xl mx-auto" style={{ color: "var(--text-muted)" }}>
-              Everything you need to know about Embeddy's AI hardware design engine.
-            </p>
-          </div>
-
-          <div className="space-y-4">
-            {FAQS.map((faq, idx) => (
-              <div 
-                key={idx}
-                className="border rounded-xl overflow-hidden transition-all duration-300"
-                style={{ 
-                  borderColor: openFaq === idx ? "var(--accent)" : "var(--border)",
-                  background: "var(--surface)" 
-                }}
-              >
-                <button
-                  onClick={() => setOpenFaq(openFaq === idx ? null : idx)}
-                  className="w-full flex items-center justify-between p-6 text-left hover:bg-white/5 transition-colors"
-                >
-                  <span className="font-bold text-sm" style={{ color: "var(--text-primary)" }}>{faq.question}</span>
-                  <div 
-                    className="p-1.5 rounded-full transition-transform duration-300"
-                    style={{ 
-                      background: openFaq === idx ? "var(--accent-glow)" : "rgba(255,255,255,0.03)",
-                      color: openFaq === idx ? "var(--accent)" : "var(--text-muted)",
-                      transform: openFaq === idx ? "rotate(45deg)" : "rotate(0deg)"
-                    }}
-                  >
-                    <Plus size={16} />
-                  </div>
-                </button>
-                
-                <div 
-                  className="px-6 transition-all duration-300 ease-in-out"
-                  style={{ 
-                    maxHeight: openFaq === idx ? "200px" : "0px",
-                    opacity: openFaq === idx ? 1 : 0,
-                    paddingBottom: openFaq === idx ? "24px" : "0px"
-                  }}
-                >
-                  <p className="text-xs leading-relaxed" style={{ color: "var(--text-muted)" }}>
-                    {faq.answer}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
 
 
       <footer
@@ -1448,7 +1388,7 @@ export default function Home() {
                     <div
                       key={f.id}
                       onClick={() => setActiveFeatureId(isActive ? null : f.id)}
-                      className="rounded-lg border p-4 cursor-pointer transition-all duration-300 card-hover relative overflow-hidden"
+                      className="rounded-lg border p-4 cursor-pointer card-hover relative overflow-hidden transition-[border-color,box-shadow] duration-200"
                       style={{
                         background: isActive
                           ? "rgba(0, 255, 102, 0.02)"
@@ -1534,12 +1474,11 @@ export default function Home() {
                               }}
                             >
                               <div className="text-[var(--accent)]">
-                                {"// Dynamic routing initialization"}
+                                // Dynamic routing initialization
                               </div>
                               <div>$ renderer.stage.zoom(1.2);</div>
                               <div>
-                                $
-                                connectionGroup.highlight(&quot;comp_ESP32&quot;);
+                                $ connectionGroup.highlight(&quot;comp_ESP32&quot;);
                               </div>
                             </div>
                           )}
