@@ -1,16 +1,11 @@
-/**
- * PCB Router Module
- * Implements accurate PCB layout generation with proper autorouting
- * Uses Manhattan routing (right-angle traces) with collision detection
- * NOTE: This is a beta feature - results may need manual refinement
- */
+
 
 import { PCBTrace } from "./types";
 
-// Grid-based placement (0.5mm grid for standard PCB design)
+
 const GRID_SIZE = 0.5;
 
-// Standard PCB design rules (in mm)
+
 const DESIGN_RULES = {
   minTraceWidth: 0.15,
   preferredTraceWidth: 0.25,
@@ -20,7 +15,7 @@ const DESIGN_RULES = {
   componentSpacing: 2.0,
 };
 
-// Standard component footprints (in mm)
+
 export const FOOTPRINTS: Record<
   string,
   {
@@ -29,7 +24,7 @@ export const FOOTPRINTS: Record<
     pins: { name: string; x: number; y: number }[];
   }
 > = {
-  // MCU footprints
+  
   "TQFP-32": {
     width: 9.0,
     height: 9.0,
@@ -72,7 +67,7 @@ export const FOOTPRINTS: Record<
       { name: "PIN5", x: 3.81, y: 5.08 },
     ],
   },
-  // SMD resistors/capacitors
+  
   "0805": {
     width: 1.2,
     height: 2.0,
@@ -89,7 +84,7 @@ export const FOOTPRINTS: Record<
       { name: "2", x: 0, y: 1.1 },
     ],
   },
-  // Headers
+  
   Header_1x4: {
     width: 2.54,
     height: 10.16,
@@ -108,7 +103,7 @@ export const FOOTPRINTS: Record<
       { name: "2", x: 0, y: 1.27 },
     ],
   },
-  // Regulators
+  
   "TO-220": {
     width: 10.0,
     height: 15.0,
@@ -128,7 +123,7 @@ export const FOOTPRINTS: Record<
       { name: "TAB", x: 0, y: -2.0 },
     ],
   },
-  // Common sensors
+  
   DHT22: {
     width: 15.0,
     height: 25.0,
@@ -161,7 +156,7 @@ export const FOOTPRINTS: Record<
       { name: "SDA", x: 1.2, y: 5.0 },
     ],
   },
-  // Board modules
+  
   ESP32_Module: {
     width: 25.5,
     height: 48.0,
@@ -223,13 +218,13 @@ export const FOOTPRINTS: Record<
       { name: "D2", x: 16.0, y: -30.0 },
       { name: "D1", x: 18.0, y: -30.0 },
       { name: "D0", x: 20.0, y: -30.0 },
-      // Power pins
+      
       { name: "RESET", x: -24.0, y: -28.0 },
       { name: "3V3", x: -22.0, y: -28.0 },
       { name: "5V", x: -20.0, y: -28.0 },
       { name: "GND", x: -18.0, y: -28.0 },
       { name: "VIN", x: -16.0, y: -28.0 },
-      // Analog pins
+      
       { name: "A0", x: -24.0, y: 25.0 },
       { name: "A1", x: -22.0, y: 25.0 },
       { name: "A2", x: -20.0, y: 25.0 },
@@ -238,13 +233,13 @@ export const FOOTPRINTS: Record<
   },
 };
 
-// Get footprint for a component type
+
 export function getFootprintForComponent(
   componentType: string,
 ): { name: string; data: (typeof FOOTPRINTS)[string] } | null {
   const type = componentType.toLowerCase();
 
-  // Check for MCU types
+  
   if (type.includes("esp32"))
     return { name: "ESP32_Module", data: FOOTPRINTS["ESP32_Module"] };
   if (type.includes("arduino uno"))
@@ -254,7 +249,7 @@ export function getFootprintForComponent(
   if (type.includes("stm32"))
     return { name: "TQFP-32", data: FOOTPRINTS["TQFP-32"] };
 
-  // Sensors
+  
   if (type.includes("dht"))
     return { name: "Header_1x4", data: FOOTPRINTS["Header_1x4"] };
   if (type.includes("bmp280"))
@@ -262,7 +257,7 @@ export function getFootprintForComponent(
   if (type.includes("ssd1306") || type.includes("oled") || type.includes("lcd"))
     return { name: "Header_1x4", data: FOOTPRINTS["Header_1x4"] };
 
-  // Passives
+  
   if (
     type.includes("resistor") ||
     type.includes("led") ||
@@ -272,32 +267,32 @@ export function getFootprintForComponent(
     return { name: "0805", data: FOOTPRINTS["0805"] };
   }
 
-  // Power
+  
   if (type.includes("regulator") || type.includes("7805"))
     return { name: "TO-220", data: FOOTPRINTS["TO-220"] };
   if (type.includes("ams1117"))
     return { name: "SOT-223", data: FOOTPRINTS["SOT-223"] };
 
-  // Switches/Buttons
+  
   if (type.includes("button") || type.includes("switch"))
     return { name: "Header_1x2", data: FOOTPRINTS["Header_1x2"] };
   if (type.includes("relay"))
     return { name: "Header_1x2", data: FOOTPRINTS["Header_1x2"] };
 
-  // Motors/servos
+  
   if (type.includes("motor") || type.includes("servo"))
     return { name: "Header_1x2", data: FOOTPRINTS["Header_1x2"] };
 
-  // Default to a generic header
+  
   return { name: "Header_1x4", data: FOOTPRINTS["Header_1x4"] };
 }
 
-// Snap to grid
+
 export function snapToGrid(value: number): number {
   return Math.round(value / GRID_SIZE) * GRID_SIZE;
 }
 
-// Check if two rectangles collide
+
 export function rectanglesCollide(
   x1: number,
   y1: number,
@@ -318,7 +313,7 @@ export function rectanglesCollide(
   );
 }
 
-// Find valid placement position using simple grid placement
+
 export function findValidPlacement(
   width: number,
   height: number,
@@ -328,16 +323,16 @@ export function findValidPlacement(
   preferredX?: number,
   preferredY?: number,
 ): { x: number; y: number } | null {
-  // Start from preferred position or center-left
+  
   const startX = preferredX ?? boardWidth * 0.3;
   const startY = preferredY ?? boardHeight * 0.5;
 
-  // Spiral search pattern
+  
   const directions = [
-    { dx: 0, dy: -1 }, // up
-    { dx: 1, dy: 0 }, // right
-    { dx: 0, dy: 1 }, // down
-    { dx: -1, dy: 0 }, // left
+    { dx: 0, dy: -1 }, 
+    { dx: 1, dy: 0 }, 
+    { dx: 0, dy: 1 }, 
+    { dx: -1, dy: 0 }, 
   ];
 
   let x = snapToGrid(startX);
@@ -351,14 +346,14 @@ export function findValidPlacement(
   const maxAttempts = 500;
 
   for (let attempt = 0; attempt < maxAttempts; attempt++) {
-    // Check bounds
+    
     if (
       x >= width / 2 + 3 &&
       x <= boardWidth - width / 2 - 3 &&
       y >= height / 2 + 3 &&
       y <= boardHeight - height / 2 - 3
     ) {
-      // Check collision with existing placements
+      
       let collision = false;
       for (const existing of existingPlacements) {
         if (
@@ -383,7 +378,7 @@ export function findValidPlacement(
       }
     }
 
-    // Move in spiral
+    
     x += directions[directionIndex].dx * step;
     y += directions[directionIndex].dy * step;
     stepsInCurrentDirection++;
@@ -402,23 +397,23 @@ export function findValidPlacement(
   return null;
 }
 
-// Manhattan routing - generates orthogonal PCB traces
+
 export function manhattanRoute(
   startX: number,
   startY: number,
   endX: number,
   endY: number,
 ): { x: number; y: number }[] | null {
-  // Simple L-route or Z-route generation
+  
   const points: { x: number; y: number }[] = [{ x: startX, y: startY }];
 
-  // Check which L-route is better
+  
   const distXFirst = Math.abs(endX - startX) + Math.abs(endY - startY);
   const distYFirst = Math.abs(endY - startY) + Math.abs(endX - startX);
 
-  // Use the shorter L-route
+  
   if (distXFirst <= distYFirst) {
-    // Horizontal first, then vertical
+    
     if (startX !== endX) {
       points.push({ x: endX, y: startY });
     }
@@ -426,7 +421,7 @@ export function manhattanRoute(
       points.push({ x: endX, y: endY });
     }
   } else {
-    // Vertical first, then horizontal
+    
     if (startY !== endY) {
       points.push({ x: startX, y: endY });
     }
@@ -438,12 +433,12 @@ export function manhattanRoute(
   return points;
 }
 
-// Collision detection for traces
+
 export function traceCollides(
   trace: { x: number; y: number }[],
   obstacles: { x: number; y: number; width: number; height: number }[],
 ): boolean {
-  // Simple bounding box check
+  
   for (let i = 0; i < trace.length - 1; i++) {
     const p1 = trace[i];
     const p2 = trace[i + 1];
@@ -471,14 +466,14 @@ export function traceCollides(
   return false;
 }
 
-// Design rule check
+
 export function checkDesignRules(traces: PCBTrace[]): {
   passed: boolean;
   issues: string[];
 } {
   const issues: string[] = [];
 
-  // Check trace widths
+  
   for (const trace of traces) {
     if (trace.width < DESIGN_RULES.minTraceWidth) {
       issues.push(
@@ -487,7 +482,7 @@ export function checkDesignRules(traces: PCBTrace[]): {
     }
   }
 
-  // Check for potential shorts (simplified)
+  
   const nets = new Map<string, PCBTrace[]>();
   for (const trace of traces) {
     if (!nets.has(trace.netName)) {

@@ -19,7 +19,7 @@ export async function CodeSkeletonAgent(
     .map((p) => `// ${p.component} ${p.pin} -> ${p.boardPin}`)
     .join("\n");
 
-  // Determine language and framework, using preferences if provided
+  
   const detectFramework = (): "Arduino" | "ESP-IDF" | "STM32 HAL" => {
     if (preferredFramework) return preferredFramework;
     if (board.startsWith("Arduino")) return "Arduino";
@@ -29,7 +29,7 @@ export async function CodeSkeletonAgent(
 
   const detectLanguage = (): "C++" | "MicroPython" => {
     if (preferredLanguage) return preferredLanguage;
-    // Default to C++ for most boards
+    
     return "C++";
   };
 

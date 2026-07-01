@@ -61,7 +61,7 @@ export default function ProjectPage() {
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [isNLEGenerating, setIsNLEGenerating] = useState(false);
 
-  // User initials
+  
   const initials = user?.displayName
     ? user.displayName
         .split(" ")
@@ -129,7 +129,7 @@ export default function ProjectPage() {
       await saveProject(updated);
       setProject(updated);
     } catch {
-      // Error handled silently
+      
     } finally {
       setRetrying((prev) => ({ ...prev, pcbLayout: false }));
     }
@@ -254,21 +254,21 @@ export default function ProjectPage() {
       >
         <button
           onClick={() => router.push("/")}
-          className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+          className="flex items-center gap-2 hover:opacity-80 transition-opacity flex-shrink-0"
         >
           <div className="w-7 h-7 rounded-lg border border-[#00ff6630] bg-[#050505] shadow-[0_0_12px_rgba(0,255,102,0.15)] flex items-center justify-center p-0.5">
             <img src="/icon.png" alt="Embeddy" className="w-full h-full object-contain" />
           </div>
-          <span className="font-bold" style={{ color: "var(--text-primary)" }}>
+          <span className="hidden sm:inline font-bold" style={{ color: "var(--text-primary)" }}>
             Embeddy
           </span>
         </button>
 
-        <span style={{ color: "var(--text-dim)" }}>/</span>
+        <span className="hidden sm:inline" style={{ color: "var(--text-dim)" }}>/</span>
 
         <h1
-          className="font-semibold text-sm truncate"
-          style={{ color: "var(--text-primary)", maxWidth: "280px" }}
+          className="font-semibold text-xs sm:text-sm truncate max-w-[120px] sm:max-w-[280px]"
+          style={{ color: "var(--text-primary)" }}
         >
           {project.title}
         </h1>
@@ -285,9 +285,9 @@ export default function ProjectPage() {
           </span>
         )}
 
-        {/* Cloud sync indicator */}
+        
         <span
-          className="flex items-center gap-1 text-[10px]"
+          className="hidden sm:flex items-center gap-1 text-[10px]"
           style={{ color: "var(--accent)" }}
         >
           <Cloud size={11} />
@@ -296,7 +296,7 @@ export default function ProjectPage() {
 
         <button
           onClick={handleShare}
-          className="ml-1 flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all"
+          className="ml-auto sm:ml-1 flex items-center gap-1.5 px-2.5 py-1.5 sm:px-3 sm:py-1.5 rounded-lg text-xs font-semibold transition-all"
           style={{
             border: `1px solid ${shareCopied ? "#00ff6650" : "var(--border)"}`,
             background: shareCopied ? "#00ff6612" : "transparent",
@@ -309,11 +309,13 @@ export default function ProjectPage() {
           ) : (
             <Share2 size={11} />
           )}
-          {shareCopied ? "Copied!" : "Share"}
+          <span className="hidden sm:inline">
+            {shareCopied ? "Copied!" : "Share"}
+          </span>
         </button>
 
         <span
-          className="ml-auto text-xs"
+          className="hidden md:inline ml-auto text-xs"
           style={{ color: "var(--text-muted)" }}
         >
           {new Date(project.createdAt).toLocaleDateString("en-US", {
@@ -409,16 +411,15 @@ export default function ProjectPage() {
         </div>
       </header>
 
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-col lg:flex-row flex-1 overflow-hidden">
         <aside
-          className="flex-shrink-0 border-r overflow-y-auto p-3 flex flex-col gap-1"
+          className="flex-shrink-0 border-b lg:border-b-0 lg:border-r overflow-x-auto lg:overflow-y-auto p-2 lg:p-3 flex flex-row lg:flex-col gap-1 w-full lg:w-56"
           style={{
-            width: "220px",
             borderColor: "var(--border)",
             background: "var(--surface)",
           }}
         >
-          <div className="panel-header px-3 py-2 mb-1">Dashboard</div>
+          <div className="hidden lg:block panel-header px-3 py-2 mb-1">Dashboard</div>
 
           {NAV_ITEMS.map(({ key, label, icon: Icon }) => {
             const isActive = activeTab === key;
@@ -426,7 +427,7 @@ export default function ProjectPage() {
               <button
                 key={key}
                 onClick={() => setActiveTab(key)}
-                className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-medium transition-all w-full text-left"
+                className="flex items-center gap-2 px-2.5 py-1.5 lg:py-2.5 rounded-lg text-xs lg:text-sm font-medium transition-all lg:w-full text-left whitespace-nowrap flex-shrink-0"
                 style={{
                   background: isActive ? "#00ff6610" : "transparent",
                   color: isActive ? "var(--accent)" : "var(--text-muted)",
@@ -721,7 +722,7 @@ export default function ProjectPage() {
                       </div>
                     </div>
 
-                    <div className="flex flex-col gap-4">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                       <div className="flex flex-col gap-4">
                         <ProjectOverviewCard
                           overview={project.overview}
@@ -778,11 +779,10 @@ export default function ProjectPage() {
             {activeTab === "hardware" && (
               <div className="flex flex-col gap-5 fade-up">
                 <div
+                  className="h-[350px] sm:h-[500px] overflow-hidden border w-full"
                   style={{
-                    height: "500px",
                     borderRadius: "10px",
-                    overflow: "hidden",
-                    border: "1px solid var(--border)",
+                    borderColor: "var(--border)",
                     background: "var(--surface)",
                   }}
                 >
@@ -848,7 +848,7 @@ export default function ProjectPage() {
           </div>
         </main>
 
-        {/* Natural Language Editor */}
+        
         <NaturalLanguageEditor
           project={project}
           onProjectUpdate={(updated) => setProject(updated)}

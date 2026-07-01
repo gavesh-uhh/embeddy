@@ -552,7 +552,7 @@ export default function Home() {
                   </div>
                 </div>
 
-                {/* PCB Generation Option */}
+                
                 <div
                   className="flex items-center gap-3 px-3 py-3 rounded-lg border"
                   style={{

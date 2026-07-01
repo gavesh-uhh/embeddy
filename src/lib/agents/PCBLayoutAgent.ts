@@ -1,8 +1,4 @@
-/**
- * PCB Layout Agent
- * Generates accurate PCB layouts using proper autorouting algorithms
- * BETA FEATURE: Results may require manual verification and adjustment
- */
+
 
 import {
   PCBLayout,
@@ -195,7 +191,7 @@ async function generateTraces(
 
     if (!fromPlacement || !toPlacement) continue;
 
-    // Find corresponding pads
+    
     const fromPads = pads.filter((p) => p.componentId === fromPlacement.id);
     const toPads = pads.filter((p) => p.componentId === toPlacement.id);
 

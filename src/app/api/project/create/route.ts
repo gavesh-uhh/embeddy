@@ -118,7 +118,7 @@ export async function POST(req: NextRequest) {
     if (codeSkeletonResult.status === "rejected")
       errors.codeSkeleton = codeSkeletonResult.reason?.message;
 
-    // Step 4: Generate PCB layout if schematic succeeded and generation requested
+    
     let pcbLayout;
     if (schematic && generatePCB) {
       try {

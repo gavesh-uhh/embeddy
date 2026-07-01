@@ -8,7 +8,7 @@ interface Props {
   activeLayer: "top" | "bottom" | "both";
 }
 
-// PCB board colors
+
 const BOARD_COLOR = "#1a3520";
 const BOARD_BORDER = "#2d5a3d";
 const COPPER_TOP = "#ff9500";
@@ -18,7 +18,7 @@ const PAD_COLOR = "#ffd700";
 
 const VIA_COLOR = "#c0c0c0";
 
-// Scale factor: mm to pixels
+
 const SCALE = 10;
 const PADDING = 20;
 
@@ -32,11 +32,11 @@ export default function PCBRenderer({ pcb, activeLayer }: Props) {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    // Calculate dimensions
+    
     const width = pcb.boardWidth * SCALE + PADDING * 2;
     const height = pcb.boardHeight * SCALE + PADDING * 2;
 
-    // Set canvas size with device pixel ratio for crisp rendering
+    
     const dpr = window.devicePixelRatio || 1;
     canvas.width = width * dpr;
     canvas.height = height * dpr;
@@ -44,13 +44,13 @@ export default function PCBRenderer({ pcb, activeLayer }: Props) {
     canvas.style.height = `${height}px`;
     ctx.scale(dpr, dpr);
 
-    // Clear canvas
+    
     ctx.clearRect(0, 0, width, height);
 
     const boardOffsetX = PADDING;
     const boardOffsetY = PADDING;
 
-    // Draw board outline
+    
     ctx.fillStyle = BOARD_COLOR;
     ctx.strokeStyle = BOARD_BORDER;
     ctx.lineWidth = 2;
@@ -67,7 +67,7 @@ export default function PCBRenderer({ pcb, activeLayer }: Props) {
       pcb.boardHeight * SCALE,
     );
 
-    // Draw mounting holes
+    
     pcb.mountingHoles.forEach((hole) => {
       const x = boardOffsetX + hole.x * SCALE;
       const y = boardOffsetY + hole.y * SCALE;
@@ -82,7 +82,7 @@ export default function PCBRenderer({ pcb, activeLayer }: Props) {
       ctx.stroke();
     });
 
-    // Draw traces based on active layer
+    
     pcb.traces.forEach((trace) => {
       if (activeLayer === "top" && trace.layer === "bottom") return;
       if (activeLayer === "bottom" && trace.layer === "top") return;
@@ -115,7 +115,7 @@ export default function PCBRenderer({ pcb, activeLayer }: Props) {
 
       ctx.stroke();
 
-      // Draw vias at trace transitions
+      
       if (trace.layer === "via") {
         const viaRadius = 0.3 * SCALE;
         trace.points.forEach((point) => {
@@ -132,21 +132,21 @@ export default function PCBRenderer({ pcb, activeLayer }: Props) {
       }
     });
 
-    // Draw component placements (silkscreen)
+    
     if (activeLayer !== "bottom") {
       pcb.placements.forEach((placement) => {
         const x = boardOffsetX + placement.x * SCALE;
         const y = boardOffsetY + placement.y * SCALE;
         const rotation = (placement.rotation * Math.PI) / 180;
 
-        // Save context for rotation
+        
         ctx.save();
         ctx.translate(x, y);
         ctx.rotate(rotation);
 
-        // Draw component body (outline)
-        const compWidth = 4 * SCALE; // Default width
-        const compHeight = 3 * SCALE; // Default height
+        
+        const compWidth = 4 * SCALE; 
+        const compHeight = 3 * SCALE; 
 
         ctx.strokeStyle = SILKSCREEN;
         ctx.lineWidth = 1;
@@ -154,14 +154,14 @@ export default function PCBRenderer({ pcb, activeLayer }: Props) {
         ctx.strokeRect(-compWidth / 2, -compHeight / 2, compWidth, compHeight);
         ctx.setLineDash([]);
 
-        // Draw component name
+        
         ctx.fillStyle = SILKSCREEN;
         ctx.font = `${10 * (1 / SCALE) * SCALE}px monospace`;
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
         ctx.fillText(placement.name, 0, -compHeight / 2 - 5);
 
-        // Draw component value/variant
+        
         ctx.font = `${8 * (1 / SCALE) * SCALE}px monospace`;
         ctx.fillStyle = "#cccccc";
         ctx.fillText(placement.footprint, 0, compHeight / 2 + 10);
@@ -170,7 +170,7 @@ export default function PCBRenderer({ pcb, activeLayer }: Props) {
       });
     }
 
-    // Draw pads
+    
     pcb.pads.forEach((pad) => {
       if (activeLayer === "top" && pad.layer === "bottom") return;
       if (activeLayer === "bottom" && pad.layer === "top") return;
@@ -180,7 +180,7 @@ export default function PCBRenderer({ pcb, activeLayer }: Props) {
       const width = pad.width * SCALE;
       const height = pad.height * SCALE;
 
-      // Draw pad
+      
       ctx.fillStyle = PAD_COLOR;
       ctx.strokeStyle = "#b8860b";
       ctx.lineWidth = 1;
@@ -197,12 +197,12 @@ export default function PCBRenderer({ pcb, activeLayer }: Props) {
         ctx.fill();
         ctx.stroke();
       } else {
-        // Rectangular pad
+        
         ctx.fillRect(x - width / 2, y - height / 2, width, height);
         ctx.strokeRect(x - width / 2, y - height / 2, width, height);
       }
 
-      // Draw pad hole/thru (smaller circle in middle)
+      
       const holeRadius = Math.min(width, height) * 0.3;
       ctx.beginPath();
       ctx.arc(x, y, holeRadius, 0, Math.PI * 2);
@@ -210,7 +210,7 @@ export default function PCBRenderer({ pcb, activeLayer }: Props) {
       ctx.fill();
     });
 
-    // Draw board outline again for border effect
+    
     ctx.strokeStyle = BOARD_BORDER;
     ctx.lineWidth = 3;
     ctx.strokeRect(
@@ -220,18 +220,18 @@ export default function PCBRenderer({ pcb, activeLayer }: Props) {
       pcb.boardHeight * SCALE,
     );
 
-    // Draw dimension markers
+    
     ctx.fillStyle = "#666";
     ctx.font = "10px monospace";
 
-    // Width dimension
+    
     ctx.fillText(
       `${pcb.boardWidth}mm`,
       boardOffsetX + (pcb.boardWidth * SCALE) / 2 - 15,
       boardOffsetY - 8,
     );
 
-    // Height dimension (rotated)
+    
     ctx.save();
     ctx.translate(
       boardOffsetX - 15,
