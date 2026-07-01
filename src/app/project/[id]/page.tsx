@@ -722,55 +722,51 @@ export default function ProjectPage() {
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                      <div className="flex flex-col gap-4">
-                        <ProjectOverviewCard
-                          overview={project.overview}
-                          error={errors.overview}
-                        />
-                        <PowerBudgetPanel
-                          powerBudget={project.powerBudget}
-                          error={
-                            retrying.powerBudget
-                              ? "Retrying…"
-                              : errors.powerBudget
-                          }
-                          onRetry={
-                            errors.powerBudget
-                              ? () => handleRetry("powerBudget", "powerBudget")
-                              : undefined
-                          }
-                        />
-                      </div>
-                      <div className="flex flex-col gap-4">
-                        <FatalIssuesPanel
-                          fatalIssues={project.fatalIssues}
-                          error={
-                            retrying.fatalIssues
-                              ? "Retrying…"
-                              : errors.fatalIssues
-                          }
-                          onRetry={
-                            errors.fatalIssues
-                              ? () => handleRetry("fatalIssues", "fatalIssues")
-                              : undefined
-                          }
-                        />
-                        <CompatibilityPanel
-                          compatibility={project.compatibility}
-                          error={
-                            retrying.compatibility
-                              ? "Retrying…"
-                              : errors.compatibility
-                          }
-                          onRetry={
-                            errors.compatibility
-                              ? () =>
-                                  handleRetry("compatibility", "compatibility")
-                              : undefined
-                          }
-                        />
-                      </div>
+                    <div className="flex flex-col gap-4">
+                      <ProjectOverviewCard
+                        overview={project.overview}
+                        error={errors.overview}
+                      />
+                      <PowerBudgetPanel
+                        powerBudget={project.powerBudget}
+                        error={
+                          retrying.powerBudget
+                            ? "Retrying…"
+                            : errors.powerBudget
+                        }
+                        onRetry={
+                          errors.powerBudget
+                            ? () => handleRetry("powerBudget", "powerBudget")
+                            : undefined
+                        }
+                      />
+                      <FatalIssuesPanel
+                        fatalIssues={project.fatalIssues}
+                        error={
+                          retrying.fatalIssues
+                            ? "Retrying…"
+                            : errors.fatalIssues
+                        }
+                        onRetry={
+                          errors.fatalIssues
+                            ? () => handleRetry("fatalIssues", "fatalIssues")
+                            : undefined
+                        }
+                      />
+                      <CompatibilityPanel
+                        compatibility={project.compatibility}
+                        error={
+                          retrying.compatibility
+                            ? "Retrying…"
+                            : errors.compatibility
+                        }
+                        onRetry={
+                          errors.compatibility
+                            ? () =>
+                                handleRetry("compatibility", "compatibility")
+                            : undefined
+                        }
+                      />
                     </div>
                   </div>
                 );
