@@ -75,7 +75,7 @@ export default function RegisterPage() {
       } else if (code === "auth/weak-password") {
         setError("Password is too weak. Use at least 6 characters.");
       } else {
-        setError("Registration failed. Check your Firebase config in .env.local.");
+        setError("Registration failed. Check your Firebase config in .env.");
       }
       setLoading(false);
     }

@@ -30,7 +30,7 @@ cd embeddy
 npm install
 ```
 
-Create `.env.local` with your API keys:
+Create `.env` with your API keys:
 
 ```env
 GEMINI_API_KEY=your_gemini_key
