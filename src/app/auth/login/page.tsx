@@ -66,7 +66,7 @@ function LoginForm() {
       } else if (code === "auth/invalid-email") {
         setError("Please enter a valid email address.");
       } else {
-        setError("Sign in failed. Check your Firebase config in .env.local.");
+        setError("Sign in failed. Check your Firebase config in .env.");
       }
       setLoading(false);
     }
