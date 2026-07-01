@@ -163,7 +163,8 @@ async function generateTraces(
   try {
     // Dynamic import to avoid static require
     const mod = await import("@tscircuit/capacity-autorouter");
-    const { autoroute } = mod;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { autoroute } = mod as any;
     const autorouteResult = autoroute({
       boardWidth,
       boardHeight,

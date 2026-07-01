@@ -44,26 +44,7 @@ const BOARDS: BoardType[] = [
   "STM32F4",
 ];
 
-const FEATURES = [
-  { icon: Zap, label: "Circuit Schematic", desc: "Interactive canvas" },
-  { icon: PinIcon, label: "Pin Diagram", desc: "Signal-typed wiring" },
-  {
-    icon: Layers,
-    label: "PCB Layout",
-    desc: "Auto-generated routing",
-    badge: "BETA",
-  },
-  { icon: Zap, label: "Power Budget", desc: "Current draw analysis" },
-  { icon: ShoppingCart, label: "BOM + Sourcing", desc: "Estimated LKR costs" },
-  {
-    icon: ShieldAlert,
-    label: "Safety Analysis",
-    desc: "Voltage conflict flags",
-  },
-  { icon: Wrench, label: "Compatibility", desc: "Board + component check" },
-  { icon: Code2, label: "Code Skeleton", desc: "Compilable starter code" },
-  { icon: Bot, label: "10 AI Agents", desc: "Running in parallel" },
-];
+
 
 const FEATURE_DETAILS = [
   {
@@ -167,24 +148,7 @@ const FEATURE_DETAILS = [
   },
 ];
 
-const FAQS = [
-  {
-    question: "How does the AI parallel generation work?",
-    answer: "Embeddy spins up specialized agents simultaneously. While one agent routes the PCB, another verifies power budgets, and a third writes firmware—reducing design time from weeks to hours."
-  },
-  {
-    question: "Which microcontrollers are supported?",
-    answer: "We currently support Arduino Uno, Mega, ESP32, ESP32-S3, STM32F103, and STM32F4. We are constantly adding new architectures to our AI training pipeline."
-  },
-  {
-    question: "Can I export the generated designs to my EDA tool?",
-    answer: "Yes, you can export schematics and PCB layouts in industry-standard formats compatible with Altium Designer, KiCad, and Eagle."
-  },
-  {
-    question: "Is the generated firmware ready to compile?",
-    answer: "Absolutely. The code skeleton agent provides fully compilable C/C++ firmware based on your selected microcontroller and hardware peripherals."
-  }
-];
+
 
 const EXAMPLES: Array<{
   title: string;
@@ -217,7 +181,7 @@ const EXAMPLES: Array<{
 
 export default function Home() {
   const router = useRouter();
-  const [openFaq, setOpenFaq] = useState<number | null>(null);
+
   const { user, loading: authLoading, signOut } = useAuth();
   const [showForm, setShowForm] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -1474,7 +1438,7 @@ export default function Home() {
                               }}
                             >
                               <div className="text-[var(--accent)]">
-                                // Dynamic routing initialization
+                                {"// Dynamic routing initialization"}
                               </div>
                               <div>$ renderer.stage.zoom(1.2);</div>
                               <div>
