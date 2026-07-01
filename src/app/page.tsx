@@ -817,7 +817,7 @@ export default function Home() {
 
   return (
     <div
-      className="h-screen flex flex-col overflow-hidden"
+      className="min-h-screen lg:h-screen flex flex-col lg:overflow-hidden"
       style={{ background: "var(--bg)" }}
     >
       <nav
@@ -987,8 +987,8 @@ export default function Home() {
         </div>
       </nav>
 
-      <main className="flex-1 grid grid-cols-1 lg:grid-cols-2 border-b min-h-0 overflow-hidden" style={{ borderColor: "var(--border)" }}>
-        <div className="flex flex-col justify-center px-10 lg:px-16 py-8 lg:py-0 fade-up lg:h-full lg:overflow-y-auto">
+      <main className="flex-1 grid grid-cols-1 lg:grid-cols-2 border-b min-h-0 lg:overflow-hidden" style={{ borderColor: "var(--border)" }}>
+        <div className="flex flex-col justify-center px-6 py-12 sm:px-10 lg:px-16 lg:py-0 fade-up lg:h-full lg:overflow-y-auto">
           <h1
             className="glitch-text font-bold mb-3"
             data-text="Embeddy"
@@ -1079,9 +1079,9 @@ export default function Home() {
         </div>
 
         <div
-          className="hidden lg:flex items-center justify-center p-10 relative overflow-hidden lg:h-full"
+          className="flex items-center justify-center p-6 sm:p-10 relative overflow-hidden lg:h-full border-t lg:border-t-0 lg:border-l w-full lg:w-auto"
           style={{
-            borderLeft: "1px solid var(--border)",
+            borderColor: "var(--border)",
             background: "var(--surface)",
           }}
         >
