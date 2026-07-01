@@ -22,36 +22,27 @@ Describe your project, pick your board, and Embeddy's 9 parallel AI agents gener
 - **Tailwind CSS** — Styling
 - **TypeScript** — End to end type safety
 
-## Getting started
-
-```bash
-git clone https://github.com/yourusername/embeddy
-cd embeddy
-npm install
-```
-
-Create `.env` with your API keys:
-
-```env
-GEMINI_API_KEY=your_gemini_key
-
-NEXT_PUBLIC_FB_API_KEY=
-NEXT_PUBLIC_FB_AUTH_DOMAIN=
-NEXT_PUBLIC_FB_PROJECT_ID=
-NEXT_PUBLIC_FB_STORAGE_BUCKET=
-NEXT_PUBLIC_FB_SENDER_ID=
-NEXT_PUBLIC_FB_APP_ID=
-```
-
 ## Getting Started
 
-```bash
-# Install dependencies
-npm install
+1. Clone the repository and install dependencies:
+   ```bash
+   git clone https://github.com/yourusername/embeddy
+   cd embeddy
+   npm install
+   ```
 
-# Run development server
-npm run dev
+2. Set up your environment variables:
+   Copy [`.env.example`](file:///d:/React/embeddy/.env.example) to `.env` and fill in your API keys:
+   ```bash
+   cp .env.example .env
+   ```
 
-# Build for production
-npm run build
-```
+3. Run the development server:
+   ```bash
+   npm run dev
+   ```
+
+4. Build for production:
+   ```bash
+   npm run build
+   ```
