@@ -177,6 +177,22 @@ export default function CircuitRenderer({ schematic, error, onRetry }: Props) {
   const [, setRenderKey] = useState(0);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const Konva = useRef<any>(null);
+  const [isDragMode, setIsDragMode] = useState(true);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const isMobile = window.innerWidth <= 768;
+      if (isMobile) {
+        setIsDragMode(false);
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    if (stageRef.current) {
+      stageRef.current.draggable(isDragMode);
+    }
+  }, [isDragMode]);
 
   const initKonva = useCallback(async () => {
     if (typeof window === "undefined") return;
@@ -209,7 +225,7 @@ export default function CircuitRenderer({ schematic, error, onRetry }: Props) {
       stage.position({ x: pointer.x - mousePointTo.x * scale, y: pointer.y - mousePointTo.y * scale });
     });
 
-    stage.draggable(true);
+    stage.draggable(isDragMode);
 
     const layer = new K.default.Layer();
 
@@ -459,7 +475,7 @@ export default function CircuitRenderer({ schematic, error, onRetry }: Props) {
     stage.add(layer);
     layer.batchDraw();
     setRenderKey((k) => k + 1);
-  }, [schematic, selectedId]);
+  }, [schematic, selectedId, isDragMode]);
 
   useEffect(() => {
     initKonva();
@@ -573,9 +589,27 @@ export default function CircuitRenderer({ schematic, error, onRetry }: Props) {
 
       <div
         ref={canvasRef}
-        className="flex-1"
-        style={{ background: "var(--bg)", cursor: "grab", minHeight: "300px" }}
-      />
+        className="flex-1 relative"
+        style={{ background: "var(--bg)", cursor: isDragMode ? "grab" : "default", minHeight: "300px" }}
+      >
+        <div className="absolute top-3 right-3 z-10">
+          <button
+            onClick={() => {
+              const next = !isDragMode;
+              setIsDragMode(next);
+              if (stageRef.current) stageRef.current.draggable(next);
+            }}
+            className="px-2.5 py-1.5 rounded text-[10px] font-mono font-bold tracking-wider transition-all shadow-md"
+            style={{
+              background: isDragMode ? "var(--accent)" : "rgba(0, 0, 0, 0.6)",
+              color: isDragMode ? "#000" : "var(--text-primary)",
+              border: isDragMode ? "1px solid var(--accent)" : "1px solid var(--border)",
+            }}
+          >
+            {isDragMode ? "DRAG CANVAS: ON" : "DRAG CANVAS: OFF"}
+          </button>
+        </div>
+      </div>
     </div>
   );
 }

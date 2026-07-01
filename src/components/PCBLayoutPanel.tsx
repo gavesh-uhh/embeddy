@@ -259,8 +259,10 @@ export default function PCBLayoutPanel({
       </div>
 
       
-      <div className="relative overflow-auto" style={{ maxHeight: "600px" }}>
-        <PCBRenderer pcb={pcbLayout} activeLayer={activeLayer} />
+      <div className="relative overflow-x-auto overflow-y-hidden lg:overflow-auto max-w-full w-full flex lg:justify-center p-4">
+        <div className="flex-shrink-0">
+          <PCBRenderer pcb={pcbLayout} activeLayer={activeLayer} />
+        </div>
       </div>
 
       

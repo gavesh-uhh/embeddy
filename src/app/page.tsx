@@ -1219,14 +1219,14 @@ export default function Home() {
 
       {showFeaturesModal && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          className="fixed inset-0 z-50 flex items-center justify-center p-0 sm:p-4"
           style={{
             background: "rgba(0, 0, 0, 0.75)",
             backdropFilter: "blur(12px)",
           }}
         >
           <div
-            className="rounded-xl border flex flex-col max-w-4xl w-full max-h-[85vh] overflow-hidden transition-all duration-300 relative animate-fade-in"
+            className="flex flex-col w-full h-full sm:h-auto sm:max-h-[85vh] sm:max-w-4xl sm:rounded-xl border-0 sm:border overflow-hidden transition-all duration-300 relative animate-fade-in"
             style={{
               background: "var(--surface)",
               borderColor: "var(--border)",
@@ -1234,7 +1234,7 @@ export default function Home() {
             }}
           >
             <div
-              className="flex-shrink-0 px-6 py-4 border-b flex items-center justify-between"
+              className="flex-shrink-0 px-4 py-3 sm:px-6 sm:py-4 border-b flex items-center justify-between"
               style={{ borderColor: "var(--border)" }}
             >
               <div className="flex items-center gap-2">
@@ -1262,7 +1262,7 @@ export default function Home() {
             </div>
 
             <div
-              className="flex-shrink-0 px-6 py-3.5 border-b flex flex-col md:flex-row md:items-center justify-between gap-3"
+              className="flex-shrink-0 px-4 py-3 sm:px-6 sm:py-3.5 border-b flex flex-col md:flex-row md:items-center justify-between gap-3"
               style={{
                 borderColor: "var(--border)",
                 background: "var(--surface-raised)",
@@ -1316,8 +1316,9 @@ export default function Home() {
               />
             </div>
 
-            <div className="flex-1 overflow-y-auto p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-              {(() => {
+            <div className="flex-1 overflow-y-auto p-4 sm:p-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {(() => {
                 const filtered = FEATURE_DETAILS.filter((f) => {
                   const matchesTab =
                     selectedFeatureTab === "all" ||
@@ -1579,10 +1580,11 @@ export default function Home() {
                   );
                 });
               })()}
+              </div>
             </div>
 
             <div
-              className="flex-shrink-0 px-6 py-4 border-t flex items-center justify-end"
+              className="flex-shrink-0 px-4 py-3 sm:px-6 sm:py-4 border-t flex items-center justify-end"
               style={{
                 borderColor: "var(--border)",
                 background: "var(--surface-raised)",
