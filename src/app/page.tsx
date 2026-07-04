@@ -355,20 +355,10 @@ export default function Home() {
                 className="font-bold text-sm tracking-tight"
                 style={{ color: "var(--text-primary)" }}
               >
-                New Design Pipeline
+                New Design Pipeline Process
               </span>
             </div>
           </div>
-          <span
-            className="text-xs px-2.5 py-0.5 rounded font-bold tracking-wider"
-            style={{
-              background: "#00ff6610",
-              color: "var(--accent)",
-              border: "1px solid #00ff6620",
-            }}
-          >
-            AI DESIGN ENGINE ACTIVE
-          </span>
         </nav>
 
         <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 min-h-0 lg:overflow-hidden">

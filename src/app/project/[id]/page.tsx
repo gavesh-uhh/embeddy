@@ -61,7 +61,6 @@ export default function ProjectPage() {
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [isNLEGenerating, setIsNLEGenerating] = useState(false);
 
-  
   const initials = user?.displayName
     ? user.displayName
         .split(" ")
@@ -93,9 +92,7 @@ export default function ProjectPage() {
     } catch {}
   };
 
-  const hasFatal = project?.fatalIssues?.issues?.some(
-    (i) => i.severity === "fatal",
-  );
+  const hasFatal = project?.fatalIssues?.issues?.some((i) => i.severity === "fatal");
 
   const handlePCBGenerate = async () => {
     if (!project) return;
@@ -129,7 +126,6 @@ export default function ProjectPage() {
       await saveProject(updated);
       setProject(updated);
     } catch {
-      
     } finally {
       setRetrying((prev) => ({ ...prev, pcbLayout: false }));
     }
@@ -202,15 +198,11 @@ export default function ProjectPage() {
         >
           <AlertTriangle size={22} style={{ color: "var(--accent)" }} />
         </div>
-        <h1
-          className="text-lg font-semibold"
-          style={{ color: "var(--text-primary)" }}
-        >
+        <h1 className="text-lg font-semibold" style={{ color: "var(--text-primary)" }}>
           Project not found
         </h1>
         <p className="text-sm" style={{ color: "var(--text-muted)" }}>
-          This project ID doesn&apos;t exist or hasn&apos;t synced to this
-          device yet.
+          This project ID doesn&apos;t exist or hasn&apos;t synced to this device yet.
         </p>
         <button
           onClick={() => router.push("/")}
@@ -230,10 +222,7 @@ export default function ProjectPage() {
         className="min-h-screen flex items-center justify-center"
         style={{ background: "var(--bg)" }}
       >
-        <div
-          className="flex items-center gap-2 text-sm"
-          style={{ color: "var(--text-muted)" }}
-        >
+        <div className="flex items-center gap-2 text-sm" style={{ color: "var(--text-muted)" }}>
           <RotateCcw size={14} className="animate-spin" />
           Loading…
         </div>
@@ -244,10 +233,7 @@ export default function ProjectPage() {
   const errors = project.errors || {};
 
   return (
-    <div
-      className="flex flex-col h-screen overflow-hidden"
-      style={{ background: "var(--bg)" }}
-    >
+    <div className="flex flex-col h-screen overflow-hidden" style={{ background: "var(--bg)" }}>
       <header
         className="flex-shrink-0 border-b px-5 py-3 flex items-center gap-3"
         style={{ background: "var(--surface)", borderColor: "var(--border)" }}
@@ -264,7 +250,9 @@ export default function ProjectPage() {
           </span>
         </button>
 
-        <span className="hidden sm:inline" style={{ color: "var(--text-dim)" }}>/</span>
+        <span className="hidden sm:inline" style={{ color: "var(--text-dim)" }}>
+          /
+        </span>
 
         <h1
           className="font-semibold text-xs sm:text-sm truncate max-w-[120px] sm:max-w-[280px]"
@@ -273,11 +261,12 @@ export default function ProjectPage() {
           {project.title}
         </h1>
 
-        <BoardBadge board={project.board} />
-
         {hasFatal && (
           <span className="relative flex h-2 w-2">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" style={{ background: "var(--accent-red)" }} />
+            <span
+              className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75"
+              style={{ background: "var(--accent-red)" }}
+            />
             <span
               className="relative inline-flex rounded-full h-2 w-2"
               style={{ background: "var(--accent-red)" }}
@@ -285,13 +274,14 @@ export default function ProjectPage() {
           </span>
         )}
 
-        
-        <span
-          className="hidden sm:flex items-center gap-1 text-[10px]"
-          style={{ color: "var(--accent)" }}
-        >
-          <Cloud size={11} />
-          Cloud
+        <BoardBadge board={project.board} />
+
+        <span className="hidden md:inline ml-auto text-xs" style={{ color: "var(--text-muted)" }}>
+          {new Date(project.createdAt).toLocaleDateString("en-US", {
+            year: "numeric",
+            month: "short",
+            day: "numeric",
+          })}
         </span>
 
         <button
@@ -304,26 +294,9 @@ export default function ProjectPage() {
           }}
           title="Copy shareable link"
         >
-          {shareCopied ? (
-            <Check size={11} strokeWidth={3} />
-          ) : (
-            <Share2 size={11} />
-          )}
-          <span className="hidden sm:inline">
-            {shareCopied ? "Copied!" : "Share"}
-          </span>
+          {shareCopied ? <Check size={11} strokeWidth={3} /> : <Share2 size={11} />}
+          <span className="hidden sm:inline">{shareCopied ? "Link Copied!" : "Share"}</span>
         </button>
-
-        <span
-          className="hidden md:inline ml-auto text-xs"
-          style={{ color: "var(--text-muted)" }}
-        >
-          {new Date(project.createdAt).toLocaleDateString("en-US", {
-            year: "numeric",
-            month: "short",
-            day: "numeric",
-          })}
-        </span>
 
         <div className="relative ml-2">
           <button
@@ -341,10 +314,7 @@ export default function ProjectPage() {
 
           {userMenuOpen && (
             <>
-              <div
-                className="fixed inset-0 z-40"
-                onClick={() => setUserMenuOpen(false)}
-              />
+              <div className="fixed inset-0 z-40" onClick={() => setUserMenuOpen(false)} />
               <div
                 className="absolute right-0 top-9 z-50 rounded-xl border p-2 min-w-48"
                 style={{
@@ -353,10 +323,7 @@ export default function ProjectPage() {
                   boxShadow: "0 8px 32px rgba(0,0,0,0.6)",
                 }}
               >
-                <div
-                  className="px-3 py-2 mb-1 border-b"
-                  style={{ borderColor: "var(--border)" }}
-                >
+                <div className="px-3 py-2 mb-1 border-b" style={{ borderColor: "var(--border)" }}>
                   {user?.displayName && (
                     <p
                       className="text-xs font-semibold truncate"
@@ -365,10 +332,7 @@ export default function ProjectPage() {
                       {user.displayName}
                     </p>
                   )}
-                  <p
-                    className="text-[10px] truncate"
-                    style={{ color: "var(--text-muted)" }}
-                  >
+                  <p className="text-[10px] truncate" style={{ color: "var(--text-muted)" }}>
                     {user?.email}
                   </p>
                 </div>
@@ -379,12 +343,8 @@ export default function ProjectPage() {
                   }}
                   className="flex items-center gap-2 w-full px-3 py-2 rounded-lg text-xs font-medium transition-colors"
                   style={{ color: "var(--text-muted)" }}
-                  onMouseEnter={(e) =>
-                    (e.currentTarget.style.color = "var(--text-primary)")
-                  }
-                  onMouseLeave={(e) =>
-                    (e.currentTarget.style.color = "var(--text-muted)")
-                  }
+                  onMouseEnter={(e) => (e.currentTarget.style.color = "var(--text-primary)")}
+                  onMouseLeave={(e) => (e.currentTarget.style.color = "var(--text-muted)")}
                 >
                   My Projects
                 </button>
@@ -395,12 +355,8 @@ export default function ProjectPage() {
                   }}
                   className="flex items-center gap-2 w-full px-3 py-2 rounded-lg text-xs font-medium transition-colors"
                   style={{ color: "var(--text-muted)" }}
-                  onMouseEnter={(e) =>
-                    (e.currentTarget.style.color = "var(--accent-red)")
-                  }
-                  onMouseLeave={(e) =>
-                    (e.currentTarget.style.color = "var(--text-muted)")
-                  }
+                  onMouseEnter={(e) => (e.currentTarget.style.color = "var(--accent-red)")}
+                  onMouseLeave={(e) => (e.currentTarget.style.color = "var(--text-muted)")}
                 >
                   <LogOut size={12} />
                   Sign Out
@@ -427,19 +383,17 @@ export default function ProjectPage() {
               <button
                 key={key}
                 onClick={() => setActiveTab(key)}
-                className="flex items-center gap-2 px-2.5 py-1.5 lg:py-2.5 rounded-lg text-xs lg:text-sm font-medium transition-all lg:w-full text-left whitespace-nowrap flex-shrink-0"
+                className="flex items-center gap-3 px-2.5 py-1.5 lg:py-2.5 rounded-lg text-xs lg:text-sm font-medium transition-all lg:w-full text-left whitespace-nowrap flex-shrink-0"
                 style={{
                   background: isActive ? "#00ff6610" : "transparent",
                   color: isActive ? "var(--accent)" : "var(--text-muted)",
                   border: `1px solid ${isActive ? "#00ff6630" : "transparent"}`,
                 }}
                 onMouseEnter={(e) => {
-                  if (!isActive)
-                    e.currentTarget.style.color = "var(--text-primary)";
+                  if (!isActive) e.currentTarget.style.color = "var(--text-primary)";
                 }}
                 onMouseLeave={(e) => {
-                  if (!isActive)
-                    e.currentTarget.style.color = "var(--text-muted)";
+                  if (!isActive) e.currentTarget.style.color = "var(--text-muted)";
                 }}
               >
                 <Icon size={14} strokeWidth={isActive ? 2.5 : 1.75} />
@@ -449,25 +403,17 @@ export default function ProjectPage() {
           })}
         </aside>
 
-        <main
-          className="flex-1 overflow-y-auto p-5"
-          style={{ background: "var(--bg)" }}
-        >
+        <main className="flex-1 overflow-y-auto p-5" style={{ background: "var(--bg)" }}>
           <div className="max-w-6xl mx-auto flex flex-col gap-5">
             {activeTab === "overview" &&
               (() => {
                 const fatalCount =
-                  project.fatalIssues?.issues?.filter(
-                    (i) => i.severity === "fatal",
-                  ).length || 0;
+                  project.fatalIssues?.issues?.filter((i) => i.severity === "fatal").length || 0;
                 const warningCount =
-                  (project.fatalIssues?.issues?.filter(
-                    (i) => i.severity === "warning",
-                  ).length || 0) + (project.overview?.warnings?.length || 0);
+                  (project.fatalIssues?.issues?.filter((i) => i.severity === "warning").length ||
+                    0) + (project.overview?.warnings?.length || 0);
                 const conflictCount =
-                  project.compatibility?.checks?.filter(
-                    (c) => c.voltageConflict,
-                  ).length || 0;
+                  project.compatibility?.checks?.filter((c) => c.voltageConflict).length || 0;
                 const healthScore = Math.max(
                   0,
                   100 - fatalCount * 30 - warningCount * 8 - conflictCount * 12,
@@ -480,11 +426,7 @@ export default function ProjectPage() {
                   healthLabel = "CRITICAL";
                   healthColor = "var(--accent-red)";
                   healthBorder = "#ff3b3b30";
-                } else if (
-                  healthScore < 85 ||
-                  warningCount > 0 ||
-                  conflictCount > 0
-                ) {
+                } else if (healthScore < 85 || warningCount > 0 || conflictCount > 0) {
                   healthLabel = "WARNING";
                   healthColor = "var(--accent-yellow)";
                   healthBorder = "#f5c51830";
@@ -537,10 +479,7 @@ export default function ProjectPage() {
                               {healthLabel}
                             </span>
                           </div>
-                          <p
-                            className="text-[11px] mt-1"
-                            style={{ color: "var(--text-muted)" }}
-                          >
+                          <p className="text-[11px] mt-1" style={{ color: "var(--text-muted)" }}>
                             {fatalCount > 0
                               ? `${fatalCount} critical fatal issue(s)`
                               : `${warningCount + conflictCount} warnings / checks`}
@@ -558,9 +497,7 @@ export default function ProjectPage() {
                         <div
                           className="absolute top-0 right-0 w-24 h-24 rounded-full filter blur-xl opacity-20 pointer-events-none"
                           style={{
-                            background: overBudget
-                              ? "var(--accent-red)"
-                              : "var(--accent)",
+                            background: overBudget ? "var(--accent-red)" : "var(--accent)",
                           }}
                         />
                         <div className="flex items-center justify-between mb-3">
@@ -576,9 +513,7 @@ export default function ProjectPage() {
                           <Zap
                             size={14}
                             style={{
-                              color: overBudget
-                                ? "var(--accent-red)"
-                                : "var(--accent)",
+                              color: overBudget ? "var(--accent-red)" : "var(--accent)",
                             }}
                           />
                         </div>
@@ -591,12 +526,8 @@ export default function ProjectPage() {
                             <span
                               className="text-[10px] font-bold px-1.5 py-0.5 rounded ml-1"
                               style={{
-                                background: overBudget
-                                  ? "var(--accent-red)15"
-                                  : "var(--accent)15",
-                                color: overBudget
-                                  ? "var(--accent-red)"
-                                  : "var(--accent)",
+                                background: overBudget ? "var(--accent-red)15" : "var(--accent)15",
+                                color: overBudget ? "var(--accent-red)" : "var(--accent)",
                                 border: `1px solid ${overBudget ? "var(--accent-red)30" : "#00ff6630"}`,
                               }}
                             >
@@ -611,16 +542,11 @@ export default function ProjectPage() {
                               className="h-full rounded-full transition-all duration-500"
                               style={{
                                 width: `${loadPercent}%`,
-                                background: overBudget
-                                  ? "var(--accent-red)"
-                                  : "var(--accent)",
+                                background: overBudget ? "var(--accent-red)" : "var(--accent)",
                               }}
                             />
                           </div>
-                          <p
-                            className="text-[11px] mt-1.5"
-                            style={{ color: "var(--text-muted)" }}
-                          >
+                          <p className="text-[11px] mt-1.5" style={{ color: "var(--text-muted)" }}>
                             {overBudget
                               ? "USB budget exceeded!"
                               : `${Math.round(loadPercent)}% of USB max (500mA)`}
@@ -649,10 +575,7 @@ export default function ProjectPage() {
                           >
                             BOM Estimate
                           </span>
-                          <ShoppingCart
-                            size={14}
-                            style={{ color: "var(--accent)" }}
-                          />
+                          <ShoppingCart size={14} style={{ color: "var(--accent)" }} />
                         </div>
                         <div>
                           <div
@@ -660,20 +583,13 @@ export default function ProjectPage() {
                             style={{ color: "var(--text-primary)" }}
                           >
                             Rs.{" "}
-                            {project.bom?.totalEstimatedLKR?.toLocaleString(
-                              "en-US",
-                              {
-                                minimumFractionDigits: 2,
-                                maximumFractionDigits: 2,
-                              },
-                            ) || "0.00"}
+                            {project.bom?.totalEstimatedLKR?.toLocaleString("en-US", {
+                              minimumFractionDigits: 2,
+                              maximumFractionDigits: 2,
+                            }) || "0.00"}
                           </div>
-                          <p
-                            className="text-[11px] mt-2"
-                            style={{ color: "var(--text-muted)" }}
-                          >
-                            For {project.bom?.items?.length || 0} component
-                            lines
+                          <p className="text-[11px] mt-2" style={{ color: "var(--text-muted)" }}>
+                            For {project.bom?.items?.length || 0} component lines
                           </p>
                         </div>
                       </div>
@@ -699,10 +615,7 @@ export default function ProjectPage() {
                           >
                             System Modules
                           </span>
-                          <Boxes
-                            size={14}
-                            style={{ color: "var(--accent-blue)" }}
-                          />
+                          <Boxes size={14} style={{ color: "var(--accent-blue)" }} />
                         </div>
                         <div>
                           <div
@@ -711,29 +624,18 @@ export default function ProjectPage() {
                           >
                             {project.overview?.components?.length || 0}
                           </div>
-                          <p
-                            className="text-[11px] mt-2"
-                            style={{ color: "var(--text-muted)" }}
-                          >
-                            {project.compatibility?.checks?.length || 0} check
-                            points verified
+                          <p className="text-[11px] mt-2" style={{ color: "var(--text-muted)" }}>
+                            {project.compatibility?.checks?.length || 0} check points verified
                           </p>
                         </div>
                       </div>
                     </div>
 
                     <div className="flex flex-col gap-4">
-                      <ProjectOverviewCard
-                        overview={project.overview}
-                        error={errors.overview}
-                      />
+                      <ProjectOverviewCard overview={project.overview} error={errors.overview} />
                       <PowerBudgetPanel
                         powerBudget={project.powerBudget}
-                        error={
-                          retrying.powerBudget
-                            ? "Retrying…"
-                            : errors.powerBudget
-                        }
+                        error={retrying.powerBudget ? "Retrying…" : errors.powerBudget}
                         onRetry={
                           errors.powerBudget
                             ? () => handleRetry("powerBudget", "powerBudget")
@@ -742,11 +644,7 @@ export default function ProjectPage() {
                       />
                       <FatalIssuesPanel
                         fatalIssues={project.fatalIssues}
-                        error={
-                          retrying.fatalIssues
-                            ? "Retrying…"
-                            : errors.fatalIssues
-                        }
+                        error={retrying.fatalIssues ? "Retrying…" : errors.fatalIssues}
                         onRetry={
                           errors.fatalIssues
                             ? () => handleRetry("fatalIssues", "fatalIssues")
@@ -755,15 +653,10 @@ export default function ProjectPage() {
                       />
                       <CompatibilityPanel
                         compatibility={project.compatibility}
-                        error={
-                          retrying.compatibility
-                            ? "Retrying…"
-                            : errors.compatibility
-                        }
+                        error={retrying.compatibility ? "Retrying…" : errors.compatibility}
                         onRetry={
                           errors.compatibility
-                            ? () =>
-                                handleRetry("compatibility", "compatibility")
+                            ? () => handleRetry("compatibility", "compatibility")
                             : undefined
                         }
                       />
@@ -786,27 +679,18 @@ export default function ProjectPage() {
                     schematic={project.schematic}
                     error={retrying.schematic ? "Retrying…" : errors.schematic}
                     onRetry={
-                      errors.schematic
-                        ? () => handleRetry("schematic", "schematic")
-                        : undefined
+                      errors.schematic ? () => handleRetry("schematic", "schematic") : undefined
                     }
                   />
                 </div>
-                <PinDiagramPanel
-                  pinDiagram={project.pinDiagram}
-                  error={errors.pinDiagram}
-                />
+                <PinDiagramPanel pinDiagram={project.pinDiagram} error={errors.pinDiagram} />
                 <PCBLayoutPanel
                   pcbLayout={project.pcbLayout}
                   error={retrying.pcbLayout ? "Generating…" : errors.pcbLayout}
                   onRetry={
-                    errors.pcbLayout
-                      ? () => handleRetry("pcbLayout", "pcbLayout")
-                      : undefined
+                    errors.pcbLayout ? () => handleRetry("pcbLayout", "pcbLayout") : undefined
                   }
-                  onGenerate={
-                    !project.pcbLayout ? () => handlePCBGenerate() : undefined
-                  }
+                  onGenerate={!project.pcbLayout ? () => handlePCBGenerate() : undefined}
                 />
               </div>
             )}
@@ -816,23 +700,16 @@ export default function ProjectPage() {
                 <BOMPanel
                   bom={project.bom}
                   error={retrying.bom ? "Retrying…" : errors.bom}
-                  onRetry={
-                    errors.bom ? () => handleRetry("bom", "bom") : undefined
-                  }
+                  onRetry={errors.bom ? () => handleRetry("bom", "bom") : undefined}
                 />
               </div>
             )}
 
             {activeTab === "software" && (
-              <div
-                className="flex flex-col gap-4 fade-up"
-                style={{ minHeight: "600px" }}
-              >
+              <div className="flex flex-col gap-4 fade-up" style={{ minHeight: "600px" }}>
                 <CodeSkeletonPanel
                   codeSkeleton={project.codeSkeleton}
-                  error={
-                    retrying.codeSkeleton ? "Retrying…" : errors.codeSkeleton
-                  }
+                  error={retrying.codeSkeleton ? "Retrying…" : errors.codeSkeleton}
                   onRetry={
                     errors.codeSkeleton
                       ? () => handleRetry("codeSkeleton", "codeSkeleton")
@@ -844,7 +721,6 @@ export default function ProjectPage() {
           </div>
         </main>
 
-        
         <NaturalLanguageEditor
           project={project}
           onProjectUpdate={(updated) => setProject(updated)}

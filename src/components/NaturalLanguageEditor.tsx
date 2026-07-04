@@ -2,16 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { ProjectData, ProjectContext } from "@/lib/types";
-import {
-  Send,
-  X,
-  AlertTriangle,
-  Check,
-  RotateCcw,
-  Undo2,
-  Redo2,
-  Code2,
-} from "lucide-react";
+import { Send, X, AlertTriangle, Check, RotateCcw, Undo2, Redo2, Code2 } from "lucide-react";
 
 interface Message {
   id: string;
@@ -38,18 +29,16 @@ interface ProjectSnapshot {
 }
 
 const SUGGESTED_COMMANDS = [
-  "Add a temperature sensor",
   "Change to ESP32-S3",
   "Add a display",
   "Optimize for low power",
-  "Remove the LED",
+  "Remove the LEDs",
   "Add WiFi connectivity",
   "Explain the pin choices",
   "Suggest improvements",
   "Switch to Arduino code",
   "Use MicroPython",
   "Regenerate code skeleton",
-  "Add serial debug output",
 ];
 
 export default function NaturalLanguageEditor({
@@ -66,7 +55,6 @@ export default function NaturalLanguageEditor({
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  
   const [undoStack, setUndoStack] = useState<ProjectSnapshot[]>([]);
   const [redoStack, setRedoStack] = useState<ProjectSnapshot[]>([]);
 
@@ -126,7 +114,6 @@ export default function NaturalLanguageEditor({
       const result = await response.json();
 
       if (!response.ok) {
-        
         if (response.status === 429) {
           throw new Error(
             result.message ||
@@ -150,7 +137,6 @@ export default function NaturalLanguageEditor({
       setMessages((prev) => [...prev, assistantMessage]);
       setCommandHistory((prev) => [...prev, command]);
 
-      
       if (result.questions?.length === 0 && result.operations?.length > 0) {
         await applyOperations(result.operations, result.regenerated, command);
       }
@@ -175,20 +161,15 @@ export default function NaturalLanguageEditor({
     setIsGenerating(true);
 
     try {
-      
       saveSnapshot(command || "Unknown command");
 
-      
       let updatedProject = { ...project };
       const updatedContext = buildProjectContext();
 
-      
       if (!updatedContext.components) {
         updatedContext.components = [];
       }
 
-      
-      
       let forceCodeRegen = false;
       let newCodeLanguage: "C++" | "MicroPython" | undefined;
       let newCodeFramework: "Arduino" | "ESP-IDF" | "STM32 HAL" | undefined;
@@ -209,10 +190,7 @@ export default function NaturalLanguageEditor({
         };
         switch (operation.type) {
           case "add_component":
-            if (
-              operation.component &&
-              !updatedContext.components.includes(operation.component)
-            ) {
+            if (operation.component && !updatedContext.components.includes(operation.component)) {
               updatedContext.components.push(operation.component);
             }
             break;
@@ -229,7 +207,6 @@ export default function NaturalLanguageEditor({
             }
             break;
           case "modify_pin":
-            
             if (
               operation.component &&
               operation.oldPin &&
@@ -239,8 +216,7 @@ export default function NaturalLanguageEditor({
               const pinIndex = updatedContext.pins.findIndex(
                 (p) =>
                   p.component === operation.component &&
-                  (p.pin === operation.oldPin ||
-                    p.boardPin === operation.oldPin),
+                  (p.pin === operation.oldPin || p.boardPin === operation.oldPin),
               );
               if (pinIndex >= 0) {
                 updatedContext.pins[pinIndex] = {
@@ -251,24 +227,20 @@ export default function NaturalLanguageEditor({
             }
             break;
           case "update_component":
-            
             if (operation.component && operation.newSpecs) {
-              
               updatedContext.description = `${updatedContext.description}\n\n${operation.component} specifications updated: ${operation.newSpecs}`;
             }
             break;
           case "add_feature":
-            
             if (operation.feature) {
               updatedContext.description = `${updatedContext.description}\n\nAdditional feature requested: ${operation.feature}`;
             }
             break;
           case "change_code_language":
-            
             if (operation.language) {
               newCodeLanguage = operation.language;
               forceCodeRegen = true;
-              
+
               updatedContext.description = `${updatedContext.description}\n\nCode language preference: ${operation.language}${operation.framework ? ` with ${operation.framework} framework` : ""}`;
             }
             if (operation.framework) {
@@ -276,22 +248,18 @@ export default function NaturalLanguageEditor({
             }
             break;
           case "regenerate_code":
-            
             forceCodeRegen = true;
             break;
           case "explain_design":
           case "suggest_improvements":
           case "optimize_power":
           case "check_compatibility":
-            
             break;
           default:
-            
             console.warn("Unknown operation type:", operation.type);
         }
       }
 
-      
       const agentsToRun: {
         name: string;
         key: keyof ProjectData;
@@ -409,7 +377,6 @@ export default function NaturalLanguageEditor({
         });
       }
 
-      
       const results = await Promise.allSettled(agentsToRun.map((a) => a.fn()));
 
       results.forEach((result, index) => {
@@ -422,7 +389,6 @@ export default function NaturalLanguageEditor({
         }
       });
 
-      
       updatedProject = {
         ...updatedProject,
         board: updatedContext.board,
@@ -434,16 +400,12 @@ export default function NaturalLanguageEditor({
           : undefined,
       };
 
-      
       const { saveProject } = await import("@/lib/projectStore");
       await saveProject(updatedProject);
       onProjectUpdate(updatedProject);
 
-      
       setMessages((prev) =>
-        prev.map((m) =>
-          m.id === prev[prev.length - 1]?.id ? { ...m, applied: true } : m,
-        ),
+        prev.map((m) => (m.id === prev[prev.length - 1]?.id ? { ...m, applied: true } : m)),
       );
     } catch (error) {
       console.error("Error applying operations:", error);
@@ -464,16 +426,13 @@ export default function NaturalLanguageEditor({
       e.preventDefault();
       handleSend(input);
     }
-    
+
     if ((e.ctrlKey || e.metaKey) && e.key === "z" && !e.shiftKey) {
       e.preventDefault();
       handleUndo();
     }
-    
-    if (
-      (e.ctrlKey || e.metaKey) &&
-      (e.key === "y" || (e.key === "z" && e.shiftKey))
-    ) {
+
+    if ((e.ctrlKey || e.metaKey) && (e.key === "y" || (e.key === "z" && e.shiftKey))) {
       e.preventDefault();
       handleRedo();
     }
@@ -492,15 +451,14 @@ export default function NaturalLanguageEditor({
     setRedoStack([]);
   };
 
-  
   const saveSnapshot = (command: string) => {
     const snapshot: ProjectSnapshot = {
-      project: JSON.parse(JSON.stringify(project)), 
+      project: JSON.parse(JSON.stringify(project)),
       timestamp: new Date(),
       command,
     };
     setUndoStack((prev) => [...prev, snapshot]);
-    setRedoStack([]); 
+    setRedoStack([]);
   };
 
   const handleUndo = () => {
@@ -516,10 +474,8 @@ export default function NaturalLanguageEditor({
     setUndoStack((prev) => prev.slice(0, -1));
     setRedoStack((prev) => [currentSnapshot, ...prev]);
 
-    
     onProjectUpdate(previousSnapshot.project);
 
-    
     const undoMessage: Message = {
       id: Date.now().toString(),
       role: "system",
@@ -542,10 +498,8 @@ export default function NaturalLanguageEditor({
     setRedoStack((prev) => prev.slice(1));
     setUndoStack((prev) => [...prev, currentSnapshot]);
 
-    
     onProjectUpdate(nextSnapshot.project);
 
-    
     const redoMessage: Message = {
       id: Date.now().toString(),
       role: "system",
@@ -557,7 +511,6 @@ export default function NaturalLanguageEditor({
 
   return (
     <>
-      
       {!isOpen && (
         <button
           onClick={() => setIsOpen(true)}
@@ -573,7 +526,6 @@ export default function NaturalLanguageEditor({
         </button>
       )}
 
-      
       {isOpen && (
         <div
           className="fixed bottom-0 right-0 left-0 sm:bottom-6 sm:right-6 sm:left-auto z-50 w-full sm:w-96 rounded-t-2xl sm:rounded-2xl overflow-hidden shadow-2xl flex flex-col"
@@ -585,7 +537,6 @@ export default function NaturalLanguageEditor({
             height: "min(500px, 75vh)",
           }}
         >
-          
           <div
             className="flex items-center justify-between px-4 py-3 border-b"
             style={{
@@ -594,23 +545,11 @@ export default function NaturalLanguageEditor({
             }}
           >
             <div className="flex items-center gap-2">
-              <div
-                className="w-8 h-8 rounded-lg flex items-center justify-center"
-                style={{ background: "var(--accent)", color: "#000" }}
-              >
-                <Code2 size={16} strokeWidth={2.5} />
-              </div>
               <div>
-                <h3
-                  className="font-semibold text-sm"
-                  style={{ color: "var(--text-primary)" }}
-                >
+                <h3 className="font-semibold text-sm" style={{ color: "var(--text-primary)" }}>
                   Design Assistant
                 </h3>
-                <p
-                  className="text-[10px]"
-                  style={{ color: "var(--text-muted)" }}
-                >
+                <p className="text-[10px]" style={{ color: "var(--text-muted)" }}>
                   Edit your project with natural language
                 </p>
               </div>
@@ -652,21 +591,11 @@ export default function NaturalLanguageEditor({
             </div>
           </div>
 
-          
           <div className="flex-1 overflow-y-auto p-4 space-y-4">
             {messages.length === 0 && showSuggestions && (
               <div className="space-y-3">
-                <p
-                  className="text-xs text-center"
-                  style={{ color: "var(--text-muted)" }}
-                >
+                <p className="text-xs text-center" style={{ color: "var(--text-muted)" }}>
                   Try asking me to modify your design:
-                </p>
-                <p
-                  className="text-[10px] text-center opacity-60"
-                  style={{ color: "var(--text-muted)" }}
-                >
-                  Tip: Press Ctrl+Z to undo, Ctrl+Y to redo changes
                 </p>
                 <div className="flex flex-wrap gap-2">
                   {SUGGESTED_COMMANDS.map((cmd) => (
@@ -724,7 +653,6 @@ export default function NaturalLanguageEditor({
                 >
                   <p className="text-sm leading-relaxed">{message.content}</p>
 
-                  
                   {message.operations && message.operations.length > 0 && (
                     <div
                       className="mt-3 pt-3 border-t flex flex-wrap gap-1.5"
@@ -754,7 +682,6 @@ export default function NaturalLanguageEditor({
                     </div>
                   )}
 
-                  
                   {message.warnings && message.warnings.length > 0 && (
                     <div className="mt-3 space-y-1.5">
                       {message.warnings.map((warning, i) => (
@@ -767,17 +694,13 @@ export default function NaturalLanguageEditor({
                             border: "1px solid rgba(255, 59, 59, 0.3)",
                           }}
                         >
-                          <AlertTriangle
-                            size={12}
-                            className="mt-0.5 flex-shrink-0"
-                          />
+                          <AlertTriangle size={12} className="mt-0.5 flex-shrink-0" />
                           <span>{warning}</span>
                         </div>
                       ))}
                     </div>
                   )}
 
-                  
                   {message.questions && message.questions.length > 0 && (
                     <div className="mt-3 space-y-2">
                       {message.questions.map((question, i) => (
@@ -800,8 +723,7 @@ export default function NaturalLanguageEditor({
                   <span
                     className="text-[9px] mt-2 block opacity-50"
                     style={{
-                      color:
-                        message.role === "user" ? "#000" : "var(--text-muted)",
+                      color: message.role === "user" ? "#000" : "var(--text-muted)",
                     }}
                   >
                     {message.timestamp.toLocaleTimeString([], {
@@ -852,7 +774,6 @@ export default function NaturalLanguageEditor({
             <div ref={messagesEndRef} />
           </div>
 
-          
           <div
             className="p-4 border-t"
             style={{
@@ -881,24 +802,15 @@ export default function NaturalLanguageEditor({
                 disabled={!input.trim() || isGenerating}
                 className="p-2.5 rounded-xl transition-all"
                 style={{
-                  background:
-                    input.trim() && !isGenerating
-                      ? "var(--accent)"
-                      : "var(--surface)",
-                  color:
-                    input.trim() && !isGenerating
-                      ? "#000"
-                      : "var(--text-muted)",
+                  background: input.trim() && !isGenerating ? "var(--accent)" : "var(--surface)",
+                  color: input.trim() && !isGenerating ? "#000" : "var(--text-muted)",
                   opacity: input.trim() && !isGenerating ? 1 : 0.5,
                 }}
               >
                 <Send size={18} strokeWidth={2.5} />
               </button>
             </div>
-            <p
-              className="text-[10px] mt-2 text-center"
-              style={{ color: "var(--text-muted)" }}
-            >
+            <p className="text-[10px] mt-2 text-center" style={{ color: "var(--text-muted)" }}>
               AI may make mistakes. Review changes before building.
             </p>
           </div>
