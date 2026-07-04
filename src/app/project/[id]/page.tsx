@@ -30,9 +30,9 @@ import {
   Boxes,
   Share2,
   Check,
-  Cloud,
   LogOut,
 } from "lucide-react";
+import Image from "next/image";
 
 type DashboardSection = "overview" | "hardware" | "procurement" | "software";
 
@@ -243,7 +243,13 @@ export default function ProjectPage() {
           className="flex items-center gap-2 hover:opacity-80 transition-opacity flex-shrink-0"
         >
           <div className="w-7 h-7 rounded-lg border border-[#00ff6630] bg-[#050505] shadow-[0_0_12px_rgba(0,255,102,0.15)] flex items-center justify-center p-0.5">
-            <img src="/icon.png" alt="Embeddy" className="w-full h-full object-contain" />
+            <Image
+              src="/icon.png"
+              alt="Embeddy"
+              width={28}
+              height={28}
+              className="w-full h-full object-contain"
+            />
           </div>
           <span className="hidden sm:inline font-bold" style={{ color: "var(--text-primary)" }}>
             Embeddy

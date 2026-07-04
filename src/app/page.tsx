@@ -34,6 +34,7 @@ import {
   User,
   Layers,
 } from "lucide-react";
+import Image from "next/image";
 
 const BOARDS: BoardType[] = [
   "Arduino Uno",
@@ -349,7 +350,13 @@ export default function Home() {
             <span style={{ color: "var(--border)" }}>|</span>
             <div className="flex items-center gap-2">
               <div className="w-6 h-6 rounded-md border border-[#00ff6630] bg-[#050505] shadow-[0_0_10px_rgba(0,255,102,0.15)] flex items-center justify-center p-0.5">
-                <img src="/icon.png" alt="Embeddy" className="w-full h-full object-contain" />
+                <Image
+                  src="/icon.png"
+                  alt="Embeddy"
+                  width={24}
+                  height={24}
+                  className="w-full h-full object-contain"
+                />
               </div>
               <span
                 className="font-bold text-sm tracking-tight"
@@ -756,7 +763,13 @@ export default function Home() {
       >
         <div className="flex items-center gap-2.5">
           <div className="w-7 h-7 rounded-lg border border-[#00ff6630] bg-[#050505] shadow-[0_0_12px_rgba(0,255,102,0.15)] flex items-center justify-center p-0.5">
-            <img src="/icon.png" alt="Embeddy" className="w-full h-full object-contain" />
+            <Image
+              src="/icon.png"
+              alt="Embeddy"
+              width={28}
+              height={28}
+              className="w-full h-full object-contain"
+            />
           </div>
           <span
             className="font-bold text-sm tracking-tight"
@@ -1052,9 +1065,11 @@ export default function Home() {
               </div>
 
               <div className="relative aspect-[4/3] w-full overflow-hidden bg-black p-4 flex items-center justify-center">
-                <img
+                <Image
                   src="/circuit_schematic.png"
                   alt="Circuit Schematic preview"
+                  width={400}
+                  height={300}
                   className="w-full h-full object-cover rounded-lg border"
                   style={{ borderColor: "var(--border)" }}
                 />
