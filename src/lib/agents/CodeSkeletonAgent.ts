@@ -19,7 +19,6 @@ export async function CodeSkeletonAgent(
     .map((p) => `// ${p.component} ${p.pin} -> ${p.boardPin}`)
     .join("\n");
 
-  
   const detectFramework = (): "Arduino" | "ESP-IDF" | "STM32 HAL" => {
     if (preferredFramework) return preferredFramework;
     if (board.startsWith("Arduino")) return "Arduino";
@@ -29,46 +28,22 @@ export async function CodeSkeletonAgent(
 
   const detectLanguage = (): "C++" | "MicroPython" => {
     if (preferredLanguage) return preferredLanguage;
-    
+
     return "C++";
   };
 
   const language = detectLanguage();
   const framework = detectFramework();
 
-  const prompt = `You are an expert embedded systems programmer. Generate a complete code skeleton for this project.
+  import { BASE_PROMPT } from "./promptBase";
 
-Board: ${board}
-Framework: ${framework}
-Components: ${components.join(", ")}
+  const example = {
+    language: "C++",
+    framework: "Arduino",
+    code: "#include <Arduino.h>\n\n// Pin definitions\nconst int LED_PIN = 2;\n\nvoid setup() {\n  pinMode(LED_PIN, OUTPUT);\n}\n\nvoid loop() {\n  digitalWrite(LED_PIN, HIGH);\n  delay(500);\n  digitalWrite(LED_PIN, LOW);\n  delay(500);\n}\n",
+  };
 
-Pin definitions:
-${pinDefs}
-
-Generate a well-commented ${language} code skeleton using the ${framework} framework.
-Include:
-- Tend to cut down on unnecessary code comments
-- All necessary #include statements with library names
-- Pin constant definitions with actual pin numbers
-- Object/variable declarations for each component
-- setup() function with initialization code for each component
-- loop() function with basic read/process/output logic
-- Helper functions with TODO comments where user should implement logic
-- Error handling where appropriate
-- If possible, always keep the code simple and readable.
-- Before writing the code, always think about the overall architecture, complexity, and requirements.
-
-The code should compile without errors if the libraries are installed.
-Use realistic pin numbers from the pin assignments above.
-
-Return ONLY valid JSON (no markdown, no explanation) matching this exact schema:
-{
-  "language": "${language}",
-  "framework": "${framework}",
-  "code": "// complete code skeleton as a single string with \\n for newlines"
-}
-
-Return only JSON.`;
+  const prompt = `${BASE_PROMPT}\n\nBoard: ${board}\nFramework: ${framework}\nComponents: ${components.join(", ")}\n\nPin definitions:\n${pinDefs}\n\nGenerate a well‑commented ${language} code skeleton using the ${framework} framework. Include necessary includes, pin constants, setup(), loop(), and placeholder helper functions.\n\nExample output:\n${JSON.stringify(example)}`;
 
   return generateJSON<CodeSkeleton>(prompt);
 }
