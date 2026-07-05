@@ -1,9 +1,8 @@
 import { generateJSON } from "../gemini";
 import { BOM } from "../types";
+import { BASE_PROMPT } from "./promptBase";
 
 export async function BOMAgent(components: string[]): Promise<BOM> {
-  import { BASE_PROMPT } from "./promptBase";
-
   const example = {
     items: [
       {

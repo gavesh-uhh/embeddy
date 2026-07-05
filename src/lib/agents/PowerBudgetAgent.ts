@@ -1,9 +1,8 @@
 import { generateJSON } from "../gemini";
 import { PowerBudget } from "../types";
+import { BASE_PROMPT } from "./promptBase";
 
 export async function PowerBudgetAgent(components: string[], board: string): Promise<PowerBudget> {
-  import { BASE_PROMPT } from "./promptBase";
-
   const example = {
     totalCurrentMa: 150,
     components: [

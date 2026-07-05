@@ -1,5 +1,6 @@
 import { generateJSON } from "../gemini";
 import { CircuitSchematic } from "../types";
+import { BASE_PROMPT } from "./promptBase";
 
 export async function CircuitSchematicAgent(
   components: string[],
@@ -10,8 +11,6 @@ export async function CircuitSchematicAgent(
     .slice(0, 40)
     .map((p) => `${p.component}.${p.pin} -> ${p.boardPin} (${p.signalType})`)
     .join("\n");
-
-  import { BASE_PROMPT } from "./promptBase";
 
   const example = {
     components: [{ id: "arduino_uno", type: "mcu", variant: "Arduino Uno", x: 100, y: 300 }],

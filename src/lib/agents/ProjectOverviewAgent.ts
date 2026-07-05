@@ -1,5 +1,6 @@
 import { generateJSON } from "../gemini";
 import { ProjectOverview } from "../types";
+import { BASE_PROMPT } from "./promptBase";
 
 export async function ProjectOverviewAgent(
   description: string,
@@ -10,8 +11,6 @@ export async function ProjectOverviewAgent(
     fileContents.length > 0
       ? `\n\nSupporting documents:\n${fileContents.map((c, i) => `--- Document ${i + 1} ---\n${c.slice(0, 3000)}`).join("\n\n")}`
       : "";
-
-  import { BASE_PROMPT } from "./promptBase";
 
   const example = {
     summary: "A simple temperature sensor that logs to Serial",

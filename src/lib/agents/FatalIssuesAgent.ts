@@ -1,5 +1,6 @@
 import { generateJSON } from "../gemini";
 import { FatalIssues } from "../types";
+import { BASE_PROMPT } from "./promptBase";
 
 export async function FatalIssuesAgent(
   board: string,
@@ -7,8 +8,6 @@ export async function FatalIssuesAgent(
   description: string,
   warnings: string[],
 ): Promise<FatalIssues> {
-  import { BASE_PROMPT } from "./promptBase";
-
   const example = {
     issues: [
       {

@@ -1,12 +1,11 @@
 import { generateJSON } from "../gemini";
 import { CompatibilityChecks } from "../types";
+import { BASE_PROMPT } from "./promptBase";
 
 export async function CompatibilityCheckAgent(
   board: string,
   components: string[],
 ): Promise<CompatibilityChecks> {
-  import { BASE_PROMPT } from "./promptBase";
-
   const example = {
     checks: [
       {

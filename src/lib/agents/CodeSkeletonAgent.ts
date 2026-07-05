@@ -1,5 +1,6 @@
 import { generateJSON } from "../gemini";
 import { CodeSkeleton } from "../types";
+import { BASE_PROMPT } from "./promptBase";
 
 export async function CodeSkeletonAgent(
   board: string,
@@ -34,8 +35,6 @@ export async function CodeSkeletonAgent(
 
   const language = detectLanguage();
   const framework = detectFramework();
-
-  import { BASE_PROMPT } from "./promptBase";
 
   const example = {
     language: "C++",

@@ -1,9 +1,8 @@
 import { generateJSON } from "../gemini";
 import { PinDiagram } from "../types";
+import { BASE_PROMPT } from "./promptBase";
 
 export async function PinDiagramAgent(components: string[], board: string): Promise<PinDiagram> {
-  import { BASE_PROMPT } from "./promptBase";
-
   const example = {
     pins: [
       {
