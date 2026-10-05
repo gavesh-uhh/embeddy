@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { loadProject } from "@/lib/projectStore";
+import { loadProjectResult, saveProject } from "@/lib/projectStore";
+import { authedPostJSON, NotSignedInError } from "@/lib/apiClient";
 import { ProjectData } from "@/lib/types";
 import { useAuth } from "@/context/AuthContext";
 import BoardBadge from "@/components/BoardBadge";
@@ -14,9 +15,7 @@ import BOMPanel from "@/components/BOMPanel";
 import CodeSkeletonPanel from "@/components/CodeSkeletonPanel";
 import PinDiagramPanel from "@/components/PinDiagramPanel";
 import CircuitRenderer from "@/components/CircuitRenderer";
-import PCBLayoutPanel from "@/components/PCBLayoutPanel";
 import NaturalLanguageEditor from "@/components/NaturalLanguageEditor";
-import { saveProject } from "@/lib/projectStore";
 import {
   LayoutDashboard,
   CircuitBoard,
@@ -50,11 +49,13 @@ const NAV_ITEMS: {
 export default function ProjectPage() {
   const params = useParams();
   const router = useRouter();
-  const { user, signOut } = useAuth();
+  const { user, loading, signOut } = useAuth();
   const id = params.id as string;
 
   const [project, setProject] = useState<ProjectData | null>(null);
+  const projectRef = useRef<ProjectData | null>(null);
   const [notFound, setNotFound] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<DashboardSection>("overview");
   const [retrying, setRetrying] = useState<Record<string, boolean>>({});
   const [shareCopied, setShareCopied] = useState(false);
@@ -71,18 +72,39 @@ export default function ProjectPage() {
     : (user?.email?.[0]?.toUpperCase() ?? "U");
 
   useEffect(() => {
+    if (loading) return;
     let cancelled = false;
     async function fetchProject() {
-      const data = await loadProject(id);
+      const result = await loadProjectResult(id);
       if (cancelled) return;
-      if (!data) setNotFound(true);
-      else setProject(data);
+      if (result.status === "ok" && result.data) {
+        projectRef.current = result.data;
+        setProject(result.data);
+        setNotFound(false);
+        setLoadError(null);
+      } else if (result.status === "not_found") {
+        setNotFound(true);
+      } else {
+        setNotFound(true);
+        setLoadError(result.error ?? "Something went wrong while loading this project.");
+      }
     }
     fetchProject();
     return () => {
       cancelled = true;
     };
-  }, [id]);
+  }, [id, loading]);
+
+  const patchProject = (
+    fn: (p: ProjectData) => ProjectData
+  ): ProjectData | null => {
+    const base = projectRef.current;
+    if (!base) return null;
+    const next = fn(base);
+    projectRef.current = next;
+    setProject(next);
+    return next;
+  };
 
   const handleShare = async () => {
     try {
@@ -94,69 +116,31 @@ export default function ProjectPage() {
 
   const hasFatal = project?.fatalIssues?.issues?.some((i) => i.severity === "fatal");
 
-  const handlePCBGenerate = async () => {
-    if (!project) return;
-    setRetrying((prev) => ({ ...prev, pcbLayout: true }));
 
-    try {
-      const context = {
-        title: project.title,
-        board: project.board,
-        description: project.description,
-        components: project.overview?.components || [],
-        pins: project.pinDiagram?.pins || [],
-        schematic: project.schematic || { components: [], connections: [] },
-        fileContents: [],
-      };
-
-      const res = await fetch("/api/agents/pcbLayout", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ projectContext: context }),
-      });
-
-      if (!res.ok) throw new Error("PCB Layout generation failed");
-      const result = await res.json();
-
-      const updated: ProjectData = { ...project, pcbLayout: result };
-      if (updated.errors) {
-        delete updated.errors.pcbLayout;
-      }
-
-      await saveProject(updated);
-      setProject(updated);
-    } catch {
-    } finally {
-      setRetrying((prev) => ({ ...prev, pcbLayout: false }));
-    }
-  };
 
   const handleRetry = async (agentKey: string, agentName: string) => {
-    if (!project) return;
+    const current = projectRef.current;
+    if (!current || retrying[agentKey] || isNLEGenerating) return;
     setRetrying((prev) => ({ ...prev, [agentKey]: true }));
 
     try {
       const context = {
-        title: project.title,
-        board: project.board,
-        description: project.description,
-        components: project.overview?.components || [],
-        pins: project.pinDiagram?.pins || [],
-        warnings: project.overview?.warnings || [],
-        bomItems: project.bom?.items || [],
+        title: current.title,
+        board: current.board,
+        description: current.description,
+        components: current.overview?.components || [],
+        pins: current.pinDiagram?.pins || [],
+        warnings: current.overview?.warnings || [],
+        bomItems: current.bom?.items || [],
         fileContents: [],
       };
 
-      const res = await fetch(`/api/agents/${agentName}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ projectContext: context }),
-      });
+      const result = await authedPostJSON<Record<string, unknown>>(
+        `/api/agents/${agentName}`,
+        { projectContext: context },
+        AbortSignal.timeout(90_000),
+      );
 
-      if (!res.ok) throw new Error("Agent failed");
-      const result = await res.json();
-
-      const updated: ProjectData = { ...project };
       const fieldMap: Record<string, keyof ProjectData> = {
         fatalIssues: "fatalIssues",
         compatibility: "compatibility",
@@ -166,18 +150,29 @@ export default function ProjectPage() {
         schematic: "schematic",
       };
       const field = fieldMap[agentKey];
-      if (field) {
-        (updated as unknown as Record<string, unknown>)[field] = result;
-      } else if (agentKey === "pcbLayout") {
-        updated.pcbLayout = result;
-      }
-      if (updated.errors) {
-        delete updated.errors[agentKey];
-      }
 
-      await saveProject(updated);
-      setProject(updated);
-    } catch {
+      const merged = patchProject((p) => {
+        const nextErrors = { ...(p.errors ?? {}) };
+        delete nextErrors[agentKey];
+        if (!field) return p;
+        const next = { ...p, [field]: result } as ProjectData;
+        next.errors =
+          Object.keys(nextErrors).length > 0 ? nextErrors : undefined;
+        return next;
+      });
+
+      if (merged) await saveProject(merged);
+    } catch (err) {
+      const message =
+        err instanceof NotSignedInError
+          ? "Please sign in to retry."
+          : (err as Error).name === "TimeoutError"
+            ? "Retry timed out. Please try again."
+            : ((err as Error).message || "Retry failed");
+      patchProject((p) => ({
+        ...p,
+        errors: { ...(p.errors ?? {}), [agentKey]: message },
+      }));
     } finally {
       setRetrying((prev) => ({ ...prev, [agentKey]: false }));
     }
@@ -199,10 +194,11 @@ export default function ProjectPage() {
           <AlertTriangle size={22} style={{ color: "var(--accent)" }} />
         </div>
         <h1 className="text-lg font-semibold" style={{ color: "var(--text-primary)" }}>
-          Project not found
+          {loadError ? "Couldn't load this project" : "Project not found"}
         </h1>
-        <p className="text-sm" style={{ color: "var(--text-muted)" }}>
-          This project ID doesn&apos;t exist or hasn&apos;t synced to this device yet.
+        <p className="text-sm max-w-sm text-center" style={{ color: "var(--text-muted)" }}>
+          {loadError ??
+            "This project ID doesn't exist or hasn't synced to this device yet."}
         </p>
         <button
           onClick={() => router.push("/")}
@@ -241,6 +237,7 @@ export default function ProjectPage() {
         <button
           onClick={() => router.push("/")}
           className="flex items-center gap-2 hover:opacity-80 transition-opacity flex-shrink-0"
+          aria-label="Back to dashboard"
         >
           <div className="w-7 h-7 rounded-lg border border-[#00ff6630] bg-[#050505] shadow-[0_0_12px_rgba(0,255,102,0.15)] flex items-center justify-center p-0.5">
             <Image
@@ -291,16 +288,33 @@ export default function ProjectPage() {
         </span>
 
         <button
+          onClick={() => router.push("/pricing")}
+          className="hidden sm:flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-colors ml-auto sm:ml-2"
+          style={{ color: "var(--text-muted)" }}
+          aria-label="View pricing plans"
+          onMouseEnter={(e) => (e.currentTarget.style.color = "var(--accent)")}
+          onMouseLeave={(e) => (e.currentTarget.style.color = "var(--text-muted)")}
+        >
+          <Zap size={11} style={{ color: "var(--accent)" }} aria-hidden="true" />
+          Pricing
+        </button>
+
+        <button
           onClick={handleShare}
-          className="ml-auto sm:ml-1 flex items-center gap-1.5 px-2.5 py-1.5 sm:px-3 sm:py-1.5 rounded-lg text-xs font-semibold transition-all"
+          className="sm:ml-1 flex items-center gap-1.5 px-2.5 py-1.5 sm:px-3 sm:py-1.5 rounded-lg text-xs font-semibold transition-all"
           style={{
             border: `1px solid ${shareCopied ? "#00ff6650" : "var(--border)"}`,
             background: shareCopied ? "#00ff6612" : "transparent",
             color: shareCopied ? "var(--accent)" : "var(--text-muted)",
           }}
           title="Copy shareable link"
+          aria-label="Copy shareable project link"
         >
-          {shareCopied ? <Check size={11} strokeWidth={3} /> : <Share2 size={11} />}
+          {shareCopied ? (
+            <Check size={11} strokeWidth={3} aria-hidden="true" />
+          ) : (
+            <Share2 size={11} aria-hidden="true" />
+          )}
           <span className="hidden sm:inline">{shareCopied ? "Link Copied!" : "Share"}</span>
         </button>
 
@@ -314,6 +328,7 @@ export default function ProjectPage() {
               boxShadow: userMenuOpen ? "0 0 0 2px #00ff6650" : "none",
             }}
             title={user?.email ?? ""}
+            aria-label="User account menu"
           >
             {initials}
           </button>
@@ -690,14 +705,6 @@ export default function ProjectPage() {
                   />
                 </div>
                 <PinDiagramPanel pinDiagram={project.pinDiagram} error={errors.pinDiagram} />
-                <PCBLayoutPanel
-                  pcbLayout={project.pcbLayout}
-                  error={retrying.pcbLayout ? "Generating…" : errors.pcbLayout}
-                  onRetry={
-                    errors.pcbLayout ? () => handleRetry("pcbLayout", "pcbLayout") : undefined
-                  }
-                  onGenerate={!project.pcbLayout ? () => handlePCBGenerate() : undefined}
-                />
               </div>
             )}
 
@@ -729,7 +736,7 @@ export default function ProjectPage() {
 
         <NaturalLanguageEditor
           project={project}
-          onProjectUpdate={(updated) => setProject(updated)}
+          onProjectUpdate={(updated) => patchProject(() => updated)}
           isGenerating={isNLEGenerating}
           setIsGenerating={setIsNLEGenerating}
         />

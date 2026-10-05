@@ -22,7 +22,9 @@ const AuthContext = createContext<AuthContextValue>({
   signOut: async () => {},
 });
 
-const PUBLIC_ROUTES = ["/", "/auth/login", "/auth/register", "/project"];
+function isPublicRoute(pathname: string): boolean {
+  return pathname === "/" || pathname.startsWith("/auth/");
+}
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser]       = useState<User | null>(null);
@@ -31,21 +33,34 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const pathname = usePathname();
 
   useEffect(() => {
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.getRegistrations().then((registrations) => {
+        registrations.forEach((r) => r.unregister());
+      });
+    }
+  }, []);
+
+  useEffect(() => {
     const unsub = onAuthStateChanged(auth, (firebaseUser) => {
       setUser(firebaseUser);
       setLoading(false);
-
-      const isPublic = PUBLIC_ROUTES.some((r) => pathname === r || pathname.startsWith(r + "/"));
-      if (!firebaseUser && !isPublic) {
-        router.replace(`/auth/login?next=${encodeURIComponent(pathname)}`);
-      }
     });
     return unsub;
-  }, [pathname, router]);
+  }, []);
+
+  useEffect(() => {
+    if (loading) return;
+    if (!user && !isPublicRoute(pathname)) {
+      router.replace(`/auth/login?next=${encodeURIComponent(pathname)}`);
+    }
+  }, [user, loading, pathname, router]);
 
   const signOut = async () => {
-    await firebaseSignOut(auth);
-    router.push("/");
+    try {
+      await firebaseSignOut(auth);
+    } finally {
+      router.push("/");
+    }
   };
 
   return (

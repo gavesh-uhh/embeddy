@@ -59,7 +59,7 @@ export default function PowerBudgetPanel({ powerBudget, error, onRetry }: Props)
         <Zap size={13} style={{ color: accentColor }} />
         <span className="panel-header">Power Load Diagnostics</span>
         <span className="ml-auto text-xs font-mono font-semibold px-2 py-0.5 rounded"
-          style={{ background: `${accentColor}15`, color: accentColor, border: `1px solid ${powerBudget.overBudget ? "#ff3b3b30" : "#00ff6630"}` }}>
+          style={{ background: `${accentColor}15`, color: accentColor, border: `1px solid ${powerBudget.overBudget ? "#ff3b3b30" : "#00ff6630"}`, fontVariantNumeric: "tabular-nums" }}>
           {powerBudget.totalCurrentMa} mA
         </span>
       </div>
@@ -68,7 +68,7 @@ export default function PowerBudgetPanel({ powerBudget, error, onRetry }: Props)
         <div className="space-y-2">
           <div className="flex justify-between items-center text-xs" style={{ color: "var(--text-muted)" }}>
             <span className="font-mono text-[10px] tracking-wider uppercase">[POWER_LEVELS]</span>
-            <span className="font-mono">{powerBudget.totalCurrentMa} mA / 500 mA (USB Limit)</span>
+            <span className="font-mono" style={{ fontVariantNumeric: "tabular-nums" }}>{powerBudget.totalCurrentMa} mA / 500 mA (USB Limit)</span>
           </div>
           
           <div className="flex gap-1 p-1 rounded bg-black/40 border border-white/5" style={{ borderColor: "var(--border)" }}>
@@ -106,8 +106,8 @@ export default function PowerBudgetPanel({ powerBudget, error, onRetry }: Props)
               <div key={i} className="group">
                 <div className="flex items-center justify-between text-xs mb-1">
                   <span style={{ color: "var(--text-primary)" }} className="font-medium group-hover:text-white transition-colors">{comp.name}</span>
-                  <span className="font-mono" style={{ color: "var(--text-muted)" }}>
-                    <span className="text-white font-medium">{comp.currentMa} mA</span> @ <span className="px-1.5 py-0.5 rounded text-[10px]" style={{ background: "var(--surface-raised)", border: "1px solid var(--border)" }}>{comp.voltage}V</span>
+                  <span className="font-mono" style={{ color: "var(--text-muted)", fontVariantNumeric: "tabular-nums" }}>
+                    <span className="text-white font-medium">{comp.currentMa} mA</span> @ <span className="px-1.5 py-0.5 rounded text-[10px]" style={{ background: "var(--surface-raised)", border: "1px solid var(--border)", fontVariantNumeric: "tabular-nums" }}>{comp.voltage}V</span>
                   </span>
                 </div>
                 <div className="h-1 rounded-full overflow-hidden bg-black/40">

@@ -32,7 +32,7 @@ Describe your project, pick your board, and Embeddy's 9 parallel AI agents gener
    ```
 
 2. Set up your environment variables:
-   Copy [`.env.example`](file:///d:/React/embeddy/.env.example) to `.env` and fill in your API keys:
+   Copy `.env.example` to `.env` and fill in your API keys:
    ```bash
    cp .env.example .env
    ```

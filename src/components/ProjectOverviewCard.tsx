@@ -92,7 +92,7 @@ export default function ProjectOverviewCard({ overview, error, onRetry }: Props)
           <div className="space-y-2.5">
             <div className="flex items-center gap-1.5">
               <Package size={11} style={{ color: "var(--text-muted)" }} />
-              <p className="panel-header">Identified Hardware ({overview.components.length})</p>
+              <p className="panel-header" style={{ fontVariantNumeric: "tabular-nums" }}>Identified Hardware ({overview.components.length})</p>
             </div>
             <div className="flex flex-wrap gap-1.5">
               {overview.components.map((comp, i) => (

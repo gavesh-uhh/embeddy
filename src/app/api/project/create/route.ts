@@ -1,161 +1,133 @@
 import { NextRequest, NextResponse } from "next/server";
 import { v4 as uuidv4 } from "uuid";
-import { ProjectOverviewAgent } from "@/lib/agents/ProjectOverviewAgent";
-import { PinDiagramAgent } from "@/lib/agents/PinDiagramAgent";
-import { CircuitSchematicAgent } from "@/lib/agents/CircuitSchematicAgent";
-import { FatalIssuesAgent } from "@/lib/agents/FatalIssuesAgent";
-import { CompatibilityCheckAgent } from "@/lib/agents/CompatibilityCheckAgent";
-import { PowerBudgetAgent } from "@/lib/agents/PowerBudgetAgent";
-import { BOMAgent } from "@/lib/agents/BOMAgent";
-import { CodeSkeletonAgent } from "@/lib/agents/CodeSkeletonAgent";
-import { PCBLayoutAgent } from "@/lib/agents/PCBLayoutAgent";
-import { ProjectData, BoardType } from "@/lib/types";
+import { requireAuth, ApiError } from "@/lib/server/auth";
+import { rateLimit, rateLimitHeaders, clientRateKey } from "@/lib/server/rateLimit";
+import { CreateProjectSchema } from "@/lib/schemas";
+import { runCreationPipeline } from "@/lib/orchestrator";
+import { PIPELINE_STAGES } from "@/lib/pipelineStages";
+import { ProjectData } from "@/lib/types";
 
 export async function POST(req: NextRequest) {
+  let uid: string;
   try {
-    const body = await req.json();
-    const { title, board, description, fileContents, generatePCB } = body as {
-      title: string;
-      board: BoardType;
-      description: string;
-      fileContents: string[];
-      generatePCB?: boolean;
-    };
+    ({ uid } = await requireAuth(req));
+  } catch (e) {
+    const status = e instanceof ApiError ? e.status : 401;
+    return NextResponse.json(
+      {
+        error: e instanceof Error ? e.message : "Unauthorized",
+        code: e instanceof ApiError ? e.code : "unauthorized",
+      },
+      { status },
+    );
+  }
 
-    if (!title || !description) {
-      return NextResponse.json(
-        { error: "title and description are required" },
-        { status: 400 },
-      );
-    }
+  const limit = await rateLimit(`create:${clientRateKey(req, uid)}`, 10, 3600);
+  if (!limit.allowed) {
+    return NextResponse.json(
+      {
+        error: `Project creation limit reached. Try again in ${Math.ceil(limit.resetSec / 60)} minutes.`,
+        resetIn: limit.resetSec,
+      },
+      { status: 429, headers: rateLimitHeaders(limit, 10) },
+    );
+  }
 
-    const id = uuidv4();
-    const errors: Record<string, string> = {};
+  let body: unknown;
+  try {
+    body = await req.json();
+  } catch {
+    return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
+  }
 
-    let overview;
-    try {
-      overview = await ProjectOverviewAgent(
-        description,
-        fileContents || [],
-        board,
-      );
-    } catch (e) {
-      return NextResponse.json(
-        { error: "Failed to analyze project: " + (e as Error).message },
-        { status: 500 },
-      );
-    }
+  const parsed = CreateProjectSchema.safeParse(body);
+  if (!parsed.success) {
+    return NextResponse.json(
+      {
+        error: "Invalid request",
+        details: parsed.error.issues.map((i) => ({
+          path: i.path.join("."),
+          message: i.message,
+        })),
+      },
+      { status: 400 },
+    );
+  }
 
-    const components = overview.components;
-    const resolvedBoard = board || overview.board;
+  const { title, board, description, fileContents } = parsed.data;
 
-    let pinDiagram;
-    try {
-      pinDiagram = await PinDiagramAgent(components, resolvedBoard);
-    } catch (e) {
-      errors.pinDiagram = (e as Error).message;
-      pinDiagram = { pins: [] };
-    }
+  const encoder = new TextEncoder();
 
-    const pins = pinDiagram.pins;
+  try {
+    const stream = new ReadableStream({
+      async start(controller) {
+        const send = (payload: unknown) => {
+          controller.enqueue(
+            encoder.encode(`data: ${JSON.stringify(payload)}\n\n`),
+          );
+        };
 
-    const [
-      schematicResult,
-      fatalIssuesResult,
-      compatibilityResult,
-      powerBudgetResult,
-      bomResult,
-      codeSkeletonResult,
-    ] = await Promise.allSettled([
-      CircuitSchematicAgent(components, pins, resolvedBoard),
-      FatalIssuesAgent(
-        resolvedBoard,
-        components,
-        description,
-        overview.warnings,
-      ),
-      CompatibilityCheckAgent(resolvedBoard, components),
-      PowerBudgetAgent(components, resolvedBoard),
-      BOMAgent(components),
-      CodeSkeletonAgent(resolvedBoard, components, pins),
-    ]);
+        send({ type: "plan", stages: PIPELINE_STAGES });
 
-    const schematic =
-      schematicResult.status === "fulfilled"
-        ? schematicResult.value
-        : undefined;
-    if (schematicResult.status === "rejected")
-      errors.schematic = schematicResult.reason?.message;
+        try {
+          const result = await runCreationPipeline(
+            { board, description, fileContents },
+            (event) => {
+              if (event.stage === "stage") send({ type: "stage", ...event.data });
+            },
+          );
 
-    const fatalIssues =
-      fatalIssuesResult.status === "fulfilled"
-        ? fatalIssuesResult.value
-        : undefined;
-    if (fatalIssuesResult.status === "rejected")
-      errors.fatalIssues = fatalIssuesResult.reason?.message;
+          const project: ProjectData = {
+            id: uuidv4(),
+            title,
+            board: board ?? result.overview.board,
+            description,
+            createdAt: new Date().toISOString(),
+            overview: result.overview,
+            pinDiagram: result.pinDiagram,
+            schematic: result.sections.schematic,
+            fatalIssues: result.sections.fatalIssues,
+            compatibility: result.sections.compatibility,
+            powerBudget: result.sections.powerBudget,
+            bom: result.sections.bom,
+            codeSkeleton: result.sections.codeSkeleton,
+            errors:
+              Object.keys(result.errors).length > 0 ? result.errors : undefined,
+          };
 
-    const compatibility =
-      compatibilityResult.status === "fulfilled"
-        ? compatibilityResult.value
-        : undefined;
-    if (compatibilityResult.status === "rejected")
-      errors.compatibility = compatibilityResult.reason?.message;
+          send({ type: "result", project });
+        } catch (e) {
+          console.error("Project creation error:", e);
+          send({
+            type: "error",
+            error:
+              e instanceof Error
+                ? `Failed to analyze project: ${e.message}`
+                : "Internal server error",
+          });
+        } finally {
+          controller.close();
+        }
+      },
+    });
 
-    const powerBudget =
-      powerBudgetResult.status === "fulfilled"
-        ? powerBudgetResult.value
-        : undefined;
-    if (powerBudgetResult.status === "rejected")
-      errors.powerBudget = powerBudgetResult.reason?.message;
-
-    const bom = bomResult.status === "fulfilled" ? bomResult.value : undefined;
-    if (bomResult.status === "rejected") errors.bom = bomResult.reason?.message;
-
-    const codeSkeleton =
-      codeSkeletonResult.status === "fulfilled"
-        ? codeSkeletonResult.value
-        : undefined;
-    if (codeSkeletonResult.status === "rejected")
-      errors.codeSkeleton = codeSkeletonResult.reason?.message;
-
-    
-    let pcbLayout;
-    if (schematic && generatePCB) {
-      try {
-        pcbLayout = await PCBLayoutAgent(
-          components,
-          pins,
-          schematic,
-          resolvedBoard,
-        );
-      } catch (e) {
-        errors.pcbLayout = (e as Error).message;
-      }
-    }
-
-    const project: ProjectData = {
-      id,
-      title,
-      board: resolvedBoard,
-      description,
-      createdAt: new Date().toISOString(),
-      overview,
-      pinDiagram,
-      schematic,
-      fatalIssues,
-      compatibility,
-      powerBudget,
-      bom,
-      codeSkeleton,
-      pcbLayout,
-      errors: Object.keys(errors).length > 0 ? errors : undefined,
-    };
-
-    return NextResponse.json(project);
+    return new Response(stream, {
+      headers: {
+        "Content-Type": "text/event-stream; charset=utf-8",
+        "Cache-Control": "no-cache, no-transform",
+        Connection: "keep-alive",
+        "X-Accel-Buffering": "no",
+      },
+    });
   } catch (e) {
     console.error("Project creation error:", e);
     return NextResponse.json(
-      { error: "Internal server error" },
+      {
+        error:
+          e instanceof Error
+            ? `Failed to analyze project: ${e.message}`
+            : "Internal server error",
+      },
       { status: 500 },
     );
   }

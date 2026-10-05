@@ -173,8 +173,10 @@ export default function CircuitRenderer({ schematic, error, onRetry }: Props) {
   const canvasRef = useRef<HTMLDivElement>(null);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const stageRef = useRef<any>(null);
-  const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [, setRenderKey] = useState(0);
+  const selectedIdRef = useRef<string | null>(null);
+  const initGenRef = useRef(0);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const resizeObserverRef = useRef<any>(null);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const Konva = useRef<any>(null);
   const [isDragMode, setIsDragMode] = useState(true);
@@ -198,7 +200,10 @@ export default function CircuitRenderer({ schematic, error, onRetry }: Props) {
     if (typeof window === "undefined") return;
     if (!schematic || !canvasRef.current) return;
 
+    const gen = ++initGenRef.current;
+
     const K = await import("konva");
+    if (gen !== initGenRef.current || !canvasRef.current) return;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     Konva.current = K.default as any;
 
@@ -206,8 +211,11 @@ export default function CircuitRenderer({ schematic, error, onRetry }: Props) {
     const width = container.clientWidth || 800;
     const height = container.clientHeight || 500;
 
+    resizeObserverRef.current?.disconnect();
+
     if (stageRef.current) {
       stageRef.current.destroy();
+      stageRef.current = null;
     }
 
     const stage = new K.default.Stage({ container, width, height });
@@ -294,6 +302,39 @@ export default function CircuitRenderer({ schematic, error, onRetry }: Props) {
     });
 
     layer.add(connectionGroup);
+
+    const applySelection = (targetId: string | null) => {
+      selectedIdRef.current = targetId;
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      connectionGroup.children.forEach((child: any) => {
+        const name = child.name();
+        const matchesTarget = targetId !== null && name.includes(targetId);
+        if (matchesTarget) {
+          child.opacity(1);
+          if (child.strokeWidth) child.strokeWidth(2.5);
+        } else if (targetId !== null) {
+          child.opacity(0.15);
+        } else {
+          child.opacity(0.7);
+        }
+      });
+
+      laidOut.forEach((c) => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const grp = layer.findOne(`#${c.id}`) as any;
+        if (grp) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const r = grp.findOne("Rect") as any;
+          if (r) {
+            r.strokeWidth(targetId === c.id ? 2.5 : 1.5);
+            r.shadowBlur(targetId === c.id ? 16 : 10);
+          }
+        }
+      });
+
+      layer.batchDraw();
+    };
 
     laidOut.forEach((comp) => {
       const layout = compPinMap.get(comp.id) || { left: [], right: [] };
@@ -433,36 +474,7 @@ export default function CircuitRenderer({ schematic, error, onRetry }: Props) {
       });
 
       group.on("click", () => {
-        const newSelected = selectedId === comp.id ? null : comp.id;
-        setSelectedId(newSelected);
-
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        connectionGroup.children.forEach((child: any) => {
-          const name = child.name();
-          if (newSelected && (name.includes(comp.id))) {
-            child.opacity(1);
-            if (child.strokeWidth) child.strokeWidth(2.5);
-          } else if (newSelected) {
-            child.opacity(0.15);
-          } else {
-            child.opacity(0.7);
-          }
-        });
-
-        laidOut.forEach((c) => {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const grp = layer.findOne(`#${c.id}`) as any;
-          if (grp) {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const r = grp.findOne("Rect") as any;
-            if (r) {
-              r.strokeWidth(newSelected === c.id ? 2.5 : 1.5);
-              r.shadowBlur(newSelected === c.id ? 16 : 10);
-            }
-          }
-        });
-
-        layer.batchDraw();
+        applySelection(selectedIdRef.current === comp.id ? null : comp.id);
       });
 
       group.id(comp.id);
@@ -472,18 +484,37 @@ export default function CircuitRenderer({ schematic, error, onRetry }: Props) {
       layer.add(group);
     });
 
+    stage.on("click", (e) => {
+      if (e.target === stage && selectedIdRef.current) {
+        applySelection(null);
+      }
+    });
+
     stage.add(layer);
     layer.batchDraw();
-    setRenderKey((k) => k + 1);
-  }, [schematic, selectedId, isDragMode]);
+
+    resizeObserverRef.current = new ResizeObserver(() => {
+      if (gen !== initGenRef.current || !canvasRef.current || !stageRef.current) return;
+      stage.size({
+        width: canvasRef.current.clientWidth || 800,
+        height: canvasRef.current.clientHeight || 500,
+      });
+      layer.batchDraw();
+    });
+    resizeObserverRef.current.observe(container);
+  }, [schematic, isDragMode]);
 
   useEffect(() => {
     initKonva();
     return () => {
+      initGenRef.current += 1;
+      resizeObserverRef.current?.disconnect();
+      resizeObserverRef.current = null;
       if (stageRef.current) {
         stageRef.current.destroy();
         stageRef.current = null;
       }
+      document.body.style.cursor = "";
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [schematic]);

@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { Suspense, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import {
@@ -11,6 +11,7 @@ import {
   googleProvider,
   updateProfile,
 } from "@/lib/firebase";
+import { sanitizeNextPath } from "@/lib/sanitizeNext";
 import {
   Mail,
   Lock,
@@ -24,7 +25,17 @@ import {
 } from "lucide-react";
 
 export default function RegisterPage() {
+  return (
+    <Suspense>
+      <RegisterForm />
+    </Suspense>
+  );
+}
+
+function RegisterForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const nextUrl = sanitizeNextPath(searchParams.get("next"));
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -48,7 +59,7 @@ export default function RegisterPage() {
     setError(null);
     try {
       await signInWithPopup(auth, googleProvider);
-      router.push("/");
+      router.push(nextUrl);
     } catch (err: unknown) {
       const code = (err as { code?: string }).code ?? "";
       if (code !== "auth/popup-closed-by-user") {
@@ -82,7 +93,7 @@ export default function RegisterPage() {
     try {
       const cred = await createUserWithEmailAndPassword(auth, email.trim(), password);
       await updateProfile(cred.user, { displayName: name.trim() });
-      router.push("/");
+      router.push(nextUrl);
     } catch (err: unknown) {
       const code = (err as { code?: string }).code ?? "";
       if (code === "auth/email-already-in-use") {
@@ -92,7 +103,7 @@ export default function RegisterPage() {
       } else if (code === "auth/weak-password") {
         setError("Password is too weak. Use at least 6 characters.");
       } else {
-        setError("Registration failed. Check your Firebase config in .env.");
+        setError("Registration failed. Please try again.");
       }
       setLoading(false);
     }

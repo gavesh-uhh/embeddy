@@ -50,7 +50,7 @@ export default function BOMPanel({ bom, error, onRetry }: Props) {
       <div className="px-4 py-2.5 border-b flex items-center gap-2" style={{ borderColor: "var(--border)" }}>
         <ShoppingCart size={13} style={{ color: "var(--accent)" }} />
         <span className="panel-header">Bill of Materials</span>
-        <span className="ml-auto text-sm font-semibold" style={{ color: "var(--accent)" }}>
+        <span className="ml-auto text-sm font-semibold" style={{ color: "var(--accent)", fontVariantNumeric: "tabular-nums" }}>
           Rs. {bom.totalEstimatedLKR.toFixed(2)} est.
         </span>
       </div>
@@ -75,12 +75,12 @@ export default function BOMPanel({ bom, error, onRetry }: Props) {
                 onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
               >
                 <td className="px-4 py-2.5 font-medium" style={{ color: "var(--text-primary)" }}>{item.name}</td>
-                <td className="px-3 py-2.5 text-center" style={{ color: "var(--text-muted)" }}>{item.quantity}</td>
+                <td className="px-3 py-2.5 text-center" style={{ color: "var(--text-muted)", fontVariantNumeric: "tabular-nums" }}>{item.quantity}</td>
                 <td className="px-4 py-2.5" style={{ color: "var(--text-muted)", maxWidth: "300px" }}>{item.description}</td>
-                <td className="px-4 py-2.5 text-right" style={{ color: "var(--text-primary)" }}>
+                <td className="px-4 py-2.5 text-right" style={{ color: "var(--text-primary)", fontVariantNumeric: "tabular-nums" }}>
                   Rs. {item.estimatedLKR.toFixed(2)}
                 </td>
-                <td className="px-4 py-2.5 text-right font-medium" style={{ color: "var(--accent)" }}>
+                <td className="px-4 py-2.5 text-right font-medium" style={{ color: "var(--accent)", fontVariantNumeric: "tabular-nums" }}>
                   Rs. {(item.quantity * item.estimatedLKR).toFixed(2)}
                 </td>
               </tr>
@@ -91,7 +91,7 @@ export default function BOMPanel({ bom, error, onRetry }: Props) {
               <td colSpan={4} className="px-4 py-3 text-right font-medium" style={{ color: "var(--text-muted)" }}>
                 Total Estimated Cost
               </td>
-              <td className="px-4 py-3 text-right font-bold" style={{ color: "var(--accent)" }}>
+              <td className="px-4 py-3 text-right font-bold" style={{ color: "var(--accent)", fontVariantNumeric: "tabular-nums" }}>
                 Rs. {bom.totalEstimatedLKR.toFixed(2)}
               </td>
             </tr>

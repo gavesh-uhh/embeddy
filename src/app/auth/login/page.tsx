@@ -10,6 +10,7 @@ import {
   googleProvider,
 } from "@/lib/firebase";
 import { Mail, Lock, ArrowRight, Loader2, ShieldAlert, Eye, EyeOff } from "lucide-react";
+import { sanitizeNextPath } from "@/lib/sanitizeNext";
 
 const inputStyle = {
   background: "var(--surface-raised)",
@@ -25,7 +26,7 @@ const onBlur = (e: React.FocusEvent<HTMLInputElement>) =>
 function LoginForm() {
   const router       = useRouter();
   const searchParams = useSearchParams();
-  const nextUrl      = searchParams.get("next") || "/";
+  const nextUrl      = sanitizeNextPath(searchParams.get("next"));
 
   const [email,       setEmail]       = useState("");
   const [password,    setPassword]    = useState("");
@@ -66,7 +67,7 @@ function LoginForm() {
       } else if (code === "auth/invalid-email") {
         setError("Please enter a valid email address.");
       } else {
-        setError("Sign in failed. Check your Firebase config in .env.");
+        setError("Sign in failed. Please try again.");
       }
       setLoading(false);
     }

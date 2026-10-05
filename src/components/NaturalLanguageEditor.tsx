@@ -2,6 +2,9 @@
 
 import { useState, useRef, useEffect } from "react";
 import { ProjectData, ProjectContext } from "@/lib/types";
+import { authedPostJSON } from "@/lib/apiClient";
+import { saveProject } from "@/lib/projectStore";
+import { BOARD_VALUES } from "@/lib/schemas";
 import { Send, X, AlertTriangle, Check, RotateCcw, Undo2, Redo2, Code2 } from "lucide-react";
 
 interface Message {
@@ -101,33 +104,27 @@ export default function NaturalLanguageEditor({
     setIsGenerating(true);
 
     try {
-      const response = await fetch("/api/natural-language", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
+      const result = await authedPostJSON<{
+        explanation: string;
+        operations: { type: string }[];
+        warnings?: string[];
+        questions?: string[];
+        regenerated?: Record<string, boolean>;
+      }>(
+        "/api/natural-language",
+        {
           projectContext: buildProjectContext(),
           userCommand: command,
           commandHistory,
-        }),
-      });
-
-      const result = await response.json();
-
-      if (!response.ok) {
-        if (response.status === 429) {
-          throw new Error(
-            result.message ||
-              `Rate limit exceeded. Please try again in ${result.resetIn || 60} seconds.`,
-          );
-        }
-        throw new Error(result.error || "Failed to process command");
-      }
+        },
+        AbortSignal.timeout(60_000),
+      );
 
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: "assistant",
         content: result.explanation,
-        operations: result.operations?.map((op: { type: string }) => op.type),
+        operations: result.operations?.map((op) => op.type),
         warnings: result.warnings,
         questions: result.questions,
         timestamp: new Date(),
@@ -137,8 +134,21 @@ export default function NaturalLanguageEditor({
       setMessages((prev) => [...prev, assistantMessage]);
       setCommandHistory((prev) => [...prev, command]);
 
-      if (result.questions?.length === 0 && result.operations?.length > 0) {
-        await applyOperations(result.operations, result.regenerated, command);
+      if (result.questions && result.questions.length > 0) {
+        if (result.operations?.length > 0) {
+          setMessages((prev) => [
+            ...prev,
+            {
+              id: (Date.now() + 2).toString(),
+              role: "system",
+              content:
+                "No changes were applied yet. Answer the questions above, then send your command again.",
+              timestamp: new Date(),
+            },
+          ]);
+        }
+      } else if (result.operations?.length > 0) {
+        await applyOperations(result.operations, result.regenerated ?? {}, command);
       }
     } catch (error) {
       const errorMessage: Message = {
@@ -173,6 +183,7 @@ export default function NaturalLanguageEditor({
       let forceCodeRegen = false;
       let newCodeLanguage: "C++" | "MicroPython" | undefined;
       let newCodeFramework: "Arduino" | "ESP-IDF" | "STM32 HAL" | undefined;
+      const skippedNotes: string[] = [];
 
       for (const op of operations) {
         const operation = op as {
@@ -190,7 +201,12 @@ export default function NaturalLanguageEditor({
         };
         switch (operation.type) {
           case "add_component":
-            if (operation.component && !updatedContext.components.includes(operation.component)) {
+            if (
+              operation.component &&
+              !updatedContext.components.some(
+                (c) => c.toLowerCase() === operation.component?.toLowerCase(),
+              )
+            ) {
               updatedContext.components.push(operation.component);
             }
             break;
@@ -202,8 +218,13 @@ export default function NaturalLanguageEditor({
             }
             break;
           case "change_board":
-            if (operation.newBoard) {
+            if (
+              operation.newBoard &&
+              (BOARD_VALUES as readonly string[]).includes(operation.newBoard)
+            ) {
               updatedContext.board = operation.newBoard as ProjectData["board"];
+            } else if (operation.newBoard) {
+              skippedNotes.push(`Unsupported board "${operation.newBoard}" — kept ${updatedContext.board}`);
             }
             break;
           case "modify_pin":
@@ -219,10 +240,15 @@ export default function NaturalLanguageEditor({
                   (p.pin === operation.oldPin || p.boardPin === operation.oldPin),
               );
               if (pinIndex >= 0) {
-                updatedContext.pins[pinIndex] = {
-                  ...updatedContext.pins[pinIndex],
-                  pin: operation.newPin,
-                };
+                const existing = updatedContext.pins[pinIndex];
+                updatedContext.pins[pinIndex] =
+                  existing.pin === operation.oldPin
+                    ? { ...existing, pin: operation.newPin }
+                    : { ...existing, boardPin: operation.newPin };
+              } else {
+                skippedNotes.push(
+                  `Pin ${operation.oldPin} on ${operation.component} was not found`,
+                );
               }
             }
             break;
@@ -260,10 +286,20 @@ export default function NaturalLanguageEditor({
         }
       }
 
+      const runAgent = (
+        name: string,
+        ctx: Record<string, unknown>,
+      ): Promise<Record<string, unknown>> =>
+        authedPostJSON<Record<string, unknown>>(
+          `/api/agents/${name}`,
+          { projectContext: ctx },
+          AbortSignal.timeout(90_000),
+        );
+
       const agentsToRun: {
         name: string;
         key: keyof ProjectData;
-        fn: () => Promise<unknown>;
+        fn: () => Promise<Record<string, unknown>>;
       }[] = [];
 
       if (regenerated.overview) {
@@ -271,16 +307,10 @@ export default function NaturalLanguageEditor({
           name: "overview",
           key: "overview",
           fn: () =>
-            fetch("/api/agents/overview", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                projectContext: {
-                  ...updatedContext,
-                  description: `${updatedContext.description}\n\nAdditional components requested: ${(updatedContext.components ?? []).join(", ")}`,
-                },
-              }),
-            }).then((r) => r.json()),
+            runAgent(
+              "overview",
+              updatedContext as unknown as Record<string, unknown>,
+            ),
         });
       }
 
@@ -289,16 +319,10 @@ export default function NaturalLanguageEditor({
           name: "pinDiagram",
           key: "pinDiagram",
           fn: () =>
-            fetch("/api/agents/pinDiagram", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                projectContext: {
-                  board: updatedContext.board,
-                  components: updatedContext.components,
-                },
-              }),
-            }).then((r) => r.json()),
+            runAgent("pinDiagram", {
+              board: updatedContext.board,
+              components: updatedContext.components,
+            }),
         });
       }
 
@@ -307,17 +331,11 @@ export default function NaturalLanguageEditor({
           name: "schematic",
           key: "schematic",
           fn: () =>
-            fetch("/api/agents/schematic", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                projectContext: {
-                  board: updatedContext.board,
-                  components: updatedContext.components,
-                  pins: updatedContext.pins,
-                },
-              }),
-            }).then((r) => r.json()),
+            runAgent("schematic", {
+              board: updatedContext.board,
+              components: updatedContext.components,
+              pins: updatedContext.pins,
+            }),
         });
       }
 
@@ -326,33 +344,21 @@ export default function NaturalLanguageEditor({
           name: "bom",
           key: "bom",
           fn: () =>
-            fetch("/api/agents/bom", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                projectContext: {
-                  components: updatedContext.components,
-                },
-              }),
-            }).then((r) => r.json()),
+            runAgent("bom", {
+              components: updatedContext.components,
+            }),
         });
       }
 
-      if (regenerated.powerBudget) {
+      if (regenerated.powerBudget || regenerated.compatibility) {
         agentsToRun.push({
-          name: "powerBudget",
-          key: "powerBudget",
+          name: regenerated.powerBudget ? "powerBudget" : "compatibility",
+          key: regenerated.powerBudget ? "powerBudget" : "compatibility",
           fn: () =>
-            fetch("/api/agents/powerBudget", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                projectContext: {
-                  board: updatedContext.board,
-                  components: updatedContext.components,
-                },
-              }),
-            }).then((r) => r.json()),
+            runAgent(regenerated.powerBudget ? "powerBudget" : "compatibility", {
+              board: updatedContext.board,
+              components: updatedContext.components,
+            }),
         });
       }
 
@@ -361,31 +367,31 @@ export default function NaturalLanguageEditor({
           name: "codeSkeleton",
           key: "codeSkeleton",
           fn: () =>
-            fetch("/api/agents/codeSkeleton", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                projectContext: {
-                  board: updatedContext.board,
-                  components: updatedContext.components,
-                  pins: updatedContext.pins,
-                  language: newCodeLanguage || updatedContext.language,
-                  framework: newCodeFramework || updatedContext.framework,
-                },
-              }),
-            }).then((r) => r.json()),
+            runAgent("codeSkeleton", {
+              board: updatedContext.board,
+              components: updatedContext.components,
+              pins: updatedContext.pins,
+              language: newCodeLanguage || updatedContext.language,
+              framework: newCodeFramework || updatedContext.framework,
+            }),
         });
       }
 
       const results = await Promise.allSettled(agentsToRun.map((a) => a.fn()));
 
+      const nextErrors: Record<string, string> = { ...(project.errors ?? {}) };
+      const failedSections: string[] = [];
+
       results.forEach((result, index) => {
         const agent = agentsToRun[index];
         if (result.status === "fulfilled") {
-          const value = result.value as { error?: string };
-          if (!value.error) {
-            (updatedProject as Record<string, unknown>)[agent.key] = value;
-          }
+          (updatedProject as Record<string, unknown>)[agent.key] = result.value;
+          delete nextErrors[agent.name];
+        } else {
+          const reason: unknown = result.reason;
+          failedSections.push(agent.name.replace(/([A-Z])/g, " $1").toLowerCase());
+          nextErrors[agent.name] =
+            reason instanceof Error ? reason.message : String(reason ?? "failed");
         }
       });
 
@@ -398,15 +404,36 @@ export default function NaturalLanguageEditor({
               components: updatedContext.components,
             }
           : undefined,
+        errors:
+          Object.keys(nextErrors).length > 0 ? nextErrors : undefined,
       };
 
-      const { saveProject } = await import("@/lib/projectStore");
       await saveProject(updatedProject);
       onProjectUpdate(updatedProject);
 
       setMessages((prev) =>
         prev.map((m) => (m.id === prev[prev.length - 1]?.id ? { ...m, applied: true } : m)),
       );
+
+      if (skippedNotes.length > 0 || failedSections.length > 0) {
+        const notes = [
+          ...skippedNotes.map((n) => `• ${n}`),
+          ...(failedSections.length > 0
+            ? [
+                `• Some sections could not be regenerated: ${failedSections.join(", ")} — retry from the error panels.`,
+              ]
+            : []),
+        ].join("\n");
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: (Date.now() + 3).toString(),
+            role: "system",
+            content: `Partially applied:\n${notes}`,
+            timestamp: new Date(),
+          },
+        ]);
+      }
     } catch (error) {
       console.error("Error applying operations:", error);
       const errorMessage: Message = {
@@ -425,7 +452,13 @@ export default function NaturalLanguageEditor({
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleSend(input);
+      return;
     }
+
+    const target = e.target as HTMLElement | null;
+    const isTextField =
+      target?.tagName === "INPUT" || target?.tagName === "TEXTAREA";
+    if (isTextField) return;
 
     if ((e.ctrlKey || e.metaKey) && e.key === "z" && !e.shiftKey) {
       e.preventDefault();
@@ -475,6 +508,7 @@ export default function NaturalLanguageEditor({
     setRedoStack((prev) => [currentSnapshot, ...prev]);
 
     onProjectUpdate(previousSnapshot.project);
+    void saveProject(previousSnapshot.project);
 
     const undoMessage: Message = {
       id: Date.now().toString(),
@@ -499,6 +533,7 @@ export default function NaturalLanguageEditor({
     setUndoStack((prev) => [...prev, currentSnapshot]);
 
     onProjectUpdate(nextSnapshot.project);
+    void saveProject(nextSnapshot.project);
 
     const redoMessage: Message = {
       id: Date.now().toString(),
@@ -561,8 +596,9 @@ export default function NaturalLanguageEditor({
                 className="p-2 rounded-lg transition-colors disabled:opacity-30"
                 style={{ color: "var(--text-muted)" }}
                 title={`Undo (${undoStack.length} available)`}
+                aria-label={`Undo (${undoStack.length} available)`}
               >
-                <Undo2 size={16} />
+                <Undo2 size={16} aria-hidden="true" />
               </button>
               <button
                 onClick={handleRedo}
@@ -570,23 +606,27 @@ export default function NaturalLanguageEditor({
                 className="p-2 rounded-lg transition-colors disabled:opacity-30"
                 style={{ color: "var(--text-muted)" }}
                 title={`Redo (${redoStack.length} available)`}
+                aria-label={`Redo (${redoStack.length} available)`}
               >
-                <Redo2 size={16} />
+                <Redo2 size={16} aria-hidden="true" />
               </button>
               <button
                 onClick={clearConversation}
                 className="p-2 rounded-lg transition-colors"
                 style={{ color: "var(--text-muted)" }}
                 title="Clear conversation"
+                aria-label="Clear conversation history"
               >
-                <RotateCcw size={14} />
+                <RotateCcw size={14} aria-hidden="true" />
               </button>
               <button
                 onClick={() => setIsOpen(false)}
                 className="p-2 rounded-lg transition-colors hover:bg-red-500/10 hover:text-red-500"
                 style={{ color: "var(--text-muted)" }}
+                title="Close assistant"
+                aria-label="Close design assistant panel"
               >
-                <X size={16} />
+                <X size={16} aria-hidden="true" />
               </button>
             </div>
           </div>
@@ -765,7 +805,7 @@ export default function NaturalLanguageEditor({
                     />
                   </div>
                   <p className="text-xs" style={{ color: "var(--text-muted)" }}>
-                    Thinking...
+                    Thinking…
                   </p>
                 </div>
               </div>
@@ -788,7 +828,8 @@ export default function NaturalLanguageEditor({
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={handleKeyDown}
-                placeholder="Describe changes to your design..."
+                placeholder="Describe changes to your design…"
+                aria-label="Natural language instructions"
                 disabled={isGenerating}
                 className="flex-1 px-4 py-2.5 rounded-xl text-sm outline-none transition-all"
                 style={{

@@ -220,88 +220,13 @@ code, pre {
 }
 
 
-@keyframes glitch-1 {
-  0%   { clip: rect(20px, 930px, 56px, 0); }
-  5%   { clip: rect(30px, 930px, 16px, 0); }
-  10%  { clip: rect(81px, 930px, 95px, 0); }
-  15%  { clip: rect(54px, 930px, 26px, 0); }
-  20%  { clip: rect(91px, 930px, 31px, 0); }
-  25%  { clip: rect(88px, 930px, 16px, 0); }
-  30%  { clip: rect(42px, 930px, 11px, 0); }
-  35%  { clip: rect(67px, 930px, 65px, 0); }
-  40%  { clip: rect(32px, 930px, 31px, 0); }
-  45%  { clip: rect(67px, 930px, 78px, 0); }
-  50%  { clip: rect(42px, 930px, 42px, 0); }
-  55%  { clip: rect(72px, 930px, 22px, 0); }
-  60%  { clip: rect(57px, 930px, 32px, 0); }
-  65%  { clip: rect(89px, 930px, 92px, 0); }
-  70%  { clip: rect(30px, 930px, 64px, 0); }
-  75%  { clip: rect(18px, 930px, 75px, 0); }
-  80%  { clip: rect(42px, 930px, 15px, 0); }
-  85%  { clip: rect(97px, 930px, 30px, 0); }
-  90%  { clip: rect(60px, 930px, 33px, 0); }
-  95%  { clip: rect(82px, 930px, 94px, 0); }
-  100% { clip: rect(10px, 930px, 24px, 0); }
+/* Accessibility Focus States - Web Interface Guidelines */
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
+[role="button"]:focus-visible {
+  outline: 2px solid var(--accent) !important;
+  outline-offset: 2px !important;
 }
 
-@keyframes glitch-2 {
-  0%   { clip: rect(72px, 930px, 25px, 0); }
-  5%   { clip: rect(92px, 930px, 85px, 0); }
-  10%  { clip: rect(38px, 930px, 65px, 0); }
-  15%  { clip: rect(66px, 930px, 84px, 0); }
-  20%  { clip: rect(19px, 930px, 35px, 0); }
-  25%  { clip: rect(11px, 930px, 82px, 0); }
-  30%  { clip: rect(44px, 930px, 81px, 0); }
-  35%  { clip: rect(53px, 930px, 21px, 0); }
-  40%  { clip: rect(31px, 930px, 69px, 0); }
-  45%  { clip: rect(39px, 930px, 17px, 0); }
-  50%  { clip: rect(54px, 930px, 28px, 0); }
-  55%  { clip: rect(95px, 930px, 17px, 0); }
-  60%  { clip: rect(75px, 930px, 65px, 0); }
-  65%  { clip: rect(67px, 930px, 23px, 0); }
-  70%  { clip: rect(58px, 930px, 73px, 0); }
-  75%  { clip: rect(41px, 930px, 95px, 0); }
-  80%  { clip: rect(83px, 930px, 54px, 0); }
-  85%  { clip: rect(30px, 930px, 82px, 0); }
-  90%  { clip: rect(95px, 930px, 21px, 0); }
-  95%  { clip: rect(12px, 930px, 25px, 0); }
-  100% { clip: rect(48px, 930px, 56px, 0); }
-}
-
-.glitch-text {
-  position: relative;
-  display: inline-block;
-}
-
-.glitch-text::before,
-.glitch-text::after {
-  content: attr(data-text);
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  font-size: inherit;
-  font-weight: inherit;
-  font-family: inherit;
-  line-height: inherit;
-  letter-spacing: inherit;
-}
-
-
-.glitch-text::before {
-  left: 2px;
-  color: #00ff66;
-  text-shadow: -2px 0 #00ff66;
-  animation: glitch-1 3s infinite linear alternate-reverse;
-  opacity: 0.75;
-}
-
-
-.glitch-text::after {
-  left: -2px;
-  color: #ff3b3b;
-  text-shadow: 2px 0 #ff3b3b;
-  animation: glitch-2 2s infinite linear alternate-reverse;
-  opacity: 0.6;
-}
